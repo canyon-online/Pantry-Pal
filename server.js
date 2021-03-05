@@ -20,7 +20,7 @@ const PORT = 3001;
 // If you are using the MongoDB Atlas cloud database then paste the link there.
 // If you are using the local version, MongoDB is accessed through localhost on port 27017 by default, 
 // and the path is the database name. We'll just call ours my_local_db.
-// const MONGODB_URI = "mongodb://localhost:27017/my_local_db";
+const MONGODB_URI = "mongodb://localhost:27017/my_local_db";
 
 // app.use(cors())
 
