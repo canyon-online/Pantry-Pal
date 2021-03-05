@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "bootstrap": "^4.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.11.18",
+    "react-bootstrap": "^1.5.1"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "group24",
+  "description": "Group 24 Web app",
+  "version": "1.0.0",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SPVTNIK-ONLINE/group24.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SPVTNIK-ONLINE/group24/issues"
+  },
+  "homepage": "https://github.com/SPVTNIK-ONLINE/group24#readme"
+}
