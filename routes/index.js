@@ -1,6 +1,5 @@
-const express = require ('express'); 
 // Create an instance of the Express Router to be used as middleware for our routes.
-
+const express = require ('express'); 
 const router = express.Router(); 
 
 // Import the Article model. For each API endpoint we will chain a method to the router object. 

@@ -7,7 +7,8 @@
     "react-bootstrap": "^1.5.1"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "concurrently \"nodemon server.js\" \"cd client && npm run start\""
   },
   "name": "group24",
   "description": "Group 24 Web app",
@@ -23,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/SPVTNIK-ONLINE/group24/issues"
   },
-  "homepage": "https://github.com/SPVTNIK-ONLINE/group24#readme"
+  "homepage": "https://github.com/SPVTNIK-ONLINE/group24#readme",
+  "devDependencies": {
+    "concurrently": "^6.0.0"
+  }
 }
