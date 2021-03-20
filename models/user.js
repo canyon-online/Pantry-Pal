@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Convert the user object to a schema using the validation function
 const userSchema = new mongoose.Schema({ 
     display: {
         type: String,
@@ -8,7 +7,9 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: [true, "Email is required"]
+        required: [true, "Email is required"],
+        unique: true,
+        dropDups: true
     },
     // Could perhaps generate a "display id" for each user, as Mongo already automatically generates
     // a ObjectId primary key, which *is* usable, but is kind of ugly and reveals when a user was created
@@ -27,11 +28,11 @@ const userSchema = new mongoose.Schema({
         // Should not have a "required" field, as default should generate it
     },
     recipeList: {
-        // A simple array might not be the most optimal approach for this and for favorites
-        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Recipe'}],
+        // A simple array might not be the most optimal approach for this or for favorites
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Recipe' }]
     },
     favorites: {
-        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Recipe' }],
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Recipe' }]
     }
 });
 
@@ -40,7 +41,7 @@ userSchema.pre('validate', function(next) {
     if (this.password || this.googleToken) {
         next();
     } else {
-        next(new Error('Attempted to create a user without a passwword or googleToken'));
+        next(new Error('Attempted to create a user without a password or googleToken'));
     }
 });
 
