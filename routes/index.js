@@ -10,6 +10,17 @@ const router = express.Router();
 // operation and may return a response. Generally only return responses that will be used by the client.
 const Article = require('../models/article'); 
 
+// Import api paths
+const apiEndpoints = {
+    login: require('./login'),
+    register: require('./register'),
+}
+
+// Pass the router to the api paths
+for (var endpoint in apiEndpoints) {
+    apiEndpoints[endpoint].use(router);
+}
+
 // Get request to /articles returns a JSON array of all article objects found in the database.
 router.get('/articles', function(req, res) { 
     Article.find(function(err, articles) {

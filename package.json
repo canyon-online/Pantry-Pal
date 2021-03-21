@@ -2,7 +2,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mongoose": "^5.11.18"
+    "mongoose": "^5.11.18",
+    "google-auth-library": "^7.0.2"
   },
   "scripts": {
     "start": "node server.js",
