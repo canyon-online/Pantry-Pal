@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const ingredientSchema = new mongoose.Schema({ 
     author: {
-        type: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        type: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
         // Author only included if a user creates the ingredient, which it is assumed will not always
         // be the case
     },
