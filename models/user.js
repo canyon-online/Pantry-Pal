@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
     },
     favorites: {
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Recipe' }]
+    },
+    verified: {
+        type: Boolean,
+        default: false
     }
 });
 
