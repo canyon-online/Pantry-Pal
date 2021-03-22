@@ -5,7 +5,11 @@ class Landing extends StatelessWidget {
   Widget build(BuildContext context) {
     var center = Center(
       child: Container(
+          width: 370,
+          height: 400,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
                 'Pantry Pal',

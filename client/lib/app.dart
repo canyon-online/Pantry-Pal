@@ -10,7 +10,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'Pantry Pal',
         theme: ThemeData(
-          primarySwatch: Colors.purple,
+          primarySwatch: Colors.deepPurple,
+          primaryColor: Colors.deepPurple,
+          accentColor: Colors.grey,
         ),
         // home: Landing(),
         initialRoute: '/',

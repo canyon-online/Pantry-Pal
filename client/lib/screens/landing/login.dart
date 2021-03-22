@@ -1,3 +1,4 @@
+import 'package:client/widgets/InputBox.dart';
 import 'package:flutter/material.dart';
 
 // Google sign in:
@@ -18,13 +19,6 @@ import 'package:flutter/material.dart';
 //   }
 // }
 
-class SignupForm extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return SignupFormState();
-  }
-}
-
 extension Validator on String? {
   bool isValidEmail() {
     if (this == null) return false;
@@ -41,68 +35,6 @@ extension Validator on String? {
   bool isValidPassword() {
     if (this == null) return false;
     return this!.length >= 8;
-  }
-}
-
-class SignupFormState extends State<SignupForm> {
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          TextFormField(
-            keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              hintText: 'Email or username',
-            ),
-            validator: (value) {
-              var empty = value?.isEmpty ?? true;
-              if (empty) {
-                return 'Please enter your email or username';
-              } else if (!value.isValidEmail()) {
-                return 'Please enter a valid email';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            textInputAction: TextInputAction.done,
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(
-              hintText: 'Password',
-            ),
-            validator: (value) {
-              var empty = value?.isEmpty ?? true;
-              if (empty) {
-                return 'Please enter your password';
-              } else if (!value.isValidPassword()) {
-                return 'Please enter a password with at least eight characters';
-              }
-              return null;
-            },
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Validate returns true if the form is valid, otherwise false.
-              var validated = _formKey.currentState?.validate() ?? false;
-              if (validated) {
-                // If the form is valid, display a snackbar. In the real world,
-                // you'd often call a server or save the information in a database.
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Logging in')));
-              }
-            },
-            child: Text('Next'),
-          )
-        ],
-      ),
-    );
   }
 }
 
@@ -140,47 +72,87 @@ var googleSignOn = InkWell(
     });
 
 class Login extends StatelessWidget {
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
-    var signupLink = InkWell(
-      onTap: () {
+    var signupLink = TextButton(
+      style: TextButton.styleFrom(
+        padding: EdgeInsets.all(2),
+        shape: const BeveledRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5))),
+      ),
+      onPressed: () {
         Navigator.pushNamed(context, '/signup');
       },
-      child: new Padding(
-        padding: new EdgeInsets.all(10.0),
-        child: new Text('Sign up for Pantry Pal',
-            style: TextStyle(color: Theme.of(context).primaryColor)),
-      ),
+      child: Text('Sign up for Pantry Pal'),
     );
 
-    var forgotPassword = InkWell(
-      onTap: () {
-        // Navigator.pushNamed(context, '/signup');
+    var forgotPasswordLink = TextButton(
+      style: TextButton.styleFrom(
+        padding: EdgeInsets.all(10),
+        shape: const BeveledRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5))),
+      ),
+      onPressed: () {
+        // Navigator.pushNamed(context, '/forgotpassword');
         print('Forgot my password');
       },
-      child: new Padding(
-        padding: new EdgeInsets.all(10.0),
-        child: new Text('Forgot my password',
-            style: TextStyle(color: Theme.of(context).primaryColor)),
-      ),
+      child: Text('Forgot my password'),
     );
 
+    var fields = <Widget>[
+      TextFormField(
+        keyboardType: TextInputType.emailAddress,
+        textInputAction: TextInputAction.next,
+        decoration: const InputDecoration(
+          hintText: 'Email or username',
+          border: OutlineInputBorder(),
+        ),
+        validator: (value) {
+          var empty = value?.isEmpty ?? true;
+          if (empty) {
+            return 'Please enter your email or username';
+          } else if (!value.isValidEmail()) {
+            return 'Please enter a valid email';
+          }
+          return null;
+        },
+      ),
+      TextFormField(
+        textInputAction: TextInputAction.done,
+        obscureText: true,
+        enableSuggestions: false,
+        autocorrect: false,
+        decoration: const InputDecoration(
+          hintText: 'Password',
+          border: OutlineInputBorder(),
+        ),
+        validator: (value) {
+          var empty = value?.isEmpty ?? true;
+          if (empty) {
+            return 'Please enter your password';
+          } else if (!value.isValidPassword()) {
+            return 'Please enter a password with at least eight characters';
+          }
+          return null;
+        },
+      ),
+      Text('Or'),
+      googleSignOn,
+      signupLink,
+      forgotPasswordLink
+    ];
+
     var center = Center(
-      child: Container(
-          padding: EdgeInsets.all(15.0),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(10))),
-          child: Column(
-            children: <Widget>[
-              SignupForm(),
-              Text('OR'),
-              googleSignOn,
-              signupLink,
-              forgotPassword
-            ],
-          )),
-    );
+        child: Container(
+      width: 370,
+      padding: EdgeInsets.all(15.0),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      child: InputBox('Log in to Pantry Pal', fields, _formKey),
+    ));
 
     return SafeArea(
       child: Scaffold(
