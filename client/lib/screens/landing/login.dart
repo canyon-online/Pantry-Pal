@@ -141,7 +141,7 @@ class Login extends StatelessWidget {
     );
   }
 
-  Widget _buildForgotPasswordLink() {
+  Widget _buildForgotPasswordLink(context) {
     return TextButton(
       style: TextButton.styleFrom(
         padding: EdgeInsets.all(10),
@@ -149,7 +149,7 @@ class Login extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(5))),
       ),
       onPressed: () {
-        // Navigator.pushNamed(context, '/forgotpassword');
+        Navigator.pushNamed(context, RouteName.FORGOTPASSWORD);
         print('Forgot my password');
       },
       child: Text('Forgot my password'),
@@ -197,7 +197,7 @@ class Login extends StatelessWidget {
             SizedBox(height: 10),
             Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
               _buildSignupLink(context),
-              _buildForgotPasswordLink()
+              _buildForgotPasswordLink(context)
             ])
           ],
           _formKey,
