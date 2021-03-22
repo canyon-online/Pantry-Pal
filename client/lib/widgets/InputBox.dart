@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 
-// InputBox(
-//   title: string,
-//   _formKey: GlobalKey,
-//   fields: List<Widget>
-// ),
-
 class InputBox extends StatefulWidget {
   final String title;
   final List<Widget> fields;
   final GlobalKey<FormState> _formKey;
+  final Widget submit;
 
-  const InputBox(this.title, this.fields, this._formKey);
+  const InputBox(this.title, this.fields, this._formKey, this.submit);
 
   @override
   InputBoxState createState() => InputBoxState();
@@ -20,8 +15,6 @@ class InputBox extends StatefulWidget {
 class InputBoxState extends State<InputBox> {
   @override
   Widget build(BuildContext context) {
-    // Here you direct access using widget
-    // return Text(widget.clientName);
     var header = Text(
       widget.title,
       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -36,21 +29,7 @@ class InputBoxState extends State<InputBox> {
 
     var footer = Row(
       mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        ElevatedButton(
-          onPressed: () {
-            // Validate returns true if the form is valid, otherwise false.
-            var validated = widget._formKey.currentState?.validate() ?? false;
-            if (validated) {
-              // If the form is valid, display a snackbar. In the real world,
-              // you'd often call a server or save the information in a database.
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Account successfuly created')));
-            }
-          },
-          child: Text('Next'),
-        )
-      ],
+      children: [widget.submit],
     );
 
     const div = Divider(height: 20, thickness: 2);
