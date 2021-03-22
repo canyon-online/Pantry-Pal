@@ -2,6 +2,9 @@ import 'package:client/utils/routeNames.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utils/stringValidator.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:convert';
 
 // Google sign in:
 // import 'package:google_sign_in/google_sign_in.dart';
@@ -21,8 +24,26 @@ import 'package:client/utils/stringValidator.dart';
 //   }
 // }
 
+Future<http.Response> loginUser(String email, String password) async {
+  final response = await http.post(
+    Uri.https('jsonplaceholder.typicode.com', 'posts'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8'
+    },
+    body: jsonEncode(<String, String>{'email': email, 'password': password}),
+  );
+
+  if (response.statusCode == 201) {
+    return response;
+  } else {
+    throw Exception('Failed to sign in user');
+  }
+}
+
 class Login extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _login = TextEditingController();
+  final TextEditingController _pass = TextEditingController();
 
   Widget _buildGoogleSignOn() {
     return InkWell(
@@ -73,9 +94,11 @@ class Login extends StatelessWidget {
     );
   }
 
-  Widget _buildEmailField() {
+  Widget _buildLoginField() {
     return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       keyboardType: TextInputType.emailAddress,
+      controller: _login,
       textInputAction: TextInputAction.next,
       decoration: const InputDecoration(
         hintText: 'Email or username',
@@ -86,8 +109,8 @@ class Login extends StatelessWidget {
         var empty = value?.isEmpty ?? true;
         if (empty) {
           return 'Please enter your email or username';
-        } else if (!value.isValidEmail()) {
-          return 'Please enter a valid email';
+        } else if (!value.isValidEmail() && !value.isValidName()) {
+          return 'Please enter a valid email or username';
         }
         return null;
       },
@@ -98,6 +121,7 @@ class Login extends StatelessWidget {
     return TextFormField(
       textInputAction: TextInputAction.done,
       obscureText: true,
+      controller: _pass,
       enableSuggestions: false,
       autocorrect: false,
       decoration: const InputDecoration(
@@ -137,8 +161,15 @@ class Login extends StatelessWidget {
       onPressed: () {
         var validated = _formKey.currentState?.validate() ?? false;
         if (validated) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Successfuly logged in')));
+          loginUser(_login.text, _pass.text)
+              .then((value) => {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(value.body)))
+                  })
+              .catchError((error) => {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(error)))
+                  });
         }
       },
       child: Text('Next'),
@@ -156,7 +187,7 @@ class Login extends StatelessWidget {
       child: InputBox(
           'Log in to Pantry Pal',
           <Widget>[
-            _buildEmailField(),
+            _buildLoginField(),
             SizedBox(height: 10),
             _buildPasswordField(),
             SizedBox(height: 15),

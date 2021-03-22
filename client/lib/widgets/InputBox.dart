@@ -13,30 +13,42 @@ class InputBox extends StatefulWidget {
 }
 
 class InputBoxState extends State<InputBox> {
-  @override
-  Widget build(BuildContext context) {
-    var header = Text(
-      widget.title,
-      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-    );
-
-    var form = Form(
+  Widget _buildForm() {
+    return Form(
       key: widget._formKey,
       child: Column(
         children: widget.fields,
       ),
     );
+  }
 
-    var footer = Row(
+  Widget _buildHeader() {
+    return Text(
+      widget.title,
+      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    );
+  }
+
+  Widget _buildFooter() {
+    return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [widget.submit],
     );
+  }
 
+  @override
+  Widget build(BuildContext context) {
     const div = Divider(height: 20, thickness: 2);
 
     return Container(
       width: 370,
-      child: Column(children: <Widget>[header, div, form, div, footer]),
+      child: Column(children: <Widget>[
+        _buildHeader(),
+        div,
+        _buildForm(),
+        div,
+        _buildFooter()
+      ]),
       // padding: EdgeInsets.all(15.0),
       // decoration: BoxDecoration(
       //     color: Colors.white,

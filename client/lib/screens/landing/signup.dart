@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:client/utils/stringValidator.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:convert';
 
 // Google sign in:
 // import 'package:google_sign_in/google_sign_in.dart';
@@ -20,8 +23,28 @@ import 'package:client/utils/stringValidator.dart';
 //   }
 // }
 
+Future<http.Response> createUser(
+    String name, String email, String password) async {
+  final response = await http.post(
+    Uri.https('jsonplaceholder.typicode.com', 'posts'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8'
+    },
+    body: jsonEncode(
+        <String, String>{'name': name, 'email': email, 'password': password}),
+  );
+
+  if (response.statusCode == 201) {
+    return response;
+  } else {
+    throw Exception('Failed to create user');
+  }
+}
+
 class Signup extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _name = TextEditingController();
+  final TextEditingController _email = TextEditingController();
   final TextEditingController _pass = TextEditingController();
   final TextEditingController _confirmPass = TextEditingController();
 
@@ -62,7 +85,9 @@ class Signup extends StatelessWidget {
 
   Widget _buildNameField() {
     return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       textInputAction: TextInputAction.next,
+      controller: _name,
       decoration: const InputDecoration(
         contentPadding: EdgeInsets.only(left: 15.0),
         border: OutlineInputBorder(),
@@ -84,7 +109,9 @@ class Signup extends StatelessWidget {
 
   Widget _buildEmailField() {
     return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       keyboardType: TextInputType.emailAddress,
+      controller: _email,
       textInputAction: TextInputAction.next,
       decoration: const InputDecoration(
         contentPadding: EdgeInsets.only(left: 15.0),
@@ -105,6 +132,7 @@ class Signup extends StatelessWidget {
 
   Widget _buildPassowordField() {
     return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       textInputAction: TextInputAction.next,
       controller: _pass,
       obscureText: true,
@@ -129,6 +157,7 @@ class Signup extends StatelessWidget {
 
   Widget _buildConfirmPasswordField() {
     return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       textInputAction: TextInputAction.done,
       controller: _confirmPass,
       obscureText: true,
@@ -158,8 +187,15 @@ class Signup extends StatelessWidget {
       onPressed: () {
         var validated = _formKey.currentState?.validate() ?? false;
         if (validated) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Account successfuly created')));
+          createUser(_name.text, _email.text, _pass.text)
+              .then((value) => {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(value.body)))
+                  })
+              .catchError((error) => {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(error)))
+                  });
         }
       },
       child: Text('Next'),
