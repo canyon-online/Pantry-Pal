@@ -1,17 +1,20 @@
+import 'package:client/utils/routeNames.dart';
 import 'package:flutter/material.dart';
+
 // TODO:
 // Replace login and signup routes with dynamic widget switching
 // - https://medium.com/codechai/switching-widgets-885d9b5b5c6f
 // Replace form labels with widgets
 // - https://medium.com/zipper-studios/the-keyboard-causes-the-bottom-overflowed-error-5da150a1c660
+// Google sign on
+// - https://medium.com/flutterdevs/google-sign-in-with-flutter-8960580dec96
 
 class Landing extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var center = Center(
+  Widget _buildCenter(context) {
+    return Center(
       child: Container(
           width: 370,
-          height: 400,
+          height: 320,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -29,7 +32,7 @@ class Landing extends StatelessWidget {
                       child: ElevatedButton(
                     onPressed: () {
                       print('Log in pushed');
-                      Navigator.pushNamed(context, '/login');
+                      Navigator.pushNamed(context, RouteName.LOGIN);
                     },
                     child: Text('Log in'),
                   ))
@@ -42,7 +45,7 @@ class Landing extends StatelessWidget {
                       child: ElevatedButton(
                     onPressed: () {
                       print('Sign up pushed');
-                      Navigator.pushNamed(context, '/signup');
+                      Navigator.pushNamed(context, RouteName.SIGNUP);
                     },
                     child: Text('Sign up'),
                     style: ElevatedButton.styleFrom(
@@ -59,7 +62,10 @@ class Landing extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.all(Radius.circular(10)))),
     );
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
             body: Container(
@@ -73,7 +79,7 @@ class Landing extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    center,
+                    _buildCenter(context),
                   ],
                 ))));
   }
