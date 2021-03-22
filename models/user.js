@@ -23,7 +23,6 @@ const userSchema = new mongoose.Schema({
         type: String
         // Can put a default here, but don't currently have one
     },
-    // This is not a scalable way of implementing this
     google: {
         type: Boolean,
         default: false
@@ -51,7 +50,7 @@ userSchema.pre('validate', function(next) {
     if (this.password || this.google) {
         next();
     } else {
-        next(new Error('Attempted to create a user without a password or googleToken'));
+        next(new Error('Attempted to create a user without a password or Google account'));
     }
 });
 

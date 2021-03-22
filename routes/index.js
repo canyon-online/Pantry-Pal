@@ -2,6 +2,24 @@
 const express = require ('express'); 
 const router = express.Router(); 
 
+// Import api endpoints
+const apiEndpoints = {
+    login: require('./login'),
+    register: require('./register'),
+}
+
+// Pass the router to the endpoints, allowing them to use it
+for (var endpoint in apiEndpoints) {
+    apiEndpoints[endpoint].use(router);
+}
+
+// Export the router object
+module.exports = router;
+
+
+// Article endpoints are left below but disabled
+// They are just sort of templates for CRUD operations
+/* 
 // Import the Article model. For each API endpoint we will chain a method to the router object. 
 // The format is: router.HTTP Method(path, handler function)
 // We imported the Article model representing the articles collection in our database.
@@ -9,17 +27,6 @@ const router = express.Router();
 // perform different types of CRUD actions. Our handler functions perform the CRUD
 // operation and may return a response. Generally only return responses that will be used by the client.
 const Article = require('../models/article'); 
-
-// Import api paths
-const apiEndpoints = {
-    login: require('./login'),
-    register: require('./register'),
-}
-
-// Pass the router to the api paths
-for (var endpoint in apiEndpoints) {
-    apiEndpoints[endpoint].use(router);
-}
 
 // Get request to /articles returns a JSON array of all article objects found in the database.
 router.get('/articles', function(req, res) { 
@@ -88,5 +95,5 @@ router.delete('/articles/:id', function(req, res) {
     });
 })
 
-// Export the router object with our Article endpoints.
-module.exports = router;
+*/ 
+

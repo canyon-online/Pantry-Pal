@@ -1,26 +1,22 @@
-// Import the user model
-const User = require('../models/user'); 
-
-// Import libraries for handling hashed passwords and google authentication
+// Import libraries for handling passwords, Google authentication, and JWTs
 const bcryptUtil = require('./lib/bcryptUtil');
 const googleOAuth = require('./lib/googleOAuth');
-
-// Import our JWT library for use in generating tokens
 const jwt = require('./lib/jwtUtils');
 
-// The root path of this, which is concatenated to the router path
+// Import the Mongoose User model for database interaction
+const User = require('../models/user'); 
+
+// The root path of this endpoint, which is concatenated to the router path
 // In the current version, this is /api/login
 const endpointPath = '/login';
 
-// Function to concatenate the paths, in the event that this should become
-// more complicated to avoid having to rewrite in a lot of spots
-// This should probably be moved to a library folder but I'll hold off for now
+// Function to concatenate paths
 function constructPath(pathRoot, path) {
     return pathRoot + path;
 }
 
 // Ensures that passed data is formatted nicely and non-maliciously
-async function verifyLocal(body, res)
+function verifyLocal(body, res)
 {
     if (!body) {
         res.json({ error: "No body included in request" });
@@ -40,6 +36,7 @@ async function verifyLocal(body, res)
     return true;
 }
 
+// Function for local login, called after verifyLocal if it succeeds
 async function loginLocal(email, password, res) {
     let user = await User.findOne({ email: email }).exec();
 
@@ -49,28 +46,33 @@ async function loginLocal(email, password, res) {
         return;
     }
 
-    bcryptUtil.comparePassword(password, user, sendToken, res);
+    // Compare the password passed with the one in the database
+    // onLogin is given as a callback function.
+    // It will be called after the comparison is completed if they match
+    bcryptUtil.comparePassword(password, user, onLogin, res);
+
+    return;
 }
 
-async function sendToken(error, user, res) {
+// Callback function called on any login attempt
+async function onLogin(error, user, res)
+{
     if (error != null) {
         res.json({ error: "Email and password combination failed to match any existing records" });
         return;
     }
 
-    // Generate a JWT using the user objectid
-    const token = await jwt.generateJWT(user._id);
+    // No error, so we can generate and send a JWT
+    await jwt.sendJWT(user, res);
 
-    // Send the user a JWT token to store to save their session
-    res.cookie("token", token, { maxAge: jwt.maxAge});
-    res.json({ token: token, expiresIn: jwt.maxAge });
+    return;
 }
 
+
 function use(router) {
-    // This could be split into multiple functions, if wanted for readability
     router.post(constructPath(endpointPath, '/'), async function(req, res) { 
         // Verify neccessary information is provided
-        let isValid = await verifyLocal(req.body, res);
+        let isValid = verifyLocal(req.body, res);
         if (!isValid)
             return;
 
@@ -89,13 +91,7 @@ function use(router) {
     });
 }
 
-// Exported object that enables the use of functions defined here in other files
-// Currently, only the `use` function is relevant to be used in external files
-// If anyone wants to do this another way please do because something about this
-// does not feel 'correct' to me
-const login = {
-    use: use
-}
-
 // Export the login object containing the use function
-module.exports = login;
+module.exports = {
+    use: use
+};

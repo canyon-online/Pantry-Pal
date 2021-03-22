@@ -1,28 +1,24 @@
-// Import the user model
-const User = require('../models/user'); 
-
-// Import libraries for handling hashed passwords and google authentication
+// Import libraries for handling passwords, Google authentication, and JWTs
 const bcryptUtil = require('./lib/bcryptUtil');
 const googleOAuth = require('./lib/googleOAuth');
-
-// Import our JWT library for use in generating tokens
 const jwt = require('./lib/jwtUtils');
 
-// The root path of this, which is concatenated to the router path
+// Import the Mongoose User model for database interaction
+const User = require('../models/user'); 
+
+// The root path of this endpoint, which is concatenated to the router path
 // In the current version, this is /api/register
 const endpointPath = '/register';
 
-// Function to concatenate the paths, in the event that this should become
-// more complicated to avoid having to rewrite in a lot of spots
-// This should probably be moved to a library folder but I'll hold off for now
+// Function to concatenate paths
 function constructPath(pathRoot, path) {
     return pathRoot + path;
 }
 
-
 // Validation function for local registration request bodies
-// Could very likely be boiled down/condensed into regex checks
-async function verifyLocal(body, res)
+// TODO: condense into regex checks (can add regex to the user schema)
+// TODO: sanitize inputs
+function verifyLocal(body, res)
 {
     // Content existence checks
     // No body sent
@@ -51,8 +47,6 @@ async function verifyLocal(body, res)
 
     // Content validation checks
     // Name checks
-    // TODO: maybe sanitize the name input. Also could move a lot of magic numbers
-    // to a configuration/.env file
     if (body.name.length == 0 || body.name.length > 32) {
         res.json({ error: "Display name must be between 1 and 32 characters" });
         return false;
@@ -63,16 +57,14 @@ async function verifyLocal(body, res)
         return false;
     }
 
-    // ... and so on and so on. This is very taxing on space and is seemigly a bad way
-    // of handling this, so I will stop here
+    // Many of these could be solved with regex, so I will stop this here for now
 
     return true;
 }
 
-// Callback function for local registration,called from the encryptPassword
-// function. It saves the user to the database and will begin the login
-// flow, as well as trigger sending a verification email.
-async function registerLocal(error, body, res, hashword)
+// Callback function for local registration, called from the encryptPassword
+// function. It saves the user to the database and will begin the login process.
+async function onPasswordEncrypt(error, body, res, hashword)
 {
     // If an error occured during password encryption, display an error
     if (error != null)
@@ -90,12 +82,8 @@ async function registerLocal(error, body, res, hashword)
         // If we get here, then the user was successfully registered
         // Now, the user has to be sent a verification email
 
-        // Generate a JWT using the user objectid
-        const token = await jwt.generateJWT(user._id);
-
-        // Send the user a JWT token to store to save their session
-        res.cookie("token", token, { maxAge: jwt.maxAge});
-        res.json({ token: token, expiresIn: jwt.maxAge });
+        // No error, so we can generate and send a JWT
+        await jwt.sendJWT(user, res);
     })
     .catch(function(err) {
         // Sends the error as output. If there is no ._message attribute, then
@@ -106,16 +94,15 @@ async function registerLocal(error, body, res, hashword)
 
 
 function use(router) {
-    // This could be split into multiple functions, if wanted for readability
     router.post(constructPath(endpointPath, '/'), async function(req, res) {
         // Verify neccessary information is provided
-        // Also checks that the information provided meets requirements
         let isValid = await verifyLocal(req.body, res);
         if (!isValid)
             return;
 
         // Begin registration process
-        await bcryptUtil.encryptPassword(req.body, registerLocal, res);
+        // onPasswordEncrypt is given as a callback, called after the password is encrypted
+        await bcryptUtil.encryptPassword(req.body, onPasswordEncrypt, res);
     });
 
     router.post(constructPath(endpointPath, '/google'), async function(req, res) {
@@ -129,13 +116,7 @@ function use(router) {
     });
 }
 
-// Exported object that enables the use of functions defined here in other files
-// Currently, only the `use` function is relevant to be used in external files
-// If anyone wants to do this another way please do because something about this
-// does not feel 'correct' to me
-const register = {
-    use: use
-}
-
 // Export the register object containing the use function
-module.exports = register;
+module.exports = {
+    use: use
+};

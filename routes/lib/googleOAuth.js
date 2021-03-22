@@ -18,8 +18,7 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 async function getTicket(token)
 {
     const ticket = await googleClient.verifyIdToken({
-        idToken: token,
-        audience: process.env.GOOGLE_CLIENT_ID
+        idToken: token
     });
 
     return ticket;
@@ -40,6 +39,7 @@ async function verifyGoogle(body, res)
     }
 
     const ticket = await getTicket(body.token).catch(function(err) {
+        console.log(err);
         res.json({ error: "Failed to validate authenticity of OAuth token" });
     });
 
@@ -72,11 +72,12 @@ async function registerGoogle(res, ticket)
     user.save()
     .then(async user => {
         // Successfully created the new user, now use it to log in
-        await loginGoogle(res, ticket);
+        await jwt.sendJWT(user, res);
     })
     .catch(async function(err) {
-        // Forward this registration attempt to login (as it can be a simple mistake)
-        // to press the register w/ Google button vs the login with Google button
+        // If this error occured for Google login, it is most likely a duplicate email
+        // Forward this registration attempt to login as it can be a simple mistake
+        // to press the register w/ Google button vs the login w/ Google button
         await loginGoogle(res, ticket);
     });
 }
@@ -103,15 +104,10 @@ async function loginGoogle(res, ticket)
     }
     else
     {
-        // Generate a JWT using the user objectid
-        const token = await jwt.generateJWT(user._id);
-
-        // Send the user a JWT token to store to save their session
-        res.cookie("token", token, { maxAge: jwt.maxAge});
-        res.json({ token: token, expiresIn: jwt.maxAge });
+        // No error, so we can generate and send a JWT
+        await jwt.sendJWT(user, res);
     }
 }
-
 
 // Export pertinent functions and objects related to Google oAuth
 module.exports = {

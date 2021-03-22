@@ -5,10 +5,10 @@ const mongoose = require('mongoose');
 // To allow cross origin access uncomment the cors lines.
 // const cors = require('cors');
 
-const router = require('./routes/index');
-
 // Load the process environmental variables, located in a .dotenv file
 require('dotenv').config()
+
+const router = require('./routes/index');
 
 // Calling the express() function will create our running app object.
 const app = express(); 
@@ -59,7 +59,7 @@ if (process.env.SSL == 1) {
         cert: fs.readFileSync(process.env.CERT_LOCATION)
     }, app);
     
-    httpsSevver.listen(PORT, function() {
+    httpsServer.listen(PORT, function() {
         console.log(`Server listening on port ${PORT}.`);
     })
 
