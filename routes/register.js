@@ -112,12 +112,12 @@ async function verifyGoogle(body, res)
         return { isValid: false };
     }
 
-    const ticket = await googleOAuth.getTicket(body.token);
-
-    if (!ticket) {
+    const ticket = await googleOAuth.getTicket(body.token).catch(function(err) {
         res.json({ error: "Failed to validate authenticity of OAuth token" });
+    });
+
+    if (!ticket)
         return { isValid: false };
-    }
 
     return { isValid: true, ticket: ticket };
 }
