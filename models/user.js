@@ -19,8 +19,14 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String
     },
-    googleToken: {
+    avatar: {
         type: String
+        // Can put a default here, but don't currently have one
+    },
+    // This is not a scalable way of implementing this
+    google: {
+        type: Boolean,
+        default: false
     },
     dateSignedUp: {
         type: Date,
@@ -42,7 +48,7 @@ const userSchema = new mongoose.Schema({
 
 // Validation function to ensure that the user has either signed up locally or through Google
 userSchema.pre('validate', function(next) {
-    if (this.password || this.googleToken) {
+    if (this.password || this.google) {
         next();
     } else {
         next(new Error('Attempted to create a user without a password or googleToken'));
