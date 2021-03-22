@@ -7,13 +7,16 @@ const mongoose = require('mongoose');
 
 const router = require('./routes/index');
 
+// Load the process environmental variables, located in a .dotenv file
+require('dotenv').config()
+
 // Calling the express() function will create our running app object.
 const app = express(); 
 
 // The Express listen method called at the bottom of our file uses 3000 as it's 
 // default port for it's server. We'll declare a new PORT constant to give us 
 // the flexibility to use different ports depending on whether we are in development or production.
-const PORT = 3001;
+const PORT = process.env.PORT;
 
 // Assigning constants for things like port number and the database URL gives us
 // the flexibility to change the values in one place.
@@ -46,6 +49,22 @@ mongoose.connection.on('error', function(error) {
 });
 
 // Chain the Express listen method to our app. This will listen for connections on the specified port.
-app.listen(PORT, function() {
-    console.log(`Server listening on port ${PORT}.`);
-});
+// Also check for the environmental variables, so we know whether or not we are going to be serving https
+if (process.env.SSL == 1) {
+
+    const https = require('https');
+    const fs = require('fs');
+    const httpsServer = https.createServer({
+        key: fs.readFileSync(process.env.CERT_KEY_LOCATION),
+        cert: fs.readFileSync(process.env.CERT_LOCATION)
+    }, app);
+    
+    httpsSevver.listen(PORT, function() {
+        console.log(`Server listening on port ${PORT}.`);
+    })
+
+} else {
+    app.listen(PORT, function() {
+        console.log(`Server listening on port ${PORT}.`);
+    });
+}
