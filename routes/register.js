@@ -47,7 +47,7 @@ function verifyLocal(body, res)
 
     // Content validation checks
     // Name checks
-    if (body.name.length == 0 || body.name.length > 32) {
+    if (body.name.length < 8 || body.name.length > 32) {
         res.json({ error: "Display name must be between 1 and 32 characters" });
         return false;
     }

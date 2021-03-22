@@ -8,11 +8,12 @@ extension StringValidator on String? {
 
   bool isValidName() {
     if (this == null) return false;
-    return RegExp(r'^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$').hasMatch(this!);
+    return RegExp(r'^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*$').hasMatch(this!);
+    // return RegExp(r'^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$').hasMatch(this!);
   }
 
   bool isValidPassword() {
     if (this == null) return false;
-    return this!.length >= 8;
+    return this!.length >= 8 && this!.length <= 32;
   }
 }

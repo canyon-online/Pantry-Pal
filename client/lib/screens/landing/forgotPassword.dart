@@ -32,7 +32,7 @@ Future<http.Response> emailUser(String email) async {
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8'
     },
-    body: jsonEncode(<String, String>{'email': email}),
+    body: jsonEncode(<String, dynamic>{'email': email}),
   );
 
   if (response.statusCode == 201) {

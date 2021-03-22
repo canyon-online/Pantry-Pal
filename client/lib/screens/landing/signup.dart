@@ -26,20 +26,15 @@ import 'dart:convert';
 Future<http.Response> createUser(
     String name, String email, String password) async {
   final response = await http.post(
-    // Uri.https('64.225.61.147:3001/api', 'register'),
-    Uri.https('jsonplaceholder.typicode.com', 'posts'),
+    Uri.https('testing.hasty.cc', 'api/register'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8'
     },
     body: jsonEncode(
-        <String, String>{'name': name, 'email': email, 'password': password}),
+        <String, dynamic>{'name': name, 'email': email, 'password': password}),
   );
 
-  if (response.statusCode == 201) {
-    return response;
-  } else {
-    throw Exception('Failed to create user');
-  }
+  return response;
 }
 
 class Signup extends StatelessWidget {
@@ -195,7 +190,7 @@ class Signup extends StatelessWidget {
                   })
               .catchError((error) => {
                     ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(error)))
+                        .showSnackBar(SnackBar(content: Text('error')))
                   });
         }
       },

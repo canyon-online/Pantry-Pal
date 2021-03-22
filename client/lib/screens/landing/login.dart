@@ -26,14 +26,14 @@ import 'dart:convert';
 
 Future<http.Response> loginUser(String email, String password) async {
   final response = await http.post(
-    Uri.https('jsonplaceholder.typicode.com', 'posts'),
+    Uri.https('testing.hasty.cc', 'api/login'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8'
     },
-    body: jsonEncode(<String, String>{'email': email, 'password': password}),
+    body: jsonEncode(<String, dynamic>{'email': email, 'password': password}),
   );
 
-  if (response.statusCode == 201) {
+  if (response.statusCode == 200) {
     return response;
   } else {
     throw Exception('Failed to sign in user');
@@ -168,7 +168,7 @@ class Login extends StatelessWidget {
                   })
               .catchError((error) => {
                     ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(error)))
+                        .showSnackBar(SnackBar(content: error))
                   });
         }
       },
