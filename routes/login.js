@@ -19,17 +19,17 @@ function constructPath(pathRoot, path) {
 function verifyLocal(body, res)
 {
     if (!body) {
-        res.json({ error: "No body included in request" });
+        res.status(422).json({ error: "No body included in request" });
         return false;
     }
 
     if (!body.email || typeof(body.email) != "string") {
-        res.json({ error: "No email included in request" });
+        res.status(422).json({ error: "No email included in request" });
         return false;
     }
         
     if (!body.password || typeof(body.password) != "string") {
-        res.json({ error: "No password included in request" });
+        res.status(422).json({ error: "No password included in request" });
         return false;
     }
 
@@ -42,7 +42,7 @@ async function loginLocal(email, password, res) {
 
     // No user is found
     if (user == null) {
-        res.json({ error: "Email and password combination failed to match any existing records" });
+        res.status(404).json({ error: "Email and password combination failed to match any existing records" });
         return;
     }
 
@@ -58,7 +58,7 @@ async function loginLocal(email, password, res) {
 async function onLogin(error, user, res)
 {
     if (error != null) {
-        res.json({ error: "Email and password combination failed to match any existing records" });
+        res.status(404).json({ error: "Email and password combination failed to match any existing records" });
         return;
     }
 

@@ -29,18 +29,17 @@ async function getTicket(token)
 async function verifyGoogle(body, res)
 {
     if (!body) {
-        res.json({ error: "No body included in request" });
+        res.status(400).json({ error: "No body included in request" });
         return { isValid: false };
     }
 
     if (!body.token) {
-        res.json({ error: "No OAuth token included in request" });
+        res.status(422).json({ error: "No OAuth token included in request" });
         return { isValid: false };
     }
 
     const ticket = await getTicket(body.token).catch(function(err) {
-        console.log(err);
-        res.json({ error: "Failed to validate authenticity of OAuth token" });
+        res.status(422).json({ error: "Failed to validate authenticity of OAuth token" });
     });
 
     if (!ticket)
@@ -57,7 +56,7 @@ async function registerGoogle(res, ticket)
 
     if (!name || !email || !picture)
     {
-        res.json({ error: "Failed to extract data from Google Login Ticket" });
+        res.status(422).json({ error: "Failed to extract data from Google Login Ticket" });
         return;
     }
 
@@ -92,7 +91,7 @@ async function loginGoogle(res, ticket)
 
     if (!name || !email || !picture)
     {
-        res.json({ error: "Failed to extract data from Google Login Ticket" });
+        res.status(422).json({ error: "Failed to extract data from Google Login Ticket" });
         return;
     }
 
