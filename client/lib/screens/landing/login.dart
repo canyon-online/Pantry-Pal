@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 //   }
 // }
 
-extension Validator on String? {
+extension StringValidator on String? {
   bool isValidEmail() {
     if (this == null) return false;
     return RegExp(
@@ -108,6 +108,7 @@ class Login extends StatelessWidget {
         decoration: const InputDecoration(
           hintText: 'Email or username',
           border: OutlineInputBorder(),
+          contentPadding: EdgeInsets.only(left: 15.0),
         ),
         validator: (value) {
           var empty = value?.isEmpty ?? true;
@@ -119,12 +120,14 @@ class Login extends StatelessWidget {
           return null;
         },
       ),
+      SizedBox(height: 10),
       TextFormField(
         textInputAction: TextInputAction.done,
         obscureText: true,
         enableSuggestions: false,
         autocorrect: false,
         decoration: const InputDecoration(
+          contentPadding: EdgeInsets.only(left: 15.0),
           hintText: 'Password',
           border: OutlineInputBorder(),
         ),
@@ -138,10 +141,14 @@ class Login extends StatelessWidget {
           return null;
         },
       ),
+      SizedBox(height: 15),
       Text('Or'),
+      SizedBox(height: 15),
       googleSignOn,
-      signupLink,
-      forgotPasswordLink
+      SizedBox(height: 10),
+      Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [signupLink, forgotPasswordLink])
     ];
 
     var center = Center(

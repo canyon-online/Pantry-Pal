@@ -19,7 +19,7 @@ import 'package:client/widgets/InputBox.dart';
 //   }
 // }
 
-extension Validator on String? {
+extension StringValidator on String? {
   bool isValidEmail() {
     if (this == null) return false;
     return RegExp(
@@ -82,6 +82,7 @@ class Signup extends StatelessWidget {
       TextFormField(
         textInputAction: TextInputAction.next,
         decoration: const InputDecoration(
+          contentPadding: EdgeInsets.only(left: 15.0),
           border: OutlineInputBorder(),
           // icon: Icon(Icons.person),
           hintText: 'Name',
@@ -97,10 +98,12 @@ class Signup extends StatelessWidget {
           return null;
         },
       ),
+      SizedBox(height: 10),
       TextFormField(
         keyboardType: TextInputType.emailAddress,
         textInputAction: TextInputAction.next,
         decoration: const InputDecoration(
+          contentPadding: EdgeInsets.only(left: 15.0),
           border: OutlineInputBorder(),
           hintText: 'Email',
         ),
@@ -114,6 +117,7 @@ class Signup extends StatelessWidget {
           return null;
         },
       ),
+      SizedBox(height: 10),
       TextFormField(
         textInputAction: TextInputAction.next,
         controller: _pass,
@@ -121,6 +125,7 @@ class Signup extends StatelessWidget {
         enableSuggestions: false,
         autocorrect: false,
         decoration: const InputDecoration(
+          contentPadding: EdgeInsets.only(left: 15.0),
           border: OutlineInputBorder(),
           hintText: 'Password',
         ),
@@ -134,6 +139,7 @@ class Signup extends StatelessWidget {
           return null;
         },
       ),
+      SizedBox(height: 10),
       TextFormField(
         textInputAction: TextInputAction.done,
         controller: _confirmPass,
@@ -141,6 +147,7 @@ class Signup extends StatelessWidget {
         enableSuggestions: false,
         autocorrect: false,
         decoration: const InputDecoration(
+          contentPadding: EdgeInsets.only(left: 15.0),
           border: OutlineInputBorder(),
           hintText: 'Confirm password',
           // labelText: 'Name *',
@@ -156,7 +163,9 @@ class Signup extends StatelessWidget {
           return null;
         },
       ),
-      Text('OR'),
+      SizedBox(height: 15),
+      Text('Or'),
+      SizedBox(height: 15),
       googleSignOn
     ];
 

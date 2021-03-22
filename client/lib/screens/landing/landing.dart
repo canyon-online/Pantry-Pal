@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+// TODO:
+// Replace routes with dynamic widget switching
+// - https://medium.com/codechai/switching-widgets-885d9b5b5c6f
+// Replace form labels with widgets
+// - https://medium.com/zipper-studios/the-keyboard-causes-the-bottom-overflowed-error-5da150a1c660
 
 class Landing extends StatelessWidget {
   @override
