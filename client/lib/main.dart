@@ -1,5 +1,8 @@
+import 'package:client/screens/landing/landing.dart';
+import 'package:client/screens/landing/login.dart';
+import 'package:client/screens/landing/signup.dart';
 import 'package:flutter/material.dart';
-import 'utils/routes.dart';
+// import 'utils/routes.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,6 +19,11 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.grey,
         ),
         initialRoute: '/',
-        onGenerateRoute: Routes.onGenerateRoute);
+        routes: {
+          '/': (context) => Landing(),
+          '/signup': (context) => Signup(),
+          '/login': (context) => Login(),
+        });
+    // onGenerateRoute: Routes.onGenerateRoute);
   }
 }
