@@ -5,6 +5,9 @@ const User = require('../models/user');
 const bcryptUtil = require('./lib/bcryptUtil');
 const googleOAuth = require('./lib/googleOAuth');
 
+// Import our JWT library for use in generating tokens
+const jwt = require('./lib/jwtUtils');
+
 // The root path of this, which is concatenated to the router path
 // In the current version, this is /api/register
 const endpointPath = '/register';
@@ -16,8 +19,6 @@ function constructPath(pathRoot, path) {
     return pathRoot + path;
 }
 
-// =================================================================================
-// Local registration functions
 
 // Validation function for local registration request bodies
 // Could very likely be boiled down/condensed into regex checks
@@ -85,13 +86,16 @@ async function registerLocal(error, body, res, hashword)
     });
 
     user.save()
-    .then(user => {
+    .then(async user => {
         // If we get here, then the user was successfully registered
         // Now, the user has to be sent a verification email
 
-        // Currently sends the user object as output, but this should be
-        // changed to some sort of authentication token
-        res.send(user);
+        // Generate a JWT using the user objectid
+        const token = await jwt.generateJWT(user._id);
+
+        // Send the user a JWT token to store to save their session
+        res.cookie("token", token, { maxAge: jwt.maxAge});
+        res.json({ token: token, expiresIn: jwt.maxAge });
     })
     .catch(function(err) {
         // Sends the error as output. If there is no ._message attribute, then
@@ -100,70 +104,6 @@ async function registerLocal(error, body, res, hashword)
     });
 }
 
-// =================================================================================
-// Google registration functions
-
-// Validation function for local registration request bodies
-// Checks existence of and authenticity of the token passed
-async function verifyGoogle(body, res)
-{
-    if (!body.token) {
-        res.json({ error: "No OAuth token included in request" });
-        return { isValid: false };
-    }
-
-    const ticket = await googleOAuth.getTicket(body.token).catch(function(err) {
-        res.json({ error: "Failed to validate authenticity of OAuth token" });
-    });
-
-    if (!ticket)
-        return { isValid: false };
-
-    return { isValid: true, ticket: ticket };
-}
-
-// Google registration function that attempts to add a user to the database
-// Takes a Google Login Ticket and generates a user from it
-async function registerGoogle(res, ticket)
-{
-    const { name, email, picture } = ticket.getPayload();
-
-    if (!name || !email || !picture)
-    {
-        res.json({ error: "Failed to extract data from Google Login Ticket" });
-        return;
-    }
-
-    // Attempt to save registered user
-    let user = new User({
-        display: name,
-        email: email,
-        avatar: picture,
-        google: true
-    });
-
-    user.save()
-    .then(user => {
-        // If we get here, then the user was successfully registered
-        // Now, the user has to be sent a verification email
-
-        // Currently sends the user object as output, but this should be
-        // changed to some sort of authentication token
-        res.send(user);
-    })
-    .catch(function(err) {
-        // Sends the error as output. If there is no ._message attribute, then
-        // the error has to do with duplicate emails.
-
-        // Forward this registration attempt to login (as it can be a simple mistake)
-        // to press the register w/ Google button vs the login with Google button
-
-        res.status(422).json({ error: err._message || "Already registered using Google" });
-    });
-}
-
-// =================================================================================
-// Router control
 
 function use(router) {
     // This could be split into multiple functions, if wanted for readability
@@ -180,12 +120,12 @@ function use(router) {
 
     router.post(constructPath(endpointPath, '/google'), async function(req, res) {
         // Verify necessary information is provided
-        let { isValid, ticket } = await verifyGoogle(req.body, res);
+        let { isValid, ticket } = await googleOAuth.verifyGoogle(req.body, res);
         if (!isValid)
             return;
 
         // Begin registration process
-        await registerGoogle(res, ticket);
+        await googleOAuth.registerGoogle(res, ticket);
     });
 }
 
