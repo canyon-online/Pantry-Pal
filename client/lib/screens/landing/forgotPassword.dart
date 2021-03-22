@@ -54,7 +54,7 @@ class ForgotPasswordState extends State<ForgotPassword> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       keyboardType: TextInputType.emailAddress,
       controller: _email,
-      textInputAction: TextInputAction.next,
+      textInputAction: TextInputAction.done,
       decoration: const InputDecoration(
         hintText: 'Email',
         border: OutlineInputBorder(),
@@ -75,7 +75,7 @@ class ForgotPasswordState extends State<ForgotPassword> {
   Widget _buildVerificationField() {
     return TextFormField(
       controller: _verification,
-      textInputAction: TextInputAction.next,
+      textInputAction: TextInputAction.done,
       decoration: const InputDecoration(
         hintText: 'Verification',
         border: OutlineInputBorder(),
@@ -91,40 +91,43 @@ class ForgotPasswordState extends State<ForgotPassword> {
     );
   }
 
+  void handleSubmit() {
+    switch (selectedStep) {
+      case Step.email:
+        var validated = _formKeyEmail.currentState?.validate() ?? false;
+        if (validated) {
+          emailUser(_email.text)
+              .then((value) => {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(value.body)))
+                  })
+              .catchError((error) => {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(error)))
+                  });
+          setState(() {
+            selectedStep = Step.verification;
+          });
+        }
+        break;
+      case Step.verification:
+        var validated = _formKeyVerification.currentState?.validate() ?? false;
+        if (validated) {
+          setState(() {
+            selectedStep = Step.login;
+          });
+        }
+        break;
+      case Step.login:
+        // TODO: Handle this case.
+        break;
+    }
+  }
+
   Widget _buildSubmit(context) {
     return ElevatedButton(
       onPressed: () {
-        switch (selectedStep) {
-          case Step.email:
-            var validated = _formKeyEmail.currentState?.validate() ?? false;
-            if (validated) {
-              emailUser(_email.text)
-                  .then((value) => {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(SnackBar(content: Text(value.body)))
-                      })
-                  .catchError((error) => {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(SnackBar(content: Text(error)))
-                      });
-              setState(() {
-                selectedStep = Step.verification;
-              });
-            }
-            break;
-          case Step.verification:
-            var validated =
-                _formKeyVerification.currentState?.validate() ?? false;
-            if (validated) {
-              setState(() {
-                selectedStep = Step.login;
-              });
-            }
-            break;
-          case Step.login:
-            // TODO: Handle this case.
-            break;
-        }
+        handleSubmit();
       },
       child: Text('Next'),
     );

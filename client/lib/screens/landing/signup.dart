@@ -26,6 +26,7 @@ import 'dart:convert';
 Future<http.Response> createUser(
     String name, String email, String password) async {
   final response = await http.post(
+    // Uri.https('64.225.61.147:3001/api', 'register'),
     Uri.https('jsonplaceholder.typicode.com', 'posts'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8'
