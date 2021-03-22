@@ -23,37 +23,37 @@ function verifyLocal(body, res)
     // Content existence checks
     // No body sent
     if (!body) {
-        res.json({ error: "No body included in request" });
+        res.status(422).json({ error: "No body included in request" });
         return false;
     }
 
     // No name sent
     if (!body.name) {
-        res.json({ error: "No name included in request" });
+        res.status(422).json({ error: "No name included in request" });
         return false;
     }
 
     // No password sent
     if (!body.password) {
-        res.json({ error: "No password included in request" });
+        res.status(422).json({ error: "No password included in request" });
         return false;
     }
 
     // No email sent
     if (!body.email) {
-        res.json({ error: "No email included in request" });
+        res.status(422).json({ error: "No email included in request" });
         return false;
     }
 
     // Content validation checks
     // Name checks
     if (body.name.length < 8 || body.name.length > 32) {
-        res.json({ error: "Display name must be between 1 and 32 characters" });
+        res.json({ error: "Display name must be between 8 and 32 characters" });
         return false;
     }
 
     if (typeof(body.name) != "string") {
-        res.json({ error: "Display name must be a string" });
+        res.status(422).json({ error: "Display name must be a string" });
         return false;
     }
 
@@ -68,7 +68,7 @@ async function onPasswordEncrypt(error, body, res, hashword)
 {
     // If an error occured during password encryption, display an error
     if (error != null)
-        res.json({ error: error });
+        res.status(422).json({ error: error });
 
     // Attempt to save registered user
     let user = new User({
