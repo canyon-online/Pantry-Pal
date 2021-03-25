@@ -1,3 +1,4 @@
+import 'package:client/screens/home/home.dart';
 import 'package:client/screens/landing/landing.dart';
 import 'package:client/screens/landing/login.dart';
 import 'package:client/screens/landing/signup.dart';
@@ -36,7 +37,8 @@ class MyApp extends StatelessWidget {
           RouteName.LANDING: (context) => Landing(),
           RouteName.SIGNUP: (context) => Signup(),
           RouteName.LOGIN: (context) => Login(),
-          RouteName.FORGOTPASSWORD: (context) => ForgotPassword()
+          RouteName.FORGOTPASSWORD: (context) => ForgotPassword(),
+          RouteName.HOME: (context) => Home()
         });
   }
 }

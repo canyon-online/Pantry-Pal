@@ -1,50 +1,8 @@
+import 'package:client/utils/AuthProvider.dart';
+import 'package:client/utils/routeNames.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:client/utils/stringValidator.dart';
-import 'package:http/http.dart' as http;
-import 'dart:async';
-import 'dart:convert';
-
-// Google sign in:
-// import 'package:google_sign_in/google_sign_in.dart';
-
-// GoogleSignIn _googleSignIn = GoogleSignIn(
-//   scopes: [
-//     'email',
-//     'https://www.googleapis.com/auth/contacts.readonly',
-//   ],
-// );
-
-// Future<void> _handleSignIn() async {
-//   try {
-//     await _googleSignIn.signIn();
-//   } catch (error) {
-//     print(error);
-//   }
-// }
-
-// Function called to add a user to the database and return a JSON object including
-// a JWT and the amount of time it has. This may be able to be offsoruced into
-// another file along with loginUser from login.dart.
-Future<http.Response> createUser(
-    String name, String email, String password) async {
-  final response = await http.post(
-    Uri.https('testing.hasty.cc', 'api/register'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8'
-    },
-    body: jsonEncode(
-        <String, dynamic>{'name': name, 'email': email, 'password': password}),
-  );
-
-  if (response.statusCode == 200) {
-    // TODO: SAVE THE COOKIE
-    return response;
-  } else {
-    // TODO: Catch exception in the submit button to create an error message.
-    throw Exception('Failed to create user');
-  }
-}
 
 class Signup extends StatelessWidget {
   // Form key is important for implementation of the InputBox class and reading the
@@ -210,12 +168,16 @@ class Signup extends StatelessWidget {
         // function. The function returns a Future object, which may be used in
         // implementing spining loading wheel objects and such.
         if (validated) {
-          createUser(_name.text, _email.text, _pass.text)
+          AuthProvider()
+              .signup(_name.text, _email.text, _pass.text)
               .then((value) => {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(value.body)))
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(value['message']))),
+                    if (value['status'] == true)
+                      Navigator.pushNamed(context, RouteName.HOME)
                   })
               .catchError((error) => {
+                    print(error),
                     ScaffoldMessenger.of(context)
                         .showSnackBar(SnackBar(content: Text('error')))
                   });
