@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const emailUtil = require('../routes/lib/emailUtils');
 
 const userSchema = new mongoose.Schema({ 
     display: {
@@ -52,6 +53,21 @@ userSchema.pre('validate', function(next) {
     } else {
         next(new Error('Attempted to create a user without a password or Google account'));
     }
+});
+
+// Whenever a new user is created successfully, send a verification email
+userSchema.post('save', function(user) {
+    // In some bizzare case where the email is nonexistent
+    if (!user.email)
+        return;
+
+    try {
+        emailUtil.sendVerificationEmail(user._id, user.display, user.email);
+    } catch(err) {
+        // Log email error
+    }
+
+    return
 });
 
 module.exports = mongoose.model('User', userSchema); 
