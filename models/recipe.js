@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const recipeSchema = new mongoose.Schema({ 
     author: {
-        type: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     },
     name: {
         type: String,
