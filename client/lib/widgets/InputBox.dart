@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 
+// This class build a container that holds form fields and displays a beautiful
+// header and footer. Styled from the prototypes within the Figma.
+// Admittedly this likely did not need to be a stateful widget. But it allows for
+// the modification of itself in the future.
 class InputBox extends StatefulWidget {
   final String title;
   final List<Widget> fields;
   final GlobalKey<FormState> _formKey;
   final Widget submit;
 
+  // Constructor to require the title, fields, form key, and submit button.
   const InputBox(this.title, this.fields, this._formKey, this.submit);
 
   @override
@@ -38,6 +43,7 @@ class InputBoxState extends State<InputBox> {
 
   @override
   Widget build(BuildContext context) {
+    // Fancy and beautiful divider to make the form look nice :-)
     const div = Divider(height: 20, thickness: 2);
 
     return Container(
@@ -49,10 +55,6 @@ class InputBoxState extends State<InputBox> {
         div,
         _buildFooter()
       ]),
-      // padding: EdgeInsets.all(15.0),
-      // decoration: BoxDecoration(
-      //     color: Colors.white,
-      //     borderRadius: BorderRadius.all(Radius.circular(10))),
     );
   }
 }
