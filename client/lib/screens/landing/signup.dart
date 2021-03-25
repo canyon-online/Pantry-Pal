@@ -1,8 +1,8 @@
 import 'package:client/utils/AuthProvider.dart';
-import 'package:client/utils/routeNames.dart';
+import 'package:client/utils/RouteNames.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/InputBox.dart';
-import 'package:client/utils/stringValidator.dart';
+import 'package:client/utils/StringValidator.dart';
 
 class Signup extends StatelessWidget {
   // Form key is important for implementation of the InputBox class and reading the

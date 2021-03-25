@@ -1,7 +1,7 @@
-import 'package:client/utils/routeNames.dart';
+import 'package:client/utils/RouteNames.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:flutter/material.dart';
-import 'package:client/utils/stringValidator.dart';
+import 'package:client/utils/StringValidator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';

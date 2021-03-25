@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:client/utils/AuthProvider.dart';
-import 'package:client/utils/routeNames.dart';
+import 'package:client/utils/RouteNames.dart';
 import 'package:client/widgets/InputBox.dart';
-import 'package:client/utils/stringValidator.dart';
+import 'package:client/utils/StringValidator.dart';
 
 // Login page class that extends stateless widget because it won't change itself.
 class Login extends StatelessWidget {
