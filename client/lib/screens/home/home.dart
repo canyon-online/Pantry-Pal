@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class home extends StatefulWidget {
+class Home extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _home();
+    return _Home();
   }
 }
 
-class _home extends State<home> {
+class _Home extends State<Home> {
   int _currentIndex = 0;
   final List<Widget> _children = [
     Text(
