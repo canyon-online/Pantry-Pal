@@ -23,6 +23,9 @@ import 'dart:convert';
 //   }
 // }
 
+// Function called to add a user to the database and return a JSON object including
+// a JWT and the amount of time it has. This may be able to be offsoruced into
+// another file along with loginUser from login.dart.
 Future<http.Response> createUser(
     String name, String email, String password) async {
   final response = await http.post(
@@ -34,17 +37,30 @@ Future<http.Response> createUser(
         <String, dynamic>{'name': name, 'email': email, 'password': password}),
   );
 
-  return response;
+  if (response.statusCode == 200) {
+    // TODO: SAVE THE COOKIE
+    return response;
+  } else {
+    // TODO: Catch exception in the submit button to create an error message.
+    throw Exception('Failed to create user');
+  }
 }
 
 class Signup extends StatelessWidget {
+  // Form key is important for implementation of the InputBox class and reading the
+  // form's fields. It essentially attaches to each field.
   final _formKey = GlobalKey<FormState>();
+
+  // TextEditingControllers allow for simple getters from the fields.
   final TextEditingController _name = TextEditingController();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _pass = TextEditingController();
   final TextEditingController _confirmPass = TextEditingController();
 
+  // Function to build and return a Google Sign On button.
   Widget _buildGoogleSignOn() {
+    // An InkWell object is sort of a fancy button that has a little splash
+    // animation to it.
     return InkWell(
         child: Container(
             width: 200,
@@ -75,10 +91,12 @@ class Signup extends StatelessWidget {
               ],
             ))),
         onTap: () async {
-          print('Google Sign On Tapped');
+          // TODO: Apply Google signup.
+          print('Google Sign Up Tapped');
         });
   }
 
+  // Function to build and return a name field text box.
   Widget _buildNameField() {
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -103,6 +121,7 @@ class Signup extends StatelessWidget {
     );
   }
 
+  // Function to build and return an email field text box.
   Widget _buildEmailField() {
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -126,6 +145,7 @@ class Signup extends StatelessWidget {
     );
   }
 
+  // Function to build and return a password field text box.
   Widget _buildPassowordField() {
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -151,6 +171,7 @@ class Signup extends StatelessWidget {
     );
   }
 
+  // Function to build and return a confirm password field text box.
   Widget _buildConfirmPasswordField() {
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -178,10 +199,16 @@ class Signup extends StatelessWidget {
     );
   }
 
+  // Function to build and return a form submit button. This is critical to the
+  // implementation of the InputBox class.
   Widget _buildSubmit(context) {
     return ElevatedButton(
       onPressed: () {
         var validated = _formKey.currentState?.validate() ?? false;
+        // If the form is valid, then execute the following code. This is where
+        // the user will get signed up and logged in, by calling the createUser
+        // function. The function returns a Future object, which may be used in
+        // implementing spining loading wheel objects and such.
         if (validated) {
           createUser(_name.text, _email.text, _pass.text)
               .then((value) => {
@@ -198,6 +225,7 @@ class Signup extends StatelessWidget {
     );
   }
 
+  // Function called to build the widget in the center.
   Widget _buildCenter(context) {
     return Center(
       child: Container(
@@ -226,11 +254,17 @@ class Signup extends StatelessWidget {
     );
   }
 
+  // This function is called to build the actual Signup widget itself.
   @override
   Widget build(BuildContext context) {
+    // Always wrap screens in a safe area and a scaffold. The safearea prevents
+    // parts of the screen getting clipped from the shape of the device,
+    // and the scaffold allows for use of objects such as drawers.
     return SafeArea(
       child: Scaffold(
         body: Container(
+          // Background image. I'm a bit annoyed how each screen reloads it.
+          // Bounty for whoever can fix that
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage("assets/images/BackgroundBlurred.jpg"),

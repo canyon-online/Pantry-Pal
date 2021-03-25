@@ -6,26 +6,13 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 
-// Google sign in:
-// import 'package:google_sign_in/google_sign_in.dart';
-
-// GoogleSignIn _googleSignIn = GoogleSignIn(
-//   scopes: [
-//     'email',
-//     'https://www.googleapis.com/auth/contacts.readonly',
-//   ],
-// );
-
-// Future<void> _handleSignIn() async {
-//   try {
-//     await _googleSignIn.signIn();
-//   } catch (error) {
-//     print(error);
-//   }
-// }
-
+// This screen is stateful becuase it changes the contents of itself depending
+// on user interaction. The first stage involves providing an email, the seconds
+// a verification password, and the last (and TODO) a page to update the password.
 enum Step { email, verification, login }
 
+// Function called to return some Future object that tells the API to send a verification
+// password. This may be able to offsourced into another file along with other API calls.
 Future<http.Response> emailUser(String email) async {
   final response = await http.post(
     Uri.https('jsonplaceholder.typicode.com', 'posts'),
@@ -36,17 +23,28 @@ Future<http.Response> emailUser(String email) async {
   );
 
   if (response.statusCode == 201) {
+    // TODO: Save verification code in a secure way (inquire Jordan).
     return response;
   } else {
+    // TODO: Catch exception in the submit button to create an error message.
     throw Exception('Failed to email user');
   }
 }
 
+// This is the state of the ForgotPassword screen. This changes depending on
+// the selectedStep. The function setState() forces an update of the widget.
 class ForgotPasswordState extends State<ForgotPassword> {
+  // Form key is important for implementation of the InputBox class and reading the
+  // form's fields. It essentially attaches to each field.
   final _formKeyEmail = GlobalKey<FormState>();
   final _formKeyVerification = GlobalKey<FormState>();
+  final _formKeyResetPassword = GlobalKey<FormState>();
+
+  // TextEditingControllers allow for simple getters from the fields.
   final TextEditingController _email = TextEditingController();
   final TextEditingController _verification = TextEditingController();
+
+  // The current state of the widget.
   Step selectedStep = Step.email;
 
   Widget _buildEmailField() {
@@ -91,8 +89,11 @@ class ForgotPasswordState extends State<ForgotPassword> {
     );
   }
 
+  // Important function called to handle submits of the pages. This function
+  // will call the setState() on the widget depending on the current state.
   void handleSubmit() {
     switch (selectedStep) {
+      // If we are currently on the email state...
       case Step.email:
         var validated = _formKeyEmail.currentState?.validate() ?? false;
         if (validated) {
@@ -105,14 +106,20 @@ class ForgotPasswordState extends State<ForgotPassword> {
                     ScaffoldMessenger.of(context)
                         .showSnackBar(SnackBar(content: Text(error)))
                   });
+
+          // We won't always want to go to the next step. For examples, if the
+          // email wasn't in the database. This is outside just for testing.
           setState(() {
+            // TODO: Move this to the valid email section of emailUser.
             selectedStep = Step.verification;
           });
         }
         break;
+      // If we are currently on the verification state...
       case Step.verification:
         var validated = _formKeyVerification.currentState?.validate() ?? false;
         if (validated) {
+          // TODO: Verify the submitted code.
           setState(() {
             selectedStep = Step.login;
           });
@@ -199,6 +206,8 @@ class ForgotPasswordState extends State<ForgotPassword> {
   }
 }
 
+// This is the main function that returns the widget itself. It depends on the
+// ForgotPasswordState class.
 class ForgotPassword extends StatefulWidget {
   State<StatefulWidget> createState() => ForgotPasswordState();
 }
