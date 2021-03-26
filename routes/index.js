@@ -38,9 +38,10 @@ router.use(function(req, res, next) {
 
 // Import api endpoints
 const apiEndpoints = {
+    account: require('./account'),
     login: require('./login'),
-    register: require('./register'),
-    account: require('./account')
+    recipes: require('./recipes'),
+    register: require('./register')
 }
 
 // Pass the router to the endpoints, allowing them to use it
