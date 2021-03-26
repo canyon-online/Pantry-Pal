@@ -1,7 +1,8 @@
 import 'package:client/screens/landing/landing.dart';
 import 'package:client/utils/AuthProvider.dart';
-import 'package:client/utils/RouteNames.dart';
 import 'package:client/utils/User.dart';
+import 'package:client/widgets/CreateView.dart';
+import 'package:client/widgets/HomeView.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,25 +12,25 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
+  int _currentIndex = 1;
+
+  final List<Widget> _children = [
+    HomeView(),
+    CreateView(),
+    Text('Index 2: Search'),
+    Text('Index 3: Profile I think?'),
+  ];
+
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     User user = Provider.of<UserProvider>(context).user;
     AuthProvider auth = Provider.of<AuthProvider>(context);
-
-    int _currentIndex = 0;
-
-    final List<Widget> _children = [
-      Text('Index 0: Home'),
-      Text('Index 1: Add'),
-      Text('Index 2: Search'),
-      Text('Index 3: Profile I think?'),
-    ];
-
-    void onTabTapped(int index) {
-      setState(() {
-        _currentIndex = index;
-      });
-    }
 
     // Hacky way of forcing people to login is to display the login screen if the
     // app is not logged in...
