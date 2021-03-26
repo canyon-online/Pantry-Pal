@@ -17,9 +17,9 @@ function constructPath(pathRoot, path) {
     return pathRoot + path;
 }
 
-// Given a string, attempt to locate a Code object
-async function getCode(verifCode, userId) {
-    const code = await Code.findOneAndDelete({ code: verifCode, user: mongoose.Types.ObjectId(userId) });
+// Given 3 search parameters, attempt to find a verification code and delete it
+async function getCode(verifCode, userId, purpose) {
+    const code = await Code.findOneAndDelete({ code: verifCode, user: mongoose.Types.ObjectId(userId), purpose: purpose });
 
     return code
 }
@@ -36,7 +36,7 @@ function use(router) {
         const { userId } = jwt.verifyJWT(req.cookies.token);
 
         // Attempt to find the code by the request body
-        const retrievedCode = await getCode(req.body.code, userId);
+        const retrievedCode = await getCode(req.body.code, userId, "Email Verification");
 
         if (retrievedCode) {
             // Check to make sure the code is not expired (could potentially add this as a hook to the schema)
