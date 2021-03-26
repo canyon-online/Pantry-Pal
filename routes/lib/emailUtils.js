@@ -8,7 +8,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
 // Mail transporter object
-const transporter = !process.env.DO_EMAIL ? nodemailer.createTransport({
+const transporter = (process.env.DO_EMAIL == 1) ? nodemailer.createTransport({
     host: process.env.MAIL_SERVER,
     port: process.env.MAIL_PORT,
     secure: false,
