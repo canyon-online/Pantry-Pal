@@ -6,7 +6,8 @@
     "express": "^4.17.1",
     "google-auth-library": "^7.0.2",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.11.18"
+    "mongoose": "^5.11.18",
+    "nodemailer": "^6.5.0"
   },
   "scripts": {
     "start": "node server.js",

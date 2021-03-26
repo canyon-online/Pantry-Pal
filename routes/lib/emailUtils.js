@@ -3,7 +3,9 @@ const Code = require('../../models/verificationCode');
 
 // Crypto module for generating more secure numbers than Math.random can provide
 const crypto = require('crypto');
-const mongoose = require('mongoose');
+
+// Nodemailer module for actual emailing
+// const nodemailer = require('nodemailer');
 
 // Generate a verification code of N digits to be sent to a user
 function generateVerificationCode(digits, id, purpose) {
@@ -23,7 +25,7 @@ function generateVerificationCode(digits, id, purpose) {
 }
 
 function sendVerificationEmail(id, name, email) {
-    const verifCode = generateVerificationCode(6, id, "Email Verification");
+    const verifCode = generateVerificationCode(process.env.CODE_LENGTH, id, "Email Verification");
 
     return;
 }
