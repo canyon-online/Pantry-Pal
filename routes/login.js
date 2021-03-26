@@ -38,7 +38,7 @@ function verifyLocal(body, res)
 
 // Function for local login, called after verifyLocal if it succeeds
 async function loginLocal(email, password, res) {
-    let user = await User.findOne({ email: email }).exec();
+    let user = await User.findOne({ email: email.toLowerCase() }).exec();
 
     // No user is found
     if (user == null) {
