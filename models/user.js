@@ -48,6 +48,9 @@ const userSchema = new mongoose.Schema({
 
 // Validation function to ensure that the user has either signed up locally or through Google
 userSchema.pre('validate', function(next) {
+    // Convert the email to lowercase before we do validation
+    this.email = this.email.toLowerCase();
+
     if (this.password || this.google) {
         next();
     } else {
