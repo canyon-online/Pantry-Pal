@@ -28,23 +28,50 @@ function verifyJWT(token) {
     }
 }
 
+// Refresh a currently valid JWT, returns true if the token is valid and not expired
+// Currently a synchronous implementation
+function refreshJWT(token, res) {
+    // Only refresh valid tokens
+    const payload = verifyJWT(token);
 
-// Function to generate and send a JWT 
-async function genAndSendToken(user, res) {
+    if (payload) {
+        const newToken = jwt.sign(payload, jwtKey, {
+            algorithm: 'HS256',
+            expiresIn: jwtExpiryTime
+        });
+
+        if (res)
+            sendTokenHeader(newToken, res);
+
+        return true;
+    }
+    
+    return false;
+}
+
+// Function to send a JWT with a setcookie header
+async function sendTokenHeader(token, res) {
+    // Send the user a JWT token to store to save their session
+    res.cookie("token", token, { httpOnly: true, maxAge: jwtExpiryTime });
+}
+
+// Function to generate and send a JWT in the body of a response
+async function sendTokenBody(user, res) {
     // Generate a JWT using the user objectid
     const token = await generateJWT(user._id, user.display);
 
     // Send the user a JWT token to store to save their session
-    res.cookie("token", token, { httpOnly: true, maxAge: jwtExpiryTime });
+    await sendTokenHeader(token, res);
     res.json({ token: token, expiresIn: jwtExpiryTime });
 }
-
 
 
 // Export pertinent functions and objects related to JSON Web Tokens
 module.exports = {
     generateJWT: generateJWT,
-    sendJWT: genAndSendToken,
+    sendJWTHeader: sendTokenHeader,
+    sendJWTBody: sendTokenBody,
+    refreshJWT: refreshJWT,
     verifyJWT: verifyJWT,
 
     maxAge: jwtExpiryTime

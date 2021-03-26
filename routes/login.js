@@ -63,7 +63,7 @@ async function onLogin(error, user, res)
     }
 
     // No error, so we can generate and send a JWT
-    await jwt.sendJWT(user, res);
+    await jwt.sendJWTBody(user, res);
 
     return;
 }

@@ -83,7 +83,7 @@ async function onPasswordEncrypt(error, body, res, hashword)
         // Now, the user has to be sent a verification email
 
         // No error, so we can generate and send a JWT
-        await jwt.sendJWT(user, res);
+        await jwt.sendJWTBody(user, res);
     })
     .catch(function(err) {
         // Sends the error as output. If there is no ._message attribute, then
