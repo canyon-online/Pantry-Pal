@@ -1,8 +1,10 @@
 import 'package:client/utils/AuthProvider.dart';
 import 'package:client/utils/RouteNames.dart';
+import 'package:client/utils/User.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:client/utils/StringValidator.dart';
+import 'package:provider/provider.dart';
 
 class Signup extends StatelessWidget {
   // Form key is important for implementation of the InputBox class and reading the
@@ -174,7 +176,12 @@ class Signup extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(value['message']))),
                     if (value['status'] == true)
-                      Navigator.pushNamed(context, RouteName.HOME)
+                      {
+                        print('setting user in login: ' + value['user'].name),
+                        Provider.of<UserProvider>(context, listen: false)
+                            .setUser(value['user']),
+                        Navigator.pushNamed(context, RouteName.HOME)
+                      }
                   })
               .catchError((error) => {
                     print(error),

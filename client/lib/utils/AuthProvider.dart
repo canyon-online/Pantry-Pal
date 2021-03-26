@@ -5,6 +5,8 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'package:client/screens/landing/API.dart';
+import 'package:client/utils/User.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -46,9 +48,40 @@ class AuthProvider with ChangeNotifier {
   Status get loggedInStatus => _loggedInStatus;
   Status get registeredStatus => _registeredStatus;
 
-  void saveLogin(String token) {
-    print('Saved token ' + token);
-    UserPreference().saveUser(token);
+  Map<String, dynamic> parseJwt(String token) {
+    final parts = token.split('.');
+    final payload = _decodeBase64(parts[1]);
+    final payloadMap = json.decode(payload);
+    return payloadMap;
+  }
+
+  String _decodeBase64(String str) {
+    String output = str.replaceAll('-', '+').replaceAll('_', '/');
+
+    switch (output.length % 4) {
+      case 0:
+        break;
+      case 2:
+        output += '==';
+        break;
+      case 3:
+        output += '=';
+        break;
+      default:
+        throw Exception('Illegal base64url string!"');
+    }
+
+    return utf8.decode(base64Url.decode(output));
+  }
+
+  User saveLogin(Map<String, dynamic> responseData) {
+    var userData = parseJwt(responseData['token']);
+    userData['token'] = responseData['token'];
+    print(userData);
+    User authUser = User.fromMap(userData);
+    print('New user created in saveLogin: ' + authUser.name);
+    UserPreference().saveUser(authUser);
+    return authUser;
   }
 
   // API call to login a user and save login info.
@@ -64,23 +97,28 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     Response response = await http.post(
-      Uri.https('testing.hasty.cc', 'api/login'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
+      Uri.https(API.baseURL, API.login),
+      headers: API.postHeader,
       body: jsonEncode(loginData),
     );
 
     final Map<String, dynamic> responseData = json.decode(response.body);
-    if (response.statusCode == 200 && responseData['error'] == null) {
-      print(responseData);
-      _loggedInStatus = Status.LoggedIn;
-      notifyListeners();
-      result = {'status': true, 'message': 'Successfully logged in'};
-    } else {
-      _loggedInStatus = Status.NotLoggedIn;
-      notifyListeners();
-      result = {'status': false, 'message': responseData['error']};
+    try {
+      if (response.statusCode == 200 && responseData['error'] == null) {
+        _loggedInStatus = Status.LoggedIn;
+        result = {
+          'status': true,
+          'message': 'Successfully logged in',
+          'user': saveLogin(responseData)
+        };
+        notifyListeners();
+      } else {
+        _loggedInStatus = Status.NotLoggedIn;
+        notifyListeners();
+        result = {'status': false, 'message': responseData['error']};
+      }
+    } catch (on, stacktrace) {
+      print(stacktrace.toString());
     }
 
     return result;
@@ -101,10 +139,8 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     final response = await http.post(
-      Uri.https('testing.hasty.cc', 'api/register'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
+      Uri.https(API.baseURL, API.signup),
+      headers: API.postHeader,
       body: jsonEncode(signupData),
     );
 
@@ -112,11 +148,12 @@ class AuthProvider with ChangeNotifier {
     if (response.statusCode == 200) {
       _registeredStatus = Status.Registered;
       _loggedInStatus = Status.LoggedIn;
-      notifyListeners();
       result = {
         'status': true,
-        'message': 'Successfully registered and logged in'
+        'message': 'Successfully registered and logged in',
+        'user': saveLogin(responseData)
       };
+      notifyListeners();
     } else {
       _registeredStatus = Status.NotRegistered;
       _loggedInStatus = Status.NotLoggedIn;

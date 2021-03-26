@@ -1,8 +1,10 @@
+import 'package:client/utils/User.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utils/AuthProvider.dart';
 import 'package:client/utils/RouteNames.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:client/utils/StringValidator.dart';
+import 'package:provider/provider.dart';
 
 // Login page class that extends stateless widget because it won't change itself.
 class Login extends StatelessWidget {
@@ -138,6 +140,7 @@ class Login extends StatelessWidget {
   // Function to build and return a form submit button. This is critical to the
   // implementation of the InputBox class.
   Widget _buildSubmit(context) {
+    AuthProvider auth = Provider.of<AuthProvider>(context);
     return ElevatedButton(
       onPressed: () {
         var validated = _formKey.currentState?.validate() ?? false;
@@ -146,17 +149,22 @@ class Login extends StatelessWidget {
         // returns a Future object, which may be used in implementing spining loading
         // wheel objects and such.
         if (validated) {
-          AuthProvider()
+          auth
               .login(_login.text, _pass.text)
               .then((value) => {
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(value['message']))),
                     if (value['status'] == true)
-                      Navigator.pushNamed(context, RouteName.HOME)
+                      {
+                        print('setting user in login: ' + value['user'].name),
+                        Provider.of<UserProvider>(context, listen: false)
+                            .setUser(value['user']),
+                        Navigator.pushNamed(context, RouteName.HOME)
+                      }
                   })
               .catchError((error) => {
                     ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: error))
+                        .showSnackBar(SnackBar(content: Text(error.toString())))
                   });
         }
       },
@@ -196,6 +204,10 @@ class Login extends StatelessWidget {
           // Attach the form key to the InputBox.
           _formKey,
           // Attach the submit button to the InputBox.
+
+          // auth.loggedInStatus == Status.Authenticating
+          //     ? loading
+          //     : longButtons("Login", doLogin),
           _buildSubmit(context)),
     ));
   }

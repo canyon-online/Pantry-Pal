@@ -1,19 +1,33 @@
+import 'package:client/utils/User.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
 class UserPreference {
-  Future<bool> saveUser(String token) async {
+  Future<bool> saveUser(User user) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.setString('cookie', token);
+    print('saved :' + user.userId + ', ' + user.name + ', ' + user.token + '.');
+    prefs.setString('userId', user.userId);
+    prefs.setString('name', user.name);
+
+    return prefs.setString('token', user.token);
   }
 
-  Future<String?> getUser() async {
+  Future<User> getUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('cookie');
+
+    String userId = prefs.getString('userId') ?? 'null';
+    String name = prefs.getString('name') ?? 'null';
+    String token = prefs.getString('token') ?? 'null';
+    print('fetched: ' + userId + ', ' + name + ', ' + token + '.');
+
+    return User(userId: userId, name: name, token: token);
   }
 
   void removeUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('cookie');
+
+    prefs.remove('userId');
+    prefs.remove('name');
+    prefs.remove('token');
   }
 }
