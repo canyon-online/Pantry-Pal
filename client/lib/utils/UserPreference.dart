@@ -30,4 +30,10 @@ class UserPreference {
     prefs.remove('name');
     prefs.remove('token');
   }
+
+  Future<String> getToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? 'null';
+    return token;
+  }
 }

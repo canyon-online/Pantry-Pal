@@ -14,6 +14,8 @@ class HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     User user = Provider.of<UserProvider>(context).user;
+    AuthProvider auth = Provider.of<AuthProvider>(context);
+
     int _currentIndex = 0;
 
     final List<Widget> _children = [
@@ -31,7 +33,7 @@ class HomeState extends State<Home> {
 
     // Hacky way of forcing people to login is to display the login screen if the
     // app is not logged in...
-    return AuthProvider().loggedInStatus != Status.LoggedIn
+    return auth.loggedInStatus == Status.LoggedIn
         ? SafeArea(
             child: Scaffold(
             appBar: AppBar(

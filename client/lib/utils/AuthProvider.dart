@@ -118,7 +118,7 @@ class AuthProvider with ChangeNotifier {
         result = {'status': false, 'message': responseData['error']};
       }
     } catch (on, stacktrace) {
-      print(stacktrace.toString());
+      result = {'status': false, 'message': stacktrace.toString()};
     }
 
     return result;
@@ -160,7 +160,12 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
       result = {'status': false, 'message': responseData['error']};
     }
-
     return result;
+  }
+
+  void logout() {
+    UserPreference().removeUser();
+    _loggedInStatus = Status.NotLoggedIn;
+    notifyListeners();
   }
 }

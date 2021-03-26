@@ -16,7 +16,7 @@ class User {
 }
 
 class UserProvider with ChangeNotifier {
-  User _user = new User(userId: '', name: '', token: '');
+  User _user = new User(userId: 'null', name: 'null', token: 'null');
   User get user => _user;
 
   void setUser(User user) {

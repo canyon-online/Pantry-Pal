@@ -159,7 +159,8 @@ class Login extends StatelessWidget {
                         print('setting user in login: ' + value['user'].name),
                         Provider.of<UserProvider>(context, listen: false)
                             .setUser(value['user']),
-                        Navigator.pushNamed(context, RouteName.HOME)
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, RouteName.HOME, (_) => false)
                       }
                   })
               .catchError((error) => {
