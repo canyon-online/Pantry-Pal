@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 
 // To allow cross origin access uncomment the cors lines.
-// const cors = require('cors');
+const cors = require('cors');
 
 // Load the process environmental variables, located in a .dotenv file
 require('dotenv').config()
@@ -26,7 +26,7 @@ const PORT = process.env.PORT;
 // and the path is the database name. We'll just call ours my_local_db.
 const MONGODB_URI = "mongodb://localhost:27017/my_local_db";
 
-// app.use(cors())
+app.use(cors())
 
 // Chaining Express's use method to our app object gives us access to the libraries
 // we imported. express.urlencoded({ extended: true }) and express.json() are middleware
