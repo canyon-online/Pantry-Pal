@@ -5,14 +5,12 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:client/screens/landing/API.dart';
+import 'package:client/utils/API.dart';
 import 'package:client/utils/User.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:client/utils/UserPreference.dart';
-
-// TODO: REPLACE API LINKS WITH CONSTANTS
 
 enum Status {
   Authenticating,

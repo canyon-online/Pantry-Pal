@@ -12,7 +12,7 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
-  int _currentIndex = 1;
+  int _currentIndex = 0;
 
   final List<Widget> _children = [
     HomeView(),
@@ -40,12 +40,12 @@ class HomeState extends State<Home> {
             appBar: AppBar(
               title: Center(child: const Text('Pantry Pal')),
             ),
-            body: _children[_currentIndex], // new
+            body: _children[_currentIndex],
             bottomNavigationBar: BottomNavigationBar(
-              onTap: onTabTapped, // new
+              onTap: onTabTapped,
               showUnselectedLabels: true,
               iconSize: 1,
-              currentIndex: _currentIndex, // new
+              currentIndex: _currentIndex,
               items: [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home),

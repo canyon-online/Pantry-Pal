@@ -1,4 +1,3 @@
-import 'package:client/utils/RouteNames.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utils/StringValidator.dart';
@@ -126,7 +125,10 @@ class ForgotPasswordState extends State<ForgotPassword> {
         }
         break;
       case Step.login:
-        // TODO: Handle this case.
+        var validated = _formKeyResetPassword.currentState?.validate() ?? false;
+        if (validated) {
+          // TODO: Patch password call, navigate to home/login screen.
+        }
         break;
     }
   }
