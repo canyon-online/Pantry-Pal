@@ -1,11 +1,46 @@
 // Create an instance of the Express Router to be used as middleware for our routes.
-const express = require ('express'); 
+const express = require('express'); 
+const jwt = require('./lib/jwtUtils');
+
 const router = express.Router(); 
+
+// Make the router refresh the JWT for all endpoints
+// TODO: make JWT functions asynchronous so this does not bog down the server
+router.use(function(req, res, next) {
+    // Do not try to refresh a token when dealing with endpoints that do not require authorization
+    // Probably better to create two routers: one for authenticated actions and the other for others
+    if (req.path.startsWith('/register') || req.path.startsWith('/login')) {
+        next();
+        return;
+    }
+
+    // Exclusions for unauthenticated pages
+    if (req.path.includes("/forgotPassword")) {
+        next();
+        return;
+    }
+
+    if (req.cookies && req.cookies.token) {
+        const success = jwt.refreshJWT(req.cookies.token, res);
+
+        if (!success) {
+            res.status(401).json({ error: "The passed authenticaton token is invalid" });
+            return;
+        }
+
+    } else {
+        res.status(401).json({ error: "You must be logged in to perform this action" });
+        return;
+    }
+
+    next();
+});
 
 // Import api endpoints
 const apiEndpoints = {
     login: require('./login'),
     register: require('./register'),
+    account: require('./account')
 }
 
 // Pass the router to the endpoints, allowing them to use it

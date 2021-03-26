@@ -11,8 +11,7 @@ const jwtKey = process.env.JWT_SECRET_KEY;
 // Currently a synchronous implementation
 function generateJWT(oid, name) {
     const token = jwt.sign({ userId: oid, name: name }, jwtKey, {
-        algorithm: 'HS256',
-        expiresIn: jwtExpiryTime
+        algorithm: 'HS256'
     });
 
     return token;
@@ -22,8 +21,9 @@ function generateJWT(oid, name) {
 // Currently a synchronous implementation
 function verifyJWT(token) {
     try {
-        return jwt.verify(jwtKey, token);
+        return jwt.verify(token, jwtKey);
     } catch(err) {
+        console.log(err);
         return null;
     }
 }
@@ -36,8 +36,7 @@ function refreshJWT(token, res) {
 
     if (payload) {
         const newToken = jwt.sign(payload, jwtKey, {
-            algorithm: 'HS256',
-            expiresIn: jwtExpiryTime
+            algorithm: 'HS256'
         });
 
         if (res)
