@@ -1,17 +1,16 @@
 import 'dart:convert';
-
 import 'package:client/models/Ingredient.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class IngredientFieldController {
-  List<String> list = [];
+  Set<String> list = Set();
+  late String selectedIngredient;
 }
 
 class IngredientField extends StatefulWidget {
   final IngredientFieldController controller;
-
   IngredientField({required this.controller});
 
   @override
@@ -19,15 +18,20 @@ class IngredientField extends StatefulWidget {
 }
 
 class IngredientFieldState extends State<IngredientField> {
-  @override
-  build(BuildContext context) {
+  void handleOnChange(Ingredient? value) {
+    setState(() {
+      widget.controller.selectedIngredient = value!.name;
+    });
+  }
+
+  Widget _buildDropDown() {
     return DropdownSearch<Ingredient>(
-      label: 'Name',
+      label: 'Ingredient',
       showSearchBox: true,
       searchBoxDecoration: InputDecoration(
         border: OutlineInputBorder(),
         contentPadding: EdgeInsets.fromLTRB(12, 12, 8, 0),
-        labelText: "Search a name",
+        labelText: 'Search an ingredient',
       ),
       onFind: (String filter) async {
         var response = await http.get(
@@ -36,7 +40,49 @@ class IngredientFieldState extends State<IngredientField> {
         );
         return Ingredient.fromJsonList(json.decode(response.body));
       },
-      onChanged: print,
+      onChanged: handleOnChange,
+    );
+  }
+
+  @override
+  build(BuildContext context) {
+    return Container(
+      child: Column(children: [
+        Row(children: [
+          Expanded(child: _buildDropDown()),
+          IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: 'Add the selected ingredient',
+            onPressed: () {
+              setState(() {
+                widget.controller.list
+                    .add(widget.controller.selectedIngredient);
+                print(widget.controller.list);
+              });
+            },
+          )
+        ]),
+        // Using a ListView builder here is extremely dubious and might cause
+        // some problems in the future.
+        ListView.builder(
+            itemCount: widget.controller.list.length,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              var item = widget.controller.list.elementAt(index);
+              return Row(children: [
+                Text(item),
+                IconButton(
+                  icon: const Icon(Icons.remove),
+                  tooltip: 'Remove this ingredient',
+                  onPressed: () {
+                    setState(() {
+                      widget.controller.list.remove(item);
+                    });
+                  },
+                )
+              ]);
+            })
+      ]),
     );
   }
 }
