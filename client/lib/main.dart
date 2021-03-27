@@ -35,8 +35,8 @@ class MyApp extends StatelessWidget {
                 // depending on how we want the project to look.
                 theme: ThemeData(
                   // PrimarySwatch and color mostly deal with how text vs. buttons are colored.
-                  primarySwatch: Colors.deepPurple,
-                  primaryColor: Colors.deepPurple,
+                  primarySwatch: Colors.green,
+                  primaryColor: Colors.green,
                   accentColor: Colors.grey,
                 ),
 
