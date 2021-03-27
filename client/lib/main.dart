@@ -4,7 +4,7 @@ import 'package:client/screens/landing/login.dart';
 import 'package:client/screens/landing/signup.dart';
 import 'package:client/screens/landing/forgotPassword.dart';
 import 'package:client/utils/AuthProvider.dart';
-import 'package:client/utils/User.dart';
+import 'package:client/utils/UserProvider.dart';
 import 'package:client/utils/UserPreference.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

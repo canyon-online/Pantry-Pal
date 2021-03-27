@@ -1,6 +1,6 @@
 import 'package:client/utils/AuthProvider.dart';
 import 'package:client/utils/RouteNames.dart';
-import 'package:client/utils/User.dart';
+import 'package:client/utils/UserProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:client/utils/StringValidator.dart';

@@ -1,4 +1,4 @@
-import 'package:client/utils/User.dart';
+import 'package:client/utils/UserProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utils/AuthProvider.dart';
 import 'package:client/utils/RouteNames.dart';

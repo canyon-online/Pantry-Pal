@@ -1,7 +1,7 @@
 import 'package:client/models/User.dart';
 import 'package:client/screens/landing/landing.dart';
 import 'package:client/utils/AuthProvider.dart';
-import 'package:client/utils/User.dart';
+import 'package:client/utils/UserProvider.dart';
 import 'package:client/widgets/CreateView.dart';
 import 'package:client/widgets/HomeView.dart';
 import 'package:flutter/material.dart';
