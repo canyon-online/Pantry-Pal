@@ -82,7 +82,7 @@ class IngredientPill extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(2, 0, 2, 0),
           child: Text(
             ingredient,
-            style: TextStyle(color: Colors.white, fontSize: 12),
+            style: TextStyle(color: Colors.white, fontSize: 14),
           )),
     );
   }
@@ -92,7 +92,6 @@ class RecipeCardState extends State<RecipeCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-        margin: EdgeInsets.fromLTRB(30, 15, 15, 30),
         child: InkWell(
             onTap: () {
               print('Card tapped');
@@ -100,6 +99,7 @@ class RecipeCardState extends State<RecipeCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 widget.recipe.image,
                 Container(
@@ -121,7 +121,7 @@ class RecipeCardState extends State<RecipeCard> {
                           Column(
                             children: [
                               LikeButton(
-                                  size: 24,
+                                  size: 30,
                                   likeCountAnimationDuration:
                                       Duration(milliseconds: 200),
                                   onTap: (value) {
@@ -141,13 +141,15 @@ class RecipeCardState extends State<RecipeCard> {
                               Wrap(
                                 crossAxisAlignment: WrapCrossAlignment.center,
                                 children: [
-                                  Icon(Icons.touch_app, color: Colors.grey),
+                                  Icon(Icons.touch_app,
+                                      color: Colors.grey, size: 30),
                                   Text(widget.recipe.hits.round().toString()),
                                 ],
                               )
                             ],
                           ),
                           Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: List<Widget>.generate(
                                   widget.recipe.tags.length,
                                   (int index) => IngredientPill(
