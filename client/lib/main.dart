@@ -8,7 +8,8 @@ import 'package:client/utils/User.dart';
 import 'package:client/utils/UserPreference.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'utils/routeNames.dart';
+import 'models/User.dart';
+import 'utils/RouteNames.dart';
 
 void main() {
   runApp(MyApp());

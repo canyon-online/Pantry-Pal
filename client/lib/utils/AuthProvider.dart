@@ -5,6 +5,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'package:client/models/User.dart';
 import 'package:client/utils/API.dart';
 import 'package:client/utils/User.dart';
 import 'package:http/http.dart' as http;

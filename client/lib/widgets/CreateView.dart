@@ -1,3 +1,4 @@
+import 'package:client/widgets/IngredientField.dart';
 import 'package:flutter/material.dart';
 
 class CreateView extends StatefulWidget {
@@ -7,13 +8,12 @@ class CreateView extends StatefulWidget {
 
 // Creates a state class relating to the addRecipeForm widget
 class CreateViewState extends State<CreateView> {
-  // TODO: Offsource the ingredients dropdown to a new widget.
   // Ingredient list & get, add, remove, and console print fxns
   List<String> ingredients = ['carrot', 'second carrot', 'something else'];
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _name = TextEditingController();
   final TextEditingController _directions = TextEditingController();
-  final TextEditingController _ingredient = TextEditingController();
+  final IngredientFieldController _ingredients = IngredientFieldController();
   double _currentSliderValue = 5;
 
   void addIngredient(String ingredient) {
@@ -36,23 +36,7 @@ class CreateViewState extends State<CreateView> {
   }
 
   Widget _buildIngredientField() {
-    return TextFormField(
-      controller: _ingredient,
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        suffixIcon: IconButton(
-          icon: Icon(Icons.add),
-          onPressed: () => {addIngredient('test')},
-        ),
-        labelText: 'Add an Ingredient',
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter some text';
-        }
-        return null;
-      },
-    );
+    return IngredientField(controller: _ingredients);
   }
 
   Widget _buildInstructionsField() {
@@ -100,7 +84,7 @@ class CreateViewState extends State<CreateView> {
             // FETCH VALUES FROM FIELDS
             print(_name.text);
             print(_directions.text);
-            print(_ingredient.text);
+            print(_ingredients.list);
             print(_currentSliderValue);
           }
           ScaffoldMessenger.of(context)

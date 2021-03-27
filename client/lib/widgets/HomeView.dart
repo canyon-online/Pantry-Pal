@@ -1,5 +1,6 @@
+import 'package:client/models/Recipe.dart';
+import 'package:client/widgets/RecipeCard.dart';
 import 'package:flutter/material.dart';
-import 'Recipe.dart';
 
 class HomeView extends StatefulWidget {
   @override

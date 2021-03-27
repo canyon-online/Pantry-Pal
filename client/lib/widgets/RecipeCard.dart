@@ -1,61 +1,6 @@
+import 'package:client/models/Recipe.dart';
 import 'package:flutter/material.dart';
 import 'package:like_button/like_button.dart';
-
-class Recipe {
-  String recipeId;
-  String author;
-  String name;
-  // List<Ingredient> ingredients;
-  String directions;
-  List<String> tags;
-  Image image;
-  int favorites;
-  int hits;
-  int difficulty;
-
-  Recipe(
-      {required this.recipeId,
-      required this.name,
-      required this.author,
-      required this.directions,
-      required this.favorites,
-      required this.difficulty,
-      required this.hits,
-      required this.image,
-      required this.tags});
-
-  factory Recipe.fromMap(Map<String, dynamic> data) {
-    return Recipe(
-      recipeId: data['recipeId'] ?? 'NULL',
-      name: data['name'] ?? 'NULL',
-      author: data['author'] ?? 'NULL',
-      directions: data['directions'] ?? 'NULL',
-      favorites: data['favorites'] ?? 0,
-      image: data['image'] ??
-          Image(
-              image: AssetImage('assets/images/noodles.jpg'),
-              fit: BoxFit.fitWidth),
-      tags: data['tags'] ?? [],
-      difficulty: data['difficulty'] ?? 0,
-      hits: data['hits'] ?? 0,
-    );
-  }
-
-  factory Recipe.defaultRecipe() {
-    return Recipe(
-      recipeId: 'myrecipeidhere123',
-      name: 'Soy Sauce Garlic Butter Noodles',
-      author: 'super_amazing_cook12',
-      directions: 'cook it',
-      image: Image(
-          image: AssetImage('assets/images/noodles.jpg'), fit: BoxFit.fitWidth),
-      favorites: 1230,
-      difficulty: 2,
-      tags: ['Vegetarian', '🥡'],
-      hits: 12304,
-    );
-  }
-}
 
 class RecipeCard extends StatefulWidget {
   final Recipe recipe;

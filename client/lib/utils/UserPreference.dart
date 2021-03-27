@@ -1,4 +1,4 @@
-import 'package:client/utils/User.dart';
+import 'package:client/models/User.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
