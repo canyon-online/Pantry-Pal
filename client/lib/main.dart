@@ -1,8 +1,8 @@
-import 'package:client/screens/home/home.dart';
-import 'package:client/screens/landing/landing.dart';
-import 'package:client/screens/landing/login.dart';
-import 'package:client/screens/landing/signup.dart';
-import 'package:client/screens/landing/forgotPassword.dart';
+import 'package:client/screens/home.dart';
+import 'package:client/screens/landing.dart';
+import 'package:client/screens/login.dart';
+import 'package:client/screens/signup.dart';
+import 'package:client/screens/forgotPassword.dart';
 import 'package:client/utils/AuthProvider.dart';
 import 'package:client/utils/UserProvider.dart';
 import 'package:client/utils/UserPreference.dart';
