@@ -27,23 +27,21 @@ class HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Scrollbar(
-        child: GridView.builder(
-          padding: EdgeInsets.fromLTRB(30, 15, 15, 30),
-          controller: controller,
-          shrinkWrap: true,
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            return items[index];
-          },
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              mainAxisExtent: 391,
-              maxCrossAxisExtent: 500,
-              mainAxisSpacing: 30,
-              crossAxisSpacing: 30,
-              childAspectRatio: 391 / 500),
-        ),
+    return Scrollbar(
+      child: GridView.builder(
+        padding: EdgeInsets.fromLTRB(30, 15, 15, 30),
+        controller: controller,
+        shrinkWrap: true,
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          return items[index];
+        },
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            mainAxisExtent: 391,
+            maxCrossAxisExtent: 500,
+            mainAxisSpacing: 30,
+            crossAxisSpacing: 30,
+            childAspectRatio: 391 / 500),
       ),
     );
   }

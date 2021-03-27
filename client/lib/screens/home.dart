@@ -38,6 +38,7 @@ class HomeState extends State<Home> {
     return auth.loggedInStatus == Status.LoggedIn
         ? SafeArea(
             child: Scaffold(
+            resizeToAvoidBottomInset: true,
             appBar: AppBar(
               title: Center(child: const Text('Pantry Pal')),
             ),
