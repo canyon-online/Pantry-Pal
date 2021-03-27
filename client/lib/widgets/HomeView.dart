@@ -38,10 +38,10 @@ class HomeViewState extends State<HomeView> {
           },
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
               mainAxisExtent: 391,
-              maxCrossAxisExtent: 410,
+              maxCrossAxisExtent: 500,
               mainAxisSpacing: 30,
               crossAxisSpacing: 30,
-              childAspectRatio: 391 / 410),
+              childAspectRatio: 391 / 500),
         ),
       ),
     );

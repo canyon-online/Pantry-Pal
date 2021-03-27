@@ -89,6 +89,43 @@ class IngredientPill extends StatelessWidget {
 }
 
 class RecipeCardState extends State<RecipeCard> {
+  Widget _drawCardBody() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          children: [
+            LikeButton(
+                size: 30,
+                likeCountAnimationDuration: Duration(milliseconds: 200),
+                onTap: (value) {
+                  // favorited = !favorited;
+                  return Future.value(!value);
+                },
+                likeCount: widget.recipe.favorites,
+                countBuilder: (count, bool isLiked, String text) {
+                  var color = isLiked ? Colors.pink : Colors.grey;
+                  return count == 0
+                      ? Text('love', style: TextStyle(color: color))
+                      : Text(text);
+                }),
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Icon(Icons.touch_app, color: Colors.grey, size: 30),
+                Text(widget.recipe.hits.round().toString()),
+              ],
+            )
+          ],
+        ),
+        Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: List<Widget>.generate(widget.recipe.tags.length,
+                (int index) => IngredientPill(widget.recipe.tags[index])))
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -109,53 +146,14 @@ class RecipeCardState extends State<RecipeCard> {
                       Divider(height: 20, thickness: 2),
                       Text(
                         widget.recipe.name,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 22),
                       ),
                       Text(widget.recipe.author,
                           style: TextStyle(fontSize: 14, color: Colors.grey)),
                       SizedBox(height: 15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              LikeButton(
-                                  size: 30,
-                                  likeCountAnimationDuration:
-                                      Duration(milliseconds: 200),
-                                  onTap: (value) {
-                                    // favorited = !favorited;
-                                    return Future.value(!value);
-                                  },
-                                  likeCount: widget.recipe.favorites,
-                                  countBuilder:
-                                      (count, bool isLiked, String text) {
-                                    var color =
-                                        isLiked ? Colors.pink : Colors.grey;
-                                    return count == 0
-                                        ? Text('love',
-                                            style: TextStyle(color: color))
-                                        : Text(text);
-                                  }),
-                              Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                children: [
-                                  Icon(Icons.touch_app,
-                                      color: Colors.grey, size: 30),
-                                  Text(widget.recipe.hits.round().toString()),
-                                ],
-                              )
-                            ],
-                          ),
-                          Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: List<Widget>.generate(
-                                  widget.recipe.tags.length,
-                                  (int index) => IngredientPill(
-                                      widget.recipe.tags[index])))
-                        ],
-                      ),
+                      _drawCardBody(),
                       SizedBox(height: 10),
                     ],
                   ),
