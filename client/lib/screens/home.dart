@@ -4,6 +4,7 @@ import 'package:client/utils/AuthProvider.dart';
 import 'package:client/utils/UserProvider.dart';
 import 'package:client/widgets/CreateView.dart';
 import 'package:client/widgets/HomeView.dart';
+import 'package:client/widgets/ProfileView.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +20,7 @@ class HomeState extends State<Home> {
     HomeView(),
     CreateView(),
     Text('Index 2: Search'),
-    Text('Index 3: Profile I think?'),
+    ProfileView(),
   ];
 
   void onTabTapped(int index) {

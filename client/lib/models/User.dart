@@ -17,4 +17,15 @@ class User {
         token: data['token'],
         verified: data['verified']);
   }
+
+  factory User.fromJson(Map<String, dynamic> data) {
+    return User.fromMap(data);
+  }
+
+  String userAsString() {
+    return '#${this.userId} ${this.name}';
+  }
+
+  @override
+  String toString() => userAsString();
 }
