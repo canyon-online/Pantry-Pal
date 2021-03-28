@@ -35,7 +35,8 @@ function use(router) {
         }
 
         // Get the userid from the JWT (can assume that there is a valid token)
-        const { userId } = jwt.verifyJWT(req.cookies.token);
+        const token = req.headers.authorization.split(' ')[1];
+        const { userId } = jwt.verifyJWT(token);
 
         // Attempt to find the code by the request body
         const retrievedCode = await getCode(req.body.code, userId, "Email Verification");
@@ -59,7 +60,8 @@ function use(router) {
     // Assumed a user is logged in to access this endpoint
     router.post(constructPath(endpointPath, '/verify/requestEmail'), async function(req, res) {
         // Get the userid from the JWT (can assume that there is a valid token)
-        const { userId } = jwt.verifyJWT(req.cookies.token);
+        const token = req.headers.authorization.split(' ')[1];
+        const { userId } = jwt.verifyJWT(token);
         const user = await User.findById(userId);
 
         // Ensure that the user is not already verified

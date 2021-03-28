@@ -39,7 +39,8 @@ function use(router) {
         }
 
         // Get the userid from the JWT (can assume that there is a valid token)
-        const { userId } = jwt.verifyJWT(req.cookies.token);
+        const token = req.headers.authorization.split(' ')[1];
+        const { userId } = jwt.verifyJWT(token);
 
         // Attempt to create a new recipe
         const recipe = new Recipe({

@@ -48,10 +48,10 @@ function refreshJWT(token, res) {
     return false;
 }
 
-// Function to send a JWT with a setcookie header
+// Function to send a JWT with a header to indicate an updated JWT
 async function sendTokenHeader(token, res) {
     // Send the user a JWT token to store to save their session
-    res.cookie("token", token, { httpOnly: true, maxAge: jwtExpiryTime });
+    res.set('Auth-Update', token);
 }
 
 // Function to generate and send a JWT in the body of a response

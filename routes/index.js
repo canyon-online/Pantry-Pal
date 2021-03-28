@@ -21,9 +21,12 @@ router.use(async function(req, res, next) {
         return;
     }
 
-    if (req.cookies && req.cookies.token) {
+    if (req.headers.authorization) {
+        // Extract the token from the header
+        const token = req.headers.authorization.split(' ')[1];
+
         // Attempt to refresh the current JWT if it is valid
-        const success = jwt.refreshJWT(req.cookies.token, res);
+        const success = jwt.refreshJWT(token, res);
 
         if (!success) {
             res.status(401).json({ error: "The passed authenticaton token is invalid" });
@@ -32,7 +35,7 @@ router.use(async function(req, res, next) {
 
         // If the user is not in the process of verification, ensure that the user is verified
         if (!req.path.includes("/verify")) {
-            const { userId } = jwt.verifyJWT(req.cookies.token);
+            const { userId } = jwt.verifyJWT(token);
             const user = await User.findById(userId).exec();
             if (!user.verified) {
                 res.status(401).json({ error: "Your account must be verified to perform this action" });
