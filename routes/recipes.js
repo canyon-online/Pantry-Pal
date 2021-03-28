@@ -104,8 +104,25 @@ function use(router) {
         query.skip(offset * limit);
         query.limit(limit);
 
-        // todo: handle sorting field and direction
-        query.sort({numHits: "asc"});
+        // Allow different methods of sorting
+        const sortBy = req.query.sortBy;
+        if (sortBy) {
+            if (Recipe.schema.obj[sortBy].type == Number) {
+                const direction = req.query.direction || -1;
+
+                // Ensure that the direction is a valid one (1 and -1 for asc/desc)
+                if (direction != 1 && direction != -1)
+                    direction = -1;
+
+                query.sort(`${direction == 1 ? '' : '-'}${sortBy}`);
+            }
+            else {
+                query.sort({numHits: -1}); // default case
+            }
+        } else {
+            query.sort({numHits: -1}); // default case
+        }
+        
 
         let foundRecipes = await query.exec();
 
