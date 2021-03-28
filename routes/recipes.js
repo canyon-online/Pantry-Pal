@@ -10,13 +10,26 @@ const Recipe = require('../models/recipe');
 // In the current version, this is /api/recipes
 const endpointPath = '/recipes';
 
+// The maximum number of records allowed to be returned in one request
+const maxRecords = process.env.MAX_RECORD_RETURNS || 50;
+
 // Function to concatenate paths
 function constructPath(pathRoot, path) {
     return pathRoot + path;
 }
 
+// Given a list of recipes, recover the users and return a list of them
+async function getUsersForRecipes(recipes) {
+    for (var i = 0; i < recipes.length; i++) {
+        recipes[i].author = await User.findById(recipes[i].author, '_id display').exec();
+    }
+
+    return recipes;
+}
+
 function use(router) {
     // All of these endpoints are authenticated actions
+    // POST /, creates a recipe and returns it
     router.post(constructPath(endpointPath, '/'), async function(req, res) { 
         // Ensure that a recipe was properly passed to this endpoint
         if (!req.body || !req.body.name || !req.body.directions || !req.body.image) {
@@ -44,6 +57,25 @@ function use(router) {
         }).catch(function(err) {
             res.status(422).json({ error: "Failed to create a recipe with provided properties" });
         });
+    });
+
+    // GET /, returns list of recipes matching given query parameters
+    router.get(constructPath(endpointPath, '/'), async function(req, res) {
+        var query;
+
+        // Based on query parameters, construct the query
+        query = Recipe.find({});
+
+        // Actually execute query, ensuring it only returns pertinent fields
+        query.limit(maxRecords);
+        query.sort({numHits: "asc"});
+
+        let foundRecipes = await query.exec();
+
+        // Now we want to reveal some user information for each record found
+        foundRecipes = await getUsersForRecipes(foundRecipes);
+
+        res.json(foundRecipes);
     });
 }
 
