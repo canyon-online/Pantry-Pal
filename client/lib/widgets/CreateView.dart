@@ -58,19 +58,17 @@ class CreateViewState extends State<CreateView> {
   }
 
   Widget _buildSlider() {
-    return Expanded(
-      child: Slider(
-        value: _currentSliderValue,
-        min: 1,
-        max: 10,
-        divisions: 9,
-        label: _currentSliderValue.round().toString(),
-        onChanged: (double value) {
-          setState(() {
-            _currentSliderValue = value;
-          });
-        },
-      ),
+    return Slider(
+      value: _currentSliderValue,
+      min: 1,
+      max: 10,
+      divisions: 9,
+      label: _currentSliderValue.round().toString(),
+      onChanged: (double value) {
+        setState(() {
+          _currentSliderValue = value;
+        });
+      },
     );
   }
 
@@ -95,8 +93,7 @@ class CreateViewState extends State<CreateView> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildForm(context) {
     return Form(
       key: _formKey,
       child: Padding(
@@ -112,6 +109,13 @@ class CreateViewState extends State<CreateView> {
           ],
         ),
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Container(child: _buildForm(context)),
     );
   }
 }

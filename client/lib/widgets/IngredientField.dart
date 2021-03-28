@@ -64,24 +64,29 @@ class IngredientFieldState extends State<IngredientField> {
         ]),
         // Using a ListView builder here is extremely dubious and might cause
         // some problems in the future.
-        ListView.builder(
-            itemCount: widget.controller.list.length,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              var item = widget.controller.list.elementAt(index);
-              return Row(children: [
-                Text(item),
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  tooltip: 'Remove this ingredient',
-                  onPressed: () {
-                    setState(() {
-                      widget.controller.list.remove(item);
-                    });
-                  },
-                )
-              ]);
-            })
+        Container(
+          height: widget.controller.list.length * 50 < 150
+              ? widget.controller.list.length * 50
+              : 150,
+          child: ListView.builder(
+              itemCount: widget.controller.list.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                var item = widget.controller.list.elementAt(index);
+                return Row(children: [
+                  Text(item),
+                  IconButton(
+                    icon: const Icon(Icons.remove),
+                    tooltip: 'Remove this ingredient',
+                    onPressed: () {
+                      setState(() {
+                        widget.controller.list.remove(item);
+                      });
+                    },
+                  )
+                ]);
+              }),
+        )
       ]),
     );
   }
