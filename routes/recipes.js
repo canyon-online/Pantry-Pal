@@ -98,6 +98,10 @@ function use(router) {
             }
         }
 
+        // Estimate the total amount of recipes that would be found before limiting
+        const countQuery = query.model.find().merge(query);
+        const totalRecipes = await countQuery.countDocuments();
+
         // Actually execute query, ensuring it only returns pertinent fields
         const limit = req.query.limit ? (parseInt(req.query.limit) > maxRecords ? maxRecords : parseInt(req.query.limit)) : maxRecords;
         const offset = req.query.offset || 0;
@@ -122,12 +126,8 @@ function use(router) {
         } else {
             query.sort({numHits: -1}); // default case
         }
-        
 
         let foundRecipes = await query.exec();
-
-        // Estimate the total amount of recipes that would be found before limiting
-        const totalRecipes = await query.count();
 
         // Now we want to reveal some user information for each record found
         foundRecipes = await getUsersForRecipes(foundRecipes);
