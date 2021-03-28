@@ -57,6 +57,28 @@ async function sendVerificationEmail(id, name, email) {
     return;
 }
 
+// Send a verification email to the specified user
+async function sendForgotPasswordEmail(id, name, email) {
+    const verifCode = generateVerificationCode(process.env.CODE_LENGTH, id, "Forgot Password");
+
+    // Do not email on development machines
+    if (process.env.DO_EMAIL == 0)
+        return;
+    
+    let info = await transporter.sendMail({
+        from: '"PantryPal" <no-reply@pantry.pal>',
+        to: email,
+        subject: 'Forgot Password',
+        text: `Hello ${name}, your code is ${verifCode}`,
+        html: `Hello ${name}, your code is ${verifCode}`
+    });
+
+    // Keep info for logging later
+
+    return;
+}
+
 module.exports = {
-    sendVerificationEmail: sendVerificationEmail
+    sendVerificationEmail: sendVerificationEmail,
+    sendForgotPasswordEmail: sendForgotPasswordEmail
 }

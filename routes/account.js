@@ -1,7 +1,9 @@
 // Import libraries for handling JWTs and emailing
-const jwt = require('./lib/jwtUtils');
+const bcryptUtil = require('../routes/lib/bcryptUtil');
 const emailUtil = require('../routes/lib/emailUtils');
+const jwt = require('./lib/jwtUtils');
 const mongoose = require('mongoose');
+
 
 // Import the relevant models
 const User = require('../models/user'); 
@@ -87,12 +89,50 @@ function use(router) {
 
     // An unauthenticated user can access this endpoint
     router.post(constructPath(endpointPath, '/forgotPassword'), async function(req, res) {
-        
+        // Ensure that a code and new password have been provided
+
+        // Check validity of code provided
+
+        // Attempt to update the user from the code given
     });
 
     // An unauthenticated user can access this endpoint
     router.post(constructPath(endpointPath, '/forgotPassword/requestEmail'), async function(req, res) {
-        
+        // Ensure that an email has been provided
+        if (!req.body || !req.body.email) {
+            res.status(422).json({ error: "An email must be supplied for this request" });
+            return;
+        }
+
+        // Attempt to find a user with the supplied email
+        const user = await User.findOne({ email: req.body.email });
+
+        // Ensure that a user with that email exists and is not a Google user
+        if (!user || user.google) {
+            res.status(404).json({ error: "A user registered with that email does not exist" })
+            return;
+        } else if (user.google) {
+            res.status(422).json({ error: "The indicated email is a Google account. Please sign in with Google" })
+            return;
+        }
+
+        // We found a user from the JWT, so send that user an email
+        if (user) {
+
+            // TODO: rate limit this endpoint
+
+            try {
+                emailUtil.sendForgotPasswordEmail(user._id, user.display, user.email);
+            } catch(err) {
+                // Log email error
+            }
+
+            res.json({ success: "Email has been sent" })
+            return;
+        }
+
+        // It should not be possible to get here
+        res.status(422).json({ error: "Unknown error has occurred" });
     });
 }
 
