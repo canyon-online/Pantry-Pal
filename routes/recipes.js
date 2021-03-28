@@ -72,16 +72,38 @@ function use(router) {
             if (!Recipe.schema.obj[param])
                 continue;
 
-            // Currently only support querying string and integer types
+            // Currently only support querying string and number types
             if (Recipe.schema.obj[param].type != String && Recipe.schema.obj[param].type != Number)
                 continue;
 
-            query.where(param, new RegExp(`${req.query[param]}`, "i"));
-            // Semantically equivalent to query.where(param, { $regex: `.*${req.query[param]}.*`} );
+            if (Recipe.schema.obj[param].type == String)
+                query.where(param, new RegExp(`${req.query[param]}`, "i"));
+            else if (Recipe.schema.obj[param].type == Number) {
+                // Supporting gt, gte, lt, and lte comparisons
+                const extractedNumber = req.query[param].match(/\d+/)[0];
+
+                if (req.query[param].charAt(0) == ">") {
+                    if (req.query[param].charAt(1) == "=")
+                        query.where(param).gte(parseInt(extractedNumber));
+                    else
+                        query.where(param).gt(parseInt(extractedNumber));
+                } else if (req.query[param].charAt(0) == "<") {
+                    if (req.query[param].charAt(1) == "=")
+                        query.where(param).lte(parseInt(extractedNumber));
+                    else
+                        query.where(param).lt(parseInt(extractedNumber));
+                } else {
+                    continue;
+                }
+            }
         }
 
         // Actually execute query, ensuring it only returns pertinent fields
-        query.limit(req.query.limit ? (parseInt(req.query.limit) > maxRecords ? maxRecords : parseInt(req.query.limit)) : maxRecords);
+        const limit = req.query.limit ? (parseInt(req.query.limit) > maxRecords ? maxRecords : parseInt(req.query.limit)) : maxRecords;
+        const offset = req.query.offset || 0;
+        query.skip(offset * limit);
+        query.limit(limit);
+
         // todo: handle sorting field and direction
         query.sort({numHits: "asc"});
 
