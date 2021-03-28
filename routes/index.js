@@ -1,12 +1,13 @@
 // Create an instance of the Express Router to be used as middleware for our routes.
 const express = require('express'); 
 const jwt = require('./lib/jwtUtils');
+const User = require('../models/user'); 
 
 const router = express.Router(); 
 
 // Make the router refresh the JWT for all endpoints
 // TODO: make JWT functions asynchronous so this does not bog down the server
-router.use(function(req, res, next) {
+router.use(async function(req, res, next) {
     // Do not try to refresh a token when dealing with endpoints that do not require authorization
     // Probably better to create two routers: one for authenticated actions and the other for others
     if (req.path.startsWith('/register') || req.path.startsWith('/login')) {
@@ -21,11 +22,22 @@ router.use(function(req, res, next) {
     }
 
     if (req.cookies && req.cookies.token) {
+        // Attempt to refresh the current JWT if it is valid
         const success = jwt.refreshJWT(req.cookies.token, res);
 
         if (!success) {
             res.status(401).json({ error: "The passed authenticaton token is invalid" });
             return;
+        }
+
+        // If the user is not in the process of verification, ensure that the user is verified
+        if (!req.path.includes("/verify")) {
+            const { userId } = jwt.verifyJWT(req.cookies.token);
+            const user = await User.findById(userId).exec();
+            if (!user.verified) {
+                res.status(401).json({ error: "Your account must be verified to perform this action" });
+                return;
+            }
         }
 
     } else {
