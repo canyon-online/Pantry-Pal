@@ -159,37 +159,37 @@ class Signup extends StatelessWidget {
     );
   }
 
+  void handleSubmit(context) {
+    Provider.of<AuthProvider>(context, listen: false)
+        .signup(_name.text, _email.text, _pass.text)
+        .then((value) => {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(value['message']))),
+              if (value['status'] == true)
+                {
+                  print('setting user in login: ' + value['user'].name),
+                  Provider.of<UserProvider>(context, listen: false)
+                      .setUser(value['user']),
+                  // Go to verification
+                  print('pushing verification'),
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, RouteName.VERIFICATION, (_) => false)
+                }
+            })
+        .catchError((error) => {
+              print(error),
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text('error')))
+            });
+  }
+
   // Function to build and return a form submit button. This is critical to the
   // implementation of the InputBox class.
   Widget _buildSubmit(context) {
     return ElevatedButton(
       onPressed: () {
         var validated = _formKey.currentState?.validate() ?? false;
-        // If the form is valid, then execute the following code. This is where
-        // the user will get signed up and logged in, by calling the createUser
-        // function. The function returns a Future object, which may be used in
-        // implementing spining loading wheel objects and such.
-        if (validated) {
-          AuthProvider()
-              .signup(_name.text, _email.text, _pass.text)
-              .then((value) => {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(value['message']))),
-                    if (value['status'] == true)
-                      {
-                        print('setting user in login: ' + value['user'].name),
-                        Provider.of<UserProvider>(context, listen: false)
-                            .setUser(value['user']),
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, RouteName.HOME, (_) => false)
-                      }
-                  })
-              .catchError((error) => {
-                    print(error),
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text('error')))
-                  });
-        }
+        if (validated) handleSubmit(context);
       },
       child: Text('Next'),
     );
@@ -237,7 +237,7 @@ class Signup extends StatelessWidget {
           // Bounty for whoever can fix that
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/images/BackgroundBlurred.jpg"),
+              image: AssetImage('assets/images/BackgroundBlurred.jpg'),
               fit: BoxFit.cover,
             ),
           ),

@@ -137,10 +137,40 @@ class Login extends StatelessWidget {
     );
   }
 
+  void handleSubmit(context) {
+    var auth = Provider.of<AuthProvider>(context, listen: false);
+    auth
+        .login(_login.text, _pass.text)
+        .then((value) => {
+              print(auth.verificationStatus),
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(value['message']))),
+              if (value['status'] == true)
+                {
+                  print('setting user in login: ' + value['user'].name),
+                  Provider.of<UserProvider>(context, listen: false)
+                      .setUser(value['user']),
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, RouteName.HOME, (_) => false)
+                }
+              else if (auth.verificationStatus != Status.Verified)
+                {
+                  print('setting user in login: ' + value['user'].name),
+                  Provider.of<UserProvider>(context, listen: false)
+                      .setUser(value['user']),
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, RouteName.VERIFICATION, (_) => false)
+                }
+            })
+        .catchError((error) => {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(error.toString())))
+            });
+  }
+
   // Function to build and return a form submit button. This is critical to the
   // implementation of the InputBox class.
   Widget _buildSubmit(context) {
-    AuthProvider auth = Provider.of<AuthProvider>(context);
     return ElevatedButton(
       onPressed: () {
         var validated = _formKey.currentState?.validate() ?? false;
@@ -148,26 +178,7 @@ class Login extends StatelessWidget {
         // the user will get logged in, by calling the loginUser function. The function
         // returns a Future object, which may be used in implementing spining loading
         // wheel objects and such.
-        if (validated) {
-          auth
-              .login(_login.text, _pass.text)
-              .then((value) => {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(value['message']))),
-                    if (value['status'] == true)
-                      {
-                        print('setting user in login: ' + value['user'].name),
-                        Provider.of<UserProvider>(context, listen: false)
-                            .setUser(value['user']),
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, RouteName.HOME, (_) => false)
-                      }
-                  })
-              .catchError((error) => {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(error.toString())))
-                  });
-        }
+        if (validated) handleSubmit(context);
       },
       child: Text('Next'),
     );
