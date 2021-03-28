@@ -149,7 +149,11 @@ class VerificationState extends State<Verification> {
     User user = Provider.of<UserProvider>(context).user;
     AuthProvider auth = Provider.of<AuthProvider>(context);
 
-    return auth.registeredStatus != Status.Verified
+    print(auth.loggedInStatus);
+    print(auth.verificationStatus);
+    print(auth.registeredStatus);
+
+    return auth.verificationStatus != Status.Verified
         ? SafeArea(
             child: Scaffold(
             body: Container(
