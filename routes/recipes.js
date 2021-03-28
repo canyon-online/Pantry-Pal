@@ -67,16 +67,33 @@ function use(router) {
         // Based on query parameters, construct the query
         query = Recipe.find({});
 
+        for (var param in req.query) {
+            // Ensure that this is a searchable field
+            if (!Recipe.schema.obj[param])
+                continue;
+
+            // Currently only support querying string and integer types
+            if (Recipe.schema.obj[param].type != String && Recipe.schema.obj[param].type != Number)
+                continue;
+
+            query.where(param, new RegExp(`${req.query[param]}`, "i"));
+            // Semantically equivalent to query.where(param, { $regex: `.*${req.query[param]}.*`} );
+        }
+
         // Actually execute query, ensuring it only returns pertinent fields
-        query.limit(maxRecords);
+        query.limit(req.query.limit ? (parseInt(req.query.limit) > maxRecords ? maxRecords : parseInt(req.query.limit)) : maxRecords);
+        // todo: handle sorting field and direction
         query.sort({numHits: "asc"});
 
         let foundRecipes = await query.exec();
 
+        // Estimate the total amount of recipes that would be found before limiting
+        const totalRecipes = await query.count();
+
         // Now we want to reveal some user information for each record found
         foundRecipes = await getUsersForRecipes(foundRecipes);
 
-        res.json(foundRecipes);
+        res.json({ totalRecords: totalRecipes, filteredRecords: foundRecipes.length, recipes: foundRecipes });
     });
 }
 
