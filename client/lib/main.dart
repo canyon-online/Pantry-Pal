@@ -19,7 +19,8 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    UserPreference().removeUser(); // comment/uncomment this line
+    // comment/uncomment this v line depending on if you want to sign in/out on reload
+    // UserPreference().removeUser();
     Future<User> getUserData() => UserPreference().getUser();
 
     return MultiProvider(
@@ -58,6 +59,11 @@ class MyApp extends StatelessWidget {
                           else if ((snapshot.data?.token ?? 'null') == 'null') {
                             UserPreference().removeUser();
                             return Landing();
+                          } else {
+                            Provider.of<AuthProvider>(context, listen: false)
+                                .loggedInStatus = Status.LoggedIn;
+                            Provider.of<UserProvider>(context, listen: false)
+                                .initializeUser(snapshot.data!);
                           }
                           return Home();
                       }
