@@ -52,6 +52,8 @@ userSchema.pre('validate', function(next) {
     this.email = this.email.toLowerCase();
 
     if (this.password || this.google) {
+        if (this.google)
+            this.verified = true;
         next();
     } else {
         next(new Error('Attempted to create a user without a password or Google account'));
@@ -61,7 +63,12 @@ userSchema.pre('validate', function(next) {
 // Whenever a new user is created successfully, send a verification email
 userSchema.post('save', function(user) {
     // In some bizzare case where the email is nonexistent
-    if (!user.email)
+    // Also does not send an email
+    if (!user.email || user.google)
+        return;
+
+    // If the user is a google user, do not email and automatically verify them
+    if (user.google)
         return;
 
     try {
