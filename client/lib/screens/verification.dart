@@ -1,11 +1,15 @@
+import 'dart:io';
+
 import 'package:client/models/User.dart';
 import 'package:client/screens/landing.dart';
+import 'package:client/utils/API.dart';
 import 'package:client/utils/AuthProvider.dart';
 import 'package:client/utils/RouteNames.dart';
 import 'package:client/utils/UserProvider.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class Verification extends StatefulWidget {
   @override
@@ -34,6 +38,54 @@ class VerificationState extends State<Verification> {
           return 'Please enter your verification code';
         return null;
       },
+    );
+  }
+
+  Future<Map<String, dynamic>> handleRequestCode(context) async {
+    User user = Provider.of<UserProvider>(context, listen: false).user;
+    var result;
+
+    final response = await http.post(
+      Uri.https(API.baseURL, API.requestVerify),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        HttpHeaders.authorizationHeader: 'bearer ' + user.token
+      },
+    );
+
+    try {
+      if (response.statusCode == 200) {
+        result = {'status': true, 'message': 'Sent a new verification email'};
+      } else {
+        result = {
+          'status': false,
+          'message': 'Failed to send a new verification email'
+        };
+      }
+    } catch (on, stacktrace) {
+      result = {
+        'status': false,
+        'message': 'Failed to send a new verification email'
+      };
+    }
+
+    return result;
+  }
+
+  Widget _buildRequestCode(context) {
+    return TextButton(
+      style: TextButton.styleFrom(
+        padding: EdgeInsets.all(2),
+        shape: const BeveledRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5))),
+      ),
+      onPressed: () {
+        handleRequestCode(context).then(
+          (value) => ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(value['message']))),
+        );
+      },
+      child: Text('Request a new verification code'),
     );
   }
 
@@ -84,6 +136,7 @@ class VerificationState extends State<Verification> {
               'Verify your account',
               <Widget>[
                 _buildVerificationField(),
+                _buildRequestCode(context),
                 // request a new code button
               ],
               _formKey,

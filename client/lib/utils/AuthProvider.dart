@@ -8,9 +8,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:client/models/User.dart';
 import 'package:client/utils/API.dart';
+import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:client/utils/UserPreference.dart';
 
 enum Status {
@@ -247,6 +247,7 @@ class AuthProvider with ChangeNotifier {
     UserPreference().removeUser();
     _loggedInStatus = Status.NotLoggedIn;
     _registeredStatus = Status.NotRegistered;
+    _verificationStatus = Status.NotVerified;
     notifyListeners();
   }
 }
