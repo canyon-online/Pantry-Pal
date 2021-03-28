@@ -9,8 +9,8 @@ const jwtKey = process.env.JWT_SECRET_KEY;
 
 // Generate a JWT using the key provided and a user's object id
 // Currently a synchronous implementation
-function generateJWT(oid, name) {
-    const token = jwt.sign({ userId: oid, name: name }, jwtKey, {
+function generateJWT(oid, name, verified) {
+    const token = jwt.sign({ userId: oid, name: name, verified: verified }, jwtKey, {
         algorithm: 'HS256'
     });
 
@@ -57,7 +57,7 @@ async function sendTokenHeader(token, res) {
 // Function to generate and send a JWT in the body of a response
 async function sendTokenBody(user, res) {
     // Generate a JWT using the user objectid
-    const token = await generateJWT(user._id, user.display);
+    const token = await generateJWT(user._id, user.display, user.verified);
 
     // Send the user a JWT token to store to save their session
     await sendTokenHeader(token, res);
