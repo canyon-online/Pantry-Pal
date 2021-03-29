@@ -1,11 +1,17 @@
 // Library for handling file uploads and cryptography
-const multer = require('multer');
 const crypto = require('crypto');
+const jwt = require('./lib/jwtUtils');
+const mongoose = require('mongoose');
+const multer = require('multer');
+
+// Import the image model
+const Image = require('../models/image');
 
 // Control the disk storage and upload filenames
+const uploadDir = process.env.UPLOADS_DIRECTORY || 'uploads/';
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, process.env.UPLOADS_DIRECTORY || 'uploads/');
+        cb(null, uploadDir);
     },
     filename: function(req, file, cb) {
         // For now, save all images as ending in .png
@@ -81,8 +87,21 @@ function use(router) {
                 return;
             }
 
-            // Upload was successful, return the url
-            res.json({ image: `/images/${req.file.filename}` });
+            // Get the userid from the JWT (can assume that there is a valid token)
+            const token = req.headers.authorization.split(' ')[1];
+            const { userId } = jwt.verifyJWT(token);
+
+            // Upload was successful, store this in the database and return the relative url
+            const image = new Image({
+                author: mongoose.Types.ObjectId(userId),
+                fileName: req.file.filename,
+                discLocation: `${uploadDir}/${req.file.filename}`,
+                uriLocation: `/images/${req.file.filename}`
+            });
+
+            image.save().then(function(img) {
+                res.json({ image: `/images/${req.file.filename}` });
+            });
         });
     });
 }
