@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Require the Image model to properly keep track of what images are in use
 const Image = require('./image');
 
 const recipeSchema = new mongoose.Schema({ 
@@ -28,7 +29,13 @@ const recipeSchema = new mongoose.Schema({
     },
     image: {
         type: String,
-        // Want some sort of validation here to avoid being able to load images from other sites
+        validate: {
+            validator: function(v) {
+                // Check the format of the image provided
+                return /^\/images\/([A-Za-z0-9])*.png$/.test(v);
+            },
+            message: props => `${props.value} is not a valid image uri`
+        },
         required: [true, "Recipes require some image to display the end result"]
     },
     numFavorites: {
