@@ -27,6 +27,18 @@ async function getUsersForRecipes(recipes) {
 
 function use(router) {
     // All of these endpoints are authenticated actions
+    // GET /, returns list of recipes matching given query parameters
+    router.get(constructPath(endpointPath, '/'), async function(req, res) {
+        const { totalRecords, query } = await search(Recipe, req);
+
+        let foundRecipes = await query.exec();
+
+        // Now we want to reveal some user information for each record found
+        foundRecipes = await getUsersForRecipes(foundRecipes);
+
+        res.json({ totalRecords: totalRecords, filteredRecords: foundRecipes.length, recipes: foundRecipes });
+    });
+
     // POST /, creates a recipe and returns it
     router.post(constructPath(endpointPath, '/'), async function(req, res) { 
         // Ensure that a recipe was properly passed to this endpoint
@@ -58,16 +70,37 @@ function use(router) {
         });
     });
 
-    // GET /, returns list of recipes matching given query parameters
-    router.get(constructPath(endpointPath, '/'), async function(req, res) {
-        const { totalRecords, query } = await search(Recipe, req);
+    // GET /:id, returns the recipe indicated by the id
+    router.get(constructPath(endpointPath, '/:id'), async function(req, res) {
+        var foundRecipe;
+        
+        // Attempt to form an object id from the input
+        try {
+            mongoose.Types.ObjectId(req.params.id);
+        } catch(err) {
+            // Not a valid id, so tell the user
+            res.status(422).json({ error: "The id is malformed" });
+            return;
+        }
 
-        let foundRecipes = await query.exec();
+        // Attempt to retrieve the recipe
+        try {
+            foundRecipe = await Recipe.findById(req.params.id);
+        } catch(err) {
+            foundRecipe = null;
+        }
+        
+        // Id does not point to an existing recipe
+        if (!foundRecipe) {
+            res.status(404).json({ error: "There is no recipe with that id" });
+            return;
+        }
 
-        // Now we want to reveal some user information for each record found
-        foundRecipes = await getUsersForRecipes(foundRecipes);
+        // Now we want to reveal some user information for the recipe found
+        // We transform the recipe into a list temporarily so this function works for it
+        foundRecipe = await getUsersForRecipes([foundRecipe]);
 
-        res.json({ totalRecords: totalRecords, filteredRecords: foundRecipes.length, recipes: foundRecipes });
+        res.json(foundRecipe[0]);
     });
 }
 
