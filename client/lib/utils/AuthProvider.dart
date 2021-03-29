@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:client/models/User.dart';
 import 'package:client/utils/API.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -30,24 +31,6 @@ enum Status {
   Registered,
   NotRegistered
 }
-
-// Google sign in:
-// import 'package:google_sign_in/google_sign_in.dart';
-
-// GoogleSignIn _googleSignIn = GoogleSignIn(
-//   scopes: [
-//     'email',
-//     'https://www.googleapis.com/auth/contacts.readonly',
-//   ],
-// );
-
-// Future<void> _handleSignIn() async {
-//   try {
-//     await _googleSignIn.signIn();
-//   } catch (error) {
-//     print(error);
-//   }
-// }
 
 String _decodeBase64(String str) {
   String output = str.replaceAll('-', '+').replaceAll('_', '/');
@@ -88,11 +71,80 @@ class AuthProvider with ChangeNotifier {
 
   User saveLogin(Map<String, dynamic> responseData) {
     var userData = parseJwt(responseData['token']);
+    print('userData: ' + userData.toString());
     userData['token'] = responseData['token'];
     User authUser = User.fromMap(userData);
     print('New user created in saveLogin: ' + authUser.name);
     UserPreference().saveUser(authUser);
     return authUser;
+  }
+
+  Future<Map<String, dynamic>> googleLogin() async {
+    GoogleSignInAccount? account;
+    GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+
+    try {
+      account = await _googleSignIn.signIn();
+      print(account);
+    } catch (e, stacktrace) {
+      print(stacktrace.toString());
+    }
+    GoogleSignInAuthentication googleSignInAuthentication =
+        await account!.authentication;
+
+    print('access token: ' + googleSignInAuthentication.idToken.toString());
+    print('email: ' + account.email.toString());
+
+    var result;
+
+    final Map<String, dynamic> loginData = {
+      'token': googleSignInAuthentication.idToken.toString()
+    };
+
+    _loggedInStatus = Status.Authenticating;
+    notifyListeners();
+
+    Response response = await http.post(
+      Uri.https(API.baseURL, API.googleLogin),
+      headers: API.postHeader,
+      body: jsonEncode(loginData),
+    );
+
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    print(responseData);
+    try {
+      if (response.statusCode == 200 && responseData['error'] == null) {
+        User user = saveLogin(responseData);
+        if (user.verified == false) {
+          print('user is not verified');
+          _loggedInStatus = Status.NotLoggedIn;
+          _verificationStatus = Status.Verifying;
+          _registeredStatus = Status.Registered;
+          result = {
+            'status': false,
+            'message': 'Please verify your account',
+            'user': user
+          };
+        } else {
+          print('user is verified');
+          _loggedInStatus = Status.LoggedIn;
+          _verificationStatus = Status.Verified;
+          _registeredStatus = Status.Registered;
+          result = {
+            'status': true,
+            'message': 'Successfully logged in',
+            'user': user
+          };
+        }
+      } else {
+        _loggedInStatus = Status.NotLoggedIn;
+        result = {'status': false, 'message': responseData['error']};
+      }
+    } catch (on, stacktrace) {
+      result = {'status': false, 'message': stacktrace.toString()};
+    }
+
+    return result;
   }
 
   // API call to login a user and save login info.

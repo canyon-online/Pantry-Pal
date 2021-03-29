@@ -7,4 +7,6 @@ class API {
   static const String login = 'api/login';
   static const String verify = 'api/account/verify'; // the code from signup
   static const String requestVerify = 'api/account/verify/requestEmail';
+  static const String googleLogin = 'api/login/google';
+  static const String googleSignup = 'api/register/google';
 }

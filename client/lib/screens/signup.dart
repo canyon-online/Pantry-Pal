@@ -1,6 +1,7 @@
 import 'package:client/utils/AuthProvider.dart';
 import 'package:client/utils/RouteNames.dart';
 import 'package:client/utils/UserProvider.dart';
+import 'package:client/widgets/GoogleSignIn.dart';
 import 'package:flutter/material.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:client/utils/StringValidator.dart';
@@ -16,45 +17,6 @@ class Signup extends StatelessWidget {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _pass = TextEditingController();
   final TextEditingController _confirmPass = TextEditingController();
-
-  // Function to build and return a Google Sign On button.
-  Widget _buildGoogleSignOn() {
-    // An InkWell object is sort of a fancy button that has a little splash
-    // animation to it.
-    return InkWell(
-        child: Container(
-            width: 200,
-            height: 40,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20), color: Colors.black),
-            child: Center(
-                child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Container(
-                  height: 30.0,
-                  width: 30.0,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('assets/images/google.jpg'),
-                        fit: BoxFit.cover),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                Text(
-                  'Sign up with Google',
-                  style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-              ],
-            ))),
-        onTap: () async {
-          // TODO: Apply Google signup.
-          print('Google Sign Up Tapped');
-        });
-  }
 
   // Function to build and return a name field text box.
   Widget _buildNameField() {
@@ -217,7 +179,7 @@ class Signup extends StatelessWidget {
                 SizedBox(height: 15),
                 Text('Or'),
                 SizedBox(height: 15),
-                _buildGoogleSignOn()
+                GoogleSignIn()
               ],
               _formKey,
               _buildSubmit(context))),
