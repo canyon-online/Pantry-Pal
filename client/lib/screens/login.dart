@@ -17,7 +17,8 @@ class Login extends StatelessWidget {
   final TextEditingController _pass = TextEditingController();
 
   // Function to build and return a Google Sign On button.
-  Widget _buildGoogleSignOn() {
+  Widget _buildGoogleSignOn(context) {
+    var auth = Provider.of<AuthProvider>(context, listen: false);
     // An InkWell object is sort of a fancy button that has a little splash
     // animation to it.
     return InkWell(
@@ -50,8 +51,33 @@ class Login extends StatelessWidget {
               ],
             ))),
         onTap: () async {
-          // TODO: Apply Google signin.
-          print('Google Sign On Tapped');
+          auth
+              .googleLogin()
+              .then((value) => {
+                    print(value),
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(value['message']))),
+                    if (value['status'] == true)
+                      {
+                        print('setting user in login: ' + value['user'].name),
+                        Provider.of<UserProvider>(context, listen: false)
+                            .setUser(value['user']),
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, RouteName.HOME, (_) => false)
+                      }
+                    else if (auth.verificationStatus != Status.Verified)
+                      {
+                        print('setting user in login: ' + value['user'].name),
+                        Provider.of<UserProvider>(context, listen: false)
+                            .setUser(value['user']),
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, RouteName.VERIFICATION, (_) => false)
+                      }
+                  })
+              .catchError((error) => {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(error.toString())))
+                  });
         });
   }
 
@@ -186,6 +212,7 @@ class Login extends StatelessWidget {
 
   // Function called to build the widget in the center.
   Widget _buildCenter(context) {
+    var auth = Provider.of<AuthProvider>(context, listen: false);
     return Center(
         child: Container(
       width: 370,
@@ -205,7 +232,7 @@ class Login extends StatelessWidget {
             SizedBox(height: 15),
             Text('Or'),
             SizedBox(height: 15),
-            _buildGoogleSignOn(),
+            _buildGoogleSignOn(context),
             SizedBox(height: 10),
             // Additional button links to signup/password screens.
             Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
@@ -217,10 +244,9 @@ class Login extends StatelessWidget {
           _formKey,
           // Attach the submit button to the InputBox.
 
-          // auth.loggedInStatus == Status.Authenticating
-          //     ? loading
-          //     : longButtons("Login", doLogin),
-          _buildSubmit(context)),
+          auth.loggedInStatus == Status.Authenticating
+              ? CircularProgressIndicator()
+              : _buildSubmit(context)),
     ));
   }
 
