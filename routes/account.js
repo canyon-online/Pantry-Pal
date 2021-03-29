@@ -89,7 +89,7 @@ function use(router) {
         res.status(422).json({ error: "Unknown error has occurred" });
     });
 
-    // An unauthenticated user can access this endpoint
+    // An unauthenticated user can access these endpoint
     router.post(constructPath(endpointPath, '/forgotPassword'), async function(req, res) {
         // Ensure that a code and new password have been provided
 
@@ -98,7 +98,10 @@ function use(router) {
         // Attempt to update the user from the code given
     });
 
-    // An unauthenticated user can access this endpoint
+    router.post(constructPath(endpointPath, '/forgotPassword/checkCode'), async function(req, res) {
+        // Ensure that a code and an email has been provided
+    });
+
     router.post(constructPath(endpointPath, '/forgotPassword/requestEmail'), async function(req, res) {
         // Ensure that an email has been provided
         if (!req.body || !req.body.email) {

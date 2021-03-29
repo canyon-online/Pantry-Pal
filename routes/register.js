@@ -116,7 +116,7 @@ function use(router) {
     });
 }
 
-// Export the register object containing the use function
+// Export the use function, enabling the register endpoint
 module.exports = {
     use: use
 };

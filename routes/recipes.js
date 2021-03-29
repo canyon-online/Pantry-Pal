@@ -104,7 +104,7 @@ function use(router) {
     });
 }
 
-// Export the login object containing the use function
+// Export the use function, enabling the recipe endpoint
 module.exports = {
     use: use
 };
