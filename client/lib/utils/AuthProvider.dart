@@ -71,10 +71,8 @@ class AuthProvider with ChangeNotifier {
 
   User saveLogin(Map<String, dynamic> responseData) {
     var userData = parseJwt(responseData['token']);
-    print('userData: ' + userData.toString());
     userData['token'] = responseData['token'];
     User authUser = User.fromMap(userData);
-    print('New user created in saveLogin: ' + authUser.name);
     UserPreference().saveUser(authUser);
     return authUser;
   }
@@ -85,15 +83,11 @@ class AuthProvider with ChangeNotifier {
 
     try {
       account = await _googleSignIn.signIn();
-      print(account);
     } catch (e, stacktrace) {
       print(stacktrace.toString());
     }
     GoogleSignInAuthentication googleSignInAuthentication =
         await account!.authentication;
-
-    print('access token: ' + googleSignInAuthentication.idToken.toString());
-    print('email: ' + account.email.toString());
 
     var result;
 
@@ -111,7 +105,6 @@ class AuthProvider with ChangeNotifier {
     );
 
     final Map<String, dynamic> responseData = json.decode(response.body);
-    print(responseData);
     try {
       if (response.statusCode == 200 && responseData['error'] == null) {
         User user = saveLogin(responseData);
