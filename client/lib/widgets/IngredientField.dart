@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:client/models/Ingredient.dart';
+import 'package:client/widgets/TextPill.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -74,7 +75,7 @@ class IngredientFieldState extends State<IngredientField> {
               itemBuilder: (context, index) {
                 var item = widget.controller.list.elementAt(index);
                 return Row(children: [
-                  Text(item),
+                  TextPill(item),
                   IconButton(
                     icon: const Icon(Icons.remove),
                     tooltip: 'Remove this ingredient',

@@ -1,3 +1,4 @@
+import 'package:client/widgets/TextPill.dart';
 import 'package:flutter/material.dart';
 
 class TagFieldController {
@@ -17,20 +18,14 @@ class TagFieldState extends State<TagField> {
 
   Widget _buildTextField() {
     return TextFormField(
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      keyboardType: TextInputType.text,
-      controller: _tag,
-      // textInputAction: TextInputAction.next,
-      decoration: const InputDecoration(
-        hintText: 'Enter a tag',
-        border: OutlineInputBorder(),
-        contentPadding: EdgeInsets.only(left: 15.0),
-      ),
-      validator: (value) {
-        if (value?.isEmpty ?? true) return 'Please enter a valid tag';
-        return null;
-      },
-    );
+        keyboardType: TextInputType.text,
+        controller: _tag,
+        // textInputAction: TextInputAction.next,
+        decoration: const InputDecoration(
+          hintText: 'Enter a tag',
+          border: OutlineInputBorder(),
+          contentPadding: EdgeInsets.only(left: 15.0),
+        ));
   }
 
   @override
@@ -66,7 +61,7 @@ class TagFieldState extends State<TagField> {
               itemBuilder: (context, index) {
                 var item = widget.controller.list.elementAt(index);
                 return Row(children: [
-                  Text(item),
+                  TextPill(item),
                   IconButton(
                     icon: const Icon(Icons.remove),
                     tooltip: 'Remove this tag',

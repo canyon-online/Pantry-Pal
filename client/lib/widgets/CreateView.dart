@@ -77,14 +77,15 @@ class CreateViewState extends State<CreateView> {
       padding: EdgeInsets.all(16.0),
       child: ElevatedButton(
         onPressed: () {
-          var validated = _formKey.currentState?.validate() ?? false;
-          if (validated) {
+          if (_formKey.currentState?.validate() ?? false) {
             print(_name.text);
             print(_directions.text);
             print(_ingredients.list);
             print(_tags.list);
             print(_currentSliderValue);
+            print(_image.url);
           }
+
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text('Processing Data')));
         },
