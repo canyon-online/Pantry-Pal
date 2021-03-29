@@ -15,6 +15,10 @@ class Ingredient {
     return list.map((item) => Ingredient.fromJson(item)).toList();
   }
 
+  static List<String> toIdString(Set<Ingredient> list) {
+    return list.map((item) => item.id).toList();
+  }
+
   String ingredientAsString() {
     return '#${this.id} ${this.name}';
   }

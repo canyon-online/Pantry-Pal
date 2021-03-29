@@ -63,6 +63,7 @@ class VerificationState extends State<Verification> {
         };
       }
     } catch (on, stacktrace) {
+      print(stacktrace.toString());
       result = {
         'status': false,
         'message': 'Failed to send a new verification email'
