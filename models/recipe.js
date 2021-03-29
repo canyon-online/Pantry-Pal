@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const Image = require('./image');
+
 const recipeSchema = new mongoose.Schema({ 
     author: {
         type: mongoose.Schema.Types.ObjectId,
@@ -62,6 +64,24 @@ recipeSchema.pre('validate', function(next) {
     }
 
     this.ingredients = ingredients;
+
+    next();
+});
+
+// On successful save, mark the indicated image as used so it won't be deleted
+recipeSchema.post('save', async function(recipe) {
+    const image = recipe.image;
+
+    let updatedImg = await Image.findOneAndUpdate({ uriLocation: image }, { unused: false });
+
+    return;
+});
+
+// On intent to delete a recipe, mark the indicated image as unused so it will be deleted
+recipeSchema.pre('delete', async function(next) {
+    const image = this.image;
+
+    let updatedImg = await Image.findOneAndUpdate({ uriLocation: image }, { unused: true });
 
     next();
 });
