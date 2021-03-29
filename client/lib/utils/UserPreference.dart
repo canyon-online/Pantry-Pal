@@ -50,7 +50,7 @@ class UserPreference {
 
   void removeUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
+    print('removed user from preferences');
     prefs.remove('userId');
     prefs.remove('name');
     prefs.remove('token');

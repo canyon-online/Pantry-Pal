@@ -82,6 +82,9 @@ class AuthProvider with ChangeNotifier {
   Status get loggedInStatus => _loggedInStatus;
   Status get registeredStatus => _registeredStatus;
   Status get verificationStatus => _verificationStatus;
+  set loggedInStatus(value) => _loggedInStatus = value;
+  set registeredStatus(value) => _registeredStatus = value;
+  set verificationStatus(value) => _verificationStatus = value;
 
   User saveLogin(Map<String, dynamic> responseData) {
     var userData = parseJwt(responseData['token']);
