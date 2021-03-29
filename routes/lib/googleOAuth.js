@@ -95,7 +95,7 @@ async function loginGoogle(res, ticket)
         return;
     }
 
-    let user = User.findOne({ email: email }).exec();
+    let user = await User.findOne({ email: email }).exec();
 
     // If no user is found, then we should register them
     if (user == null) {

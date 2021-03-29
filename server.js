@@ -1,7 +1,6 @@
 // Start by importing our express and mongoose packages and our Express router which we'll define shortly.
 const express = require('express'); 
 const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
 
 // To allow cross origin access uncomment the cors lines.
 const cors = require('cors');
@@ -33,7 +32,6 @@ app.use(cors())
 // for parsing requests with JSON payloads (for POST and PATCH/PUT requests).
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cookieParser());
 
 // Apply the Express router object to your Express app. I'll explain this in the routing section.
 app.use('/api', router);
