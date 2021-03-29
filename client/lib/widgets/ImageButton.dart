@@ -23,7 +23,7 @@ class ImageButton extends StatefulWidget {
 }
 
 class ImageButtonState extends State<ImageButton> {
-  File? file;
+  PickedFile? file;
   bool uploading = false;
   String fileName = 'No file selected';
 
@@ -36,7 +36,7 @@ class ImageButtonState extends State<ImageButton> {
         .getImage(source: ImageSource.gallery, maxHeight: 320, maxWidth: 400))!;
 
     setState(() {
-      file = File(image.path);
+      file = PickedFile(image.path);
       fileName = file!.path.split('/').last;
       print(file.toString() + ' ' + fileName);
     });
@@ -49,7 +49,7 @@ class ImageButtonState extends State<ImageButton> {
       });
   }
 
-  void _upload(File file, String name, String token) async {
+  void _upload(PickedFile file, String name, String token) async {
     var request =
         http.MultipartRequest('POST', Uri.https(API.baseURL, API.imageUpload));
     request.headers
@@ -58,7 +58,7 @@ class ImageButtonState extends State<ImageButton> {
     request.files.add(http.MultipartFile(
       'image',
       file.openRead(),
-      await file.length(),
+      await file.readAsBytes().then((value) => value.length),
       filename: name,
       contentType: MediaType('image', 'jpeg'),
     ));
@@ -97,7 +97,7 @@ class ImageButtonState extends State<ImageButton> {
           ),
         ],
       ),
-      file == null ? SizedBox(height: 10) : Image.file(file!)
+      // file == null ? SizedBox(height: 10) : Image.file(file)
     ]);
   }
 }
