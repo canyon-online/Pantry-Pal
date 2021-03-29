@@ -6,13 +6,17 @@ class Ingredient {
 
   factory Ingredient.fromJson(Map<String, dynamic> json) {
     return Ingredient(
-      id: json['id'],
+      id: json['_id'],
       name: json['name'],
     );
   }
 
   static List<Ingredient> fromJsonList(List list) {
     return list.map((item) => Ingredient.fromJson(item)).toList();
+  }
+
+  static List<String> toIdString(Set<Ingredient> list) {
+    return list.map((item) => item.id).toList();
   }
 
   String ingredientAsString() {

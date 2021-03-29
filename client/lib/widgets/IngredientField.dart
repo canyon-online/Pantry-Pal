@@ -1,12 +1,18 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:client/models/Ingredient.dart';
+import 'package:client/models/User.dart';
+import 'package:client/utils/API.dart';
+import 'package:client/utils/UserProvider.dart';
+import 'package:client/widgets/TextPill.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class IngredientFieldController {
-  Set<String> list = Set();
-  late String selectedIngredient;
+  Set<Ingredient> list = Set();
+  late Ingredient selectedIngredient;
 }
 
 class IngredientField extends StatefulWidget {
@@ -20,11 +26,12 @@ class IngredientField extends StatefulWidget {
 class IngredientFieldState extends State<IngredientField> {
   void handleOnChange(Ingredient? value) {
     setState(() {
-      widget.controller.selectedIngredient = value!.name;
+      widget.controller.selectedIngredient = value!;
     });
   }
 
-  Widget _buildDropDown() {
+  Widget _buildDropDown(context) {
+    User user = Provider.of<UserProvider>(context, listen: false).user;
     return DropdownSearch<Ingredient>(
       label: 'Ingredient',
       showSearchBox: true,
@@ -35,10 +42,10 @@ class IngredientFieldState extends State<IngredientField> {
       ),
       onFind: (String filter) async {
         var response = await http.get(
-          Uri.https('5d85ccfb1e61af001471bf60.mockapi.io', '/user',
-              {'filter': filter}),
-        );
-        return Ingredient.fromJsonList(json.decode(response.body));
+            Uri.https(API.baseURL, API.searchIngredient, {'name': filter}),
+            headers: {HttpHeaders.authorizationHeader: 'bearer ' + user.token});
+        return Ingredient.fromJsonList(
+            json.decode(response.body)['ingredients']);
       },
       onChanged: handleOnChange,
     );
@@ -49,7 +56,7 @@ class IngredientFieldState extends State<IngredientField> {
     return Container(
       child: Column(children: [
         Row(children: [
-          Expanded(child: _buildDropDown()),
+          Expanded(child: _buildDropDown(context)),
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: 'Add the selected ingredient',
@@ -74,7 +81,7 @@ class IngredientFieldState extends State<IngredientField> {
               itemBuilder: (context, index) {
                 var item = widget.controller.list.elementAt(index);
                 return Row(children: [
-                  Text(item),
+                  TextPill(item.name),
                   IconButton(
                     icon: const Icon(Icons.remove),
                     tooltip: 'Remove this ingredient',

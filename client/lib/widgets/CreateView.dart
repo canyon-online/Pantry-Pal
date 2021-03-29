@@ -1,5 +1,16 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:client/models/Ingredient.dart';
+import 'package:client/models/User.dart';
+import 'package:client/utils/API.dart';
+import 'package:client/utils/UserProvider.dart';
+import 'package:client/widgets/ImageButton.dart';
 import 'package:client/widgets/IngredientField.dart';
+import 'package:client/widgets/TagField.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class CreateView extends StatefulWidget {
   @override
@@ -14,6 +25,8 @@ class CreateViewState extends State<CreateView> {
   final TextEditingController _name = TextEditingController();
   final TextEditingController _directions = TextEditingController();
   final IngredientFieldController _ingredients = IngredientFieldController();
+  final TagFieldController _tags = TagFieldController();
+  final ImageButtonController _image = ImageButtonController();
   double _currentSliderValue = 5;
 
   void addIngredient(String ingredient) {
@@ -33,10 +46,6 @@ class CreateViewState extends State<CreateView> {
         return null;
       },
     );
-  }
-
-  Widget _buildIngredientField() {
-    return IngredientField(controller: _ingredients);
   }
 
   Widget _buildInstructionsField() {
@@ -72,21 +81,38 @@ class CreateViewState extends State<CreateView> {
     );
   }
 
-  Widget _buildSubmitButton() {
+  Future<void> submitRecipe(context) async {
+    User user = Provider.of<UserProvider>(context, listen: false).user;
+    final Map<String, dynamic> recipeData = {
+      'name': _name.text,
+      'ingredients': Ingredient.toIdString(_ingredients.list),
+      'directions': _directions.text,
+      'tags': _tags.list.toList(),
+      'image': _image.url,
+      'difficulty': _currentSliderValue.round()
+    };
+
+    print('sending ' + recipeData.toString());
+
+    final response = await http.post(Uri.https(API.baseURL, API.createRecipe),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          HttpHeaders.authorizationHeader: 'bearer ' + user.token
+        },
+        body: jsonEncode(recipeData));
+
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    print(responseData);
+  }
+
+  Widget _buildSubmitButton(context) {
     return Padding(
       padding: EdgeInsets.all(16.0),
       child: ElevatedButton(
         onPressed: () {
-          var validated = _formKey.currentState?.validate() ?? false;
-          if (validated) {
-            // FETCH VALUES FROM FIELDS
-            print(_name.text);
-            print(_directions.text);
-            print(_ingredients.list);
-            print(_currentSliderValue);
-          }
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Processing Data')));
+          if (_formKey.currentState?.validate() ?? false)
+            submitRecipe(context).then((value) => ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text('Recipe created'))));
         },
         child: Text('Submit'),
       ),
@@ -102,10 +128,16 @@ class CreateViewState extends State<CreateView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             _buildNameField(),
-            _buildIngredientField(),
+            Divider(),
+            IngredientField(controller: _ingredients),
             _buildInstructionsField(),
+            Divider(),
+            TagField(controller: _tags),
             _buildSlider(),
-            _buildSubmitButton()
+            ImageButton(
+              controller: _image,
+            ),
+            _buildSubmitButton(context)
           ],
         ),
       ),

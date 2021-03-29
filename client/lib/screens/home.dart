@@ -61,7 +61,7 @@ class HomeState extends State<Home> {
                 BottomNavigationBarItem(
                     icon: Icon(Icons.search), label: 'Search'),
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.person), label: user.name)
+                    icon: Icon(Icons.person), label: 'Profile')
               ],
               selectedItemColor: Colors.black,
               unselectedItemColor: Colors.black38,

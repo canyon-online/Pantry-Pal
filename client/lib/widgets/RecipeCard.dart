@@ -1,5 +1,5 @@
 import 'package:client/models/Recipe.dart';
-import 'package:client/widgets/IngredientPill.dart';
+import 'package:client/widgets/TextPill.dart';
 import 'package:flutter/material.dart';
 import 'package:like_button/like_button.dart';
 
@@ -44,7 +44,7 @@ class RecipeCardState extends State<RecipeCard> {
         Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: List<Widget>.generate(widget.recipe.tags.length,
-                (int index) => IngredientPill(widget.recipe.tags[index])))
+                (int index) => TextPill(widget.recipe.tags[index])))
       ],
     );
   }
