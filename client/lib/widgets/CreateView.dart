@@ -1,4 +1,6 @@
+import 'package:client/widgets/ImageButton.dart';
 import 'package:client/widgets/IngredientField.dart';
+import 'package:client/widgets/TagField.dart';
 import 'package:flutter/material.dart';
 
 class CreateView extends StatefulWidget {
@@ -14,6 +16,8 @@ class CreateViewState extends State<CreateView> {
   final TextEditingController _name = TextEditingController();
   final TextEditingController _directions = TextEditingController();
   final IngredientFieldController _ingredients = IngredientFieldController();
+  final TagFieldController _tags = TagFieldController();
+  final ImageButtonController _image = ImageButtonController();
   double _currentSliderValue = 5;
 
   void addIngredient(String ingredient) {
@@ -33,10 +37,6 @@ class CreateViewState extends State<CreateView> {
         return null;
       },
     );
-  }
-
-  Widget _buildIngredientField() {
-    return IngredientField(controller: _ingredients);
   }
 
   Widget _buildInstructionsField() {
@@ -79,10 +79,10 @@ class CreateViewState extends State<CreateView> {
         onPressed: () {
           var validated = _formKey.currentState?.validate() ?? false;
           if (validated) {
-            // FETCH VALUES FROM FIELDS
             print(_name.text);
             print(_directions.text);
             print(_ingredients.list);
+            print(_tags.list);
             print(_currentSliderValue);
           }
           ScaffoldMessenger.of(context)
@@ -102,9 +102,15 @@ class CreateViewState extends State<CreateView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             _buildNameField(),
-            _buildIngredientField(),
+            Divider(),
+            IngredientField(controller: _ingredients),
             _buildInstructionsField(),
+            Divider(),
+            TagField(controller: _tags),
             _buildSlider(),
+            ImageButton(
+              controller: _image,
+            ),
             _buildSubmitButton()
           ],
         ),

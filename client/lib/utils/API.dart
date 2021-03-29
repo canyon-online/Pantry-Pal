@@ -9,4 +9,5 @@ class API {
   static const String requestVerify = 'api/account/verify/requestEmail';
   static const String googleLogin = 'api/login/google';
   static const String googleSignup = 'api/register/google';
+  static const String imageUpload = 'api/upload'; // change this
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-class IngredientPill extends StatelessWidget {
-  final String ingredient;
-  const IngredientPill(this.ingredient);
+class TextPill extends StatelessWidget {
+  final String text;
+  const TextPill(this.text);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class IngredientPill extends StatelessWidget {
       child: Padding(
           padding: EdgeInsets.fromLTRB(2, 0, 2, 0),
           child: Text(
-            ingredient,
+            text,
             style: TextStyle(color: Colors.white, fontSize: 14),
           )),
     );
