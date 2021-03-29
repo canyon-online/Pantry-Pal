@@ -13,10 +13,7 @@ async function search(model, req) {
         if (!model.schema.obj[param])
             continue;
 
-        // Currently only support querying string and number types
-        if (model.schema.obj[param].type != String && model.schema.obj[param].type != Number)
-            continue;
-
+        // Currently only support querying string, numbers, and ObjectIds
         if (model.schema.obj[param].type == String)
             query.where(param, new RegExp(`${req.query[param]}`, "i"));
         else if (model.schema.obj[param].type == Number) {
@@ -36,6 +33,14 @@ async function search(model, req) {
             } else {
                 continue;
             }
+        } else if (param == 'tags' &&  model.schema.obj[param]) {
+            // Handle tags searches for recipes
+            const tags = req.query[param].split(",");
+            query.where(param, { $all: tags });
+        } else if (param == 'ingredients' && model.schema.obj[param]) {
+            // Handle ingredient searches for recipes
+        } else {
+            continue;
         }
     }
 
