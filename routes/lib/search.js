@@ -1,6 +1,9 @@
 // The maximum number of records allowed to be returned in one request
 const maxRecords = process.env.MAX_RECORD_RETURNS || 50;
 
+// The length of ObjectIds in the database
+const ObjectIdLength = 24;
+
 // Robust searching for varying Mongoose models
 async function search(model, req) {
     var query;
@@ -36,9 +39,29 @@ async function search(model, req) {
         } else if (param == 'tags' &&  model.schema.obj[param]) {
             // Handle tags searches for recipes
             const tags = req.query[param].split(",");
-            query.where(param, { $all: tags });
+            if (tags[0] != '')
+                query.where(param, { $all: tags });
         } else if (param == 'ingredients' && model.schema.obj[param]) {
             // Handle ingredient searches for recipes
+            let ingredients = req.query[param].split(",");
+            let validIngredientsList = [];
+            let validIngredientsOr = [];
+            // Ensure only valid strings that can be cast to ObjectIds are passed
+            for (var i = 0; i < ingredients.length; i++)
+            {
+                if (ingredients[i].length == ObjectIdLength) {
+                    validIngredientsList.push(ingredients[i]);
+                    validIngredientsOr.push({ ingredients: ingredients[i] });
+                }
+            }
+            if (ingredients[0] == 'any') {
+                if (validIngredientsOr.length != 0)
+                    query.where('$or', validIngredientsOr);
+            }
+            else {
+                if (validIngredientsList.length != 0)
+                    query.where(param, { $all: validIngredientsList });
+            }
         } else {
             continue;
         }
