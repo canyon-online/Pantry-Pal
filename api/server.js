@@ -1,55 +1,53 @@
-// Start by importing our express and mongoose packages and our Express router which we'll define shortly.
+const cors = require('cors');
 const express = require('express'); 
 const mongoose = require('mongoose');
 
-// To allow cross origin access uncomment the cors lines.
-const cors = require('cors');
-
-// Load the process environmental variables, located in a .dotenv file
+// Load the environmental variables before anything requires them
 require('dotenv').config()
 
-const router = require('./routes/index');
-
-// Calling the express() function will create our running app object.
+// Create the running app object for the api
 const app = express(); 
 
-// The Express listen method called at the bottom of our file uses 3000 as it's 
-// default port for it's server. We'll declare a new PORT constant to give us 
-// the flexibility to use different ports depending on whether we are in development or production.
-const PORT = process.env.PORT;
-
-// Assigning constants for things like port number and the database URL gives us
-// the flexibility to change the values in one place.
-// If you are using the MongoDB Atlas cloud database then paste the link there.
-// If you are using the local version, MongoDB is accessed through localhost on port 27017 by default, 
-// and the path is the database name. We'll just call ours my_local_db.
-const MONGODB_URI = "mongodb://localhost:27017/my_local_db";
-
+// Add middleware at to the app that will be applied to every endpoint
 app.use(cors())
-
-// Chaining Express's use method to our app object gives us access to the libraries
-// we imported. express.urlencoded({ extended: true }) and express.json() are middleware
-// for parsing requests with JSON payloads (for POST and PATCH/PUT requests).
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Apply the Express router object to your Express app. I'll explain this in the routing section.
+// Retrieve MongoDB configuration from the .env
+const MONGO_HOST = process.env.DB_HOST || 'localhost';
+const MONGO_PORT = process.env.DB_PORT || 27017;
+const MONGO_DB = process.env.DB_NAME || 'my_local_db';
+const MONGO_URI = `mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}`;
+
+// Apply the Express router object to the app. This only serves content from the /api path
+// This router has two
+const { router, authenticatedRouter} = require('./routes/index');
 app.use('/api', router);
+app.use('/api', authenticatedRouter);
 
-// mongoose.connect() connects to our MongoDB database
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true });
+// Begin our connection to the configured database
+mongoose.connect(MONGO_URI, { 
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
 
-// Optionally, log a message if the above connection was successful and one if it is not.
-mongoose.connection.once('open', function() {
-    console.log('Connected to the Database.');
-});
-
-mongoose.connection.on('error', function(error) {
+ }).catch(function(error) {
+    // If we fail to connect, we should exit the app, as the database is vital to all operations
     console.log('Mongoose Connection Error : ' + error);
+    // Note: process.exit is bad practice and an alternative should be found
+    process.exit(1);
+ });
+
+// Log database connection failures after the initial connection
+mongoose.connection.on('error', function(error) {
+    // Going to utilize a logging library for this and other errors
+    console.log('Mongoose Connection Error : Connection Lost :  ' + error);
 });
 
-// Chain the Express listen method to our app. This will listen for connections on the specified port.
-// Also check for the environmental variables, so we know whether or not we are going to be serving https
+// Retrieve the port to use, or 3001 if one is not in the environment
+const PORT = process.env.PORT || 3001;
+
+// Check for the SSL environmental variables, so we know whether or not we are going to be serving https
 if (process.env.SSL == 1) {
 
     const https = require('https');
@@ -61,7 +59,7 @@ if (process.env.SSL == 1) {
     
     httpsServer.listen(PORT, function() {
         console.log(`Server listening on port ${PORT}.`);
-    })
+    });
 
 } else {
     app.listen(PORT, function() {

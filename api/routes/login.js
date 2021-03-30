@@ -8,12 +8,8 @@ const User = require('../models/user');
 
 // The root path of this endpoint, which is concatenated to the router path
 // In the current version, this is /api/login
+const constructPath = require('./lib/constructpath');
 const endpointPath = '/login';
-
-// Function to concatenate paths
-function constructPath(pathRoot, path) {
-    return pathRoot + path;
-}
 
 // Ensures that passed data is formatted nicely and non-maliciously
 function verifyLocal(body, res)
@@ -68,8 +64,9 @@ async function onLogin(error, user, res)
     return;
 }
 
-
-function use(router) {
+// Assumed a user might not be logged in to access any of these endpoints
+// Loggin in is always an unauthenticated action initially
+function safeActions(router) {
     router.post(constructPath(endpointPath, '/'), async function(req, res) { 
         // Verify neccessary information is provided
         let isValid = verifyLocal(req.body, res);
@@ -89,6 +86,12 @@ function use(router) {
         // Begin login process
         await googleOAuth.loginGoogle(res, ticket);
     });
+}
+
+
+function use(router, authenticatedRouter) {
+    // Assign the router to be used
+    safeActions(router);
 }
 
 // Export the use function, enabling the login endpoint

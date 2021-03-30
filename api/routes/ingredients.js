@@ -9,12 +9,8 @@ const Ingredient = require('../models/ingredient');
 
 // The root path of this endpoint, which is concatenated to the router path
 // In the current version, this is /api/ingredients
+const constructPath = require('./lib/constructpath');
 const endpointPath = '/ingredients';
-
-// Function to concatenate paths
-function constructPath(pathRoot, path) {
-    return pathRoot + path;
-}
 
 // Given a list of ingredients, recover the users and return a list of them
 async function getUsersForIngredients(ingredients) {
@@ -25,8 +21,8 @@ async function getUsersForIngredients(ingredients) {
     return ingredients;
 }
 
-function use(router) {
-    // All of these endpoints are authenticated actions
+// Assumed a user might not be logged in to access any of these endpoints
+function safeActions(router) {
     // GET /, returns list of ingredients matching given query parameters
     router.get(constructPath(endpointPath, '/'), async function(req, res) {
         const { totalRecords, query } = await search(Ingredient, req);
@@ -38,7 +34,10 @@ function use(router) {
 
         res.json({ totalRecords: totalRecords, filteredRecords: foundIngredients.length, ingredients: foundIngredients });
     });
+}
 
+// Assumed a user is logged in to access any of these endpoints
+function authenticatedActions(router) {
     // POST /, creates an ingredient and returns it
     router.post(constructPath(endpointPath, '/'), async function(req, res) { 
         // Ensure that an ingredient was properly passed to this endpoint
@@ -65,6 +64,12 @@ function use(router) {
             res.status(422).json({ error: "Failed to create an ingredient with provided properties" });
         });
     });
+}
+
+function use(router, authenticatedRouter) {
+    // Assign the routers to be used
+    safeActions(router);
+    authenticatedActions(authenticatedRouter); 
 }
 
 // Export the use function, enabling the ingredients endpoint

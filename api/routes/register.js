@@ -8,12 +8,8 @@ const User = require('../models/user');
 
 // The root path of this endpoint, which is concatenated to the router path
 // In the current version, this is /api/register
+const constructPath = require('./lib/constructpath');
 const endpointPath = '/register';
-
-// Function to concatenate paths
-function constructPath(pathRoot, path) {
-    return pathRoot + path;
-}
 
 // Validation function for local registration request bodies
 // TODO: condense into regex checks (can add regex to the user schema)
@@ -92,8 +88,9 @@ async function onPasswordEncrypt(error, body, res, hashword)
     });
 }
 
-
-function use(router) {
+// Assumed a user might not be logged in to access any of these endpoints
+// Registration is always an unauthenticated action initially
+function safeActions(router) {
     router.post(constructPath(endpointPath, '/'), async function(req, res) {
         // Verify neccessary information is provided
         let isValid = await verifyLocal(req.body, res);
@@ -114,6 +111,12 @@ function use(router) {
         // Begin registration process
         await googleOAuth.registerGoogle(res, ticket);
     });
+}
+
+
+function use(router, authenticatedRouter) {
+    // Assign the router to be used
+    safeActions(router);
 }
 
 // Export the use function, enabling the register endpoint

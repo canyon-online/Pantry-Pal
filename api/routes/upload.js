@@ -54,16 +54,12 @@ const allowedTypes = {
 
 // The root path of this endpoint, which is concatenated to the router path
 // In the current version, this is /api/upload
+const constructPath = require('./lib/constructpath');
 const endpointPath = '/upload';
 
-// Function to concatenate paths
-function constructPath(pathRoot, path) {
-    return pathRoot + path;
-}
-
 // TODO: make this actually secure (e.g. logging a lot of information, read/write perms, etc.)
-function use(router) {
-    // This endpoint is authenticated actions
+// Uploading is always an authenticated action
+function authenticatedActions(router) {
     // POST /, attempts a file upload, then returns a URL if successful
     router.post(constructPath(endpointPath, '/'), async function(req, res) { 
         imageUpload(req, res, function(err) {
@@ -104,6 +100,12 @@ function use(router) {
             });
         });
     });
+}
+
+
+function use(router, authenticatedRouter) {
+    // Assign the routers to be used
+    authenticatedActions(authenticatedRouter); 
 }
 
 // Export the use function, enabling the upload endpoint
