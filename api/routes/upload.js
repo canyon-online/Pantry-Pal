@@ -8,7 +8,7 @@ const multer = require('multer');
 const Image = require('../models/image');
 
 // Control the disk storage and upload filenames
-const uploadDir = process.env.UPLOADS_DIRECTORY || 'uploads/';
+const uploadDir = process.env.UPLOADS_DIRECTORY || 'uploads';
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, uploadDir);
