@@ -20,6 +20,9 @@ function generateJWT(oid, name, verified) {
 // Verify a JWT, returning either the payload of the token or null
 // Currently a synchronous implementation
 function verifyJWT(token) {
+    if (!token)
+        return null;
+
     try {
         return jwt.verify(token, jwtKey);
     } catch(err) {
