@@ -34,11 +34,11 @@ class Recipe {
       name: data['name'],
       author: data['author']['display'],
       directions: data['directions'],
-      favorites: data['favorites'],
-      image: data['image'],
-      tags: data['tags'],
+      favorites: data['numFavorites'],
+      hits: data['numHits'],
+      // image: data['image'],
+      tags: data['tags'].map<String>((item) => item.toString()).toList(),
       difficulty: data['difficulty'],
-      hits: data['hits'],
     );
   }
 

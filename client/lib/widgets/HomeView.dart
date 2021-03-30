@@ -1,6 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:client/models/Recipe.dart';
+import 'package:client/utils/API.dart';
+import 'package:client/utils/UserProvider.dart';
 import 'package:client/widgets/RecipeCard.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -9,18 +16,21 @@ class HomeView extends StatefulWidget {
 
 class HomeViewState extends State<HomeView> {
   late ScrollController controller;
+  final limit = 10;
 
-  List<RecipeCard> items =
-      new List.generate(10, (index) => RecipeCard(Recipe.defaultRecipe()));
+  List<RecipeCard> items = <RecipeCard>[];
 
   bool _isLoading = false;
   bool _hasMore = true;
-  List<Future<Recipe>> recipes = <Future<Recipe>>[];
+  List<Recipe> _recipes = <Recipe>[];
   int offset = 0;
+  late String _token;
 
   @override
   void initState() {
     super.initState();
+    _token = Provider.of<UserProvider>(context, listen: false).user.token;
+    items = List.generate(limit, (index) => RecipeCard(Recipe.defaultRecipe()));
 
     _getRecipes(0);
 
@@ -42,9 +52,11 @@ class HomeViewState extends State<HomeView> {
         padding: EdgeInsets.fromLTRB(30, 15, 15, 30),
         controller: controller,
         shrinkWrap: true,
-        itemCount: items.length,
+        itemCount: _recipes.length > 0 ? _recipes.length : limit,
         itemBuilder: (context, index) {
-          return items[index];
+          return _recipes.length > 0
+              ? RecipeCard(_recipes[index])
+              : Card(child: CircularProgressIndicator());
         },
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
             mainAxisExtent: 391,
@@ -59,7 +71,29 @@ class HomeViewState extends State<HomeView> {
   void _getRecipes(int offset) async {
     items.addAll(
         List.generate(10, (index) => RecipeCard(Recipe.defaultRecipe())));
-    _isLoading = false;
+
+    Map<String, String> params = {
+      'limit': limit.toString(),
+      'offset': offset.toString(),
+      'sortBy': 'numFavorites',
+      'direction': '-1'
+    };
+
+    var response = await http.get(
+        Uri.https(API.baseURL, API.searchRecipe, params),
+        headers: {HttpHeaders.authorizationHeader: 'bearer ' + _token});
+    List<dynamic> recipes = jsonDecode(response.body)['recipes'];
+    List<Recipe> parsedRecipes =
+        recipes.map<Recipe>((item) => Recipe.fromMap(item)).toList();
+
+    setState(() {
+      if (parsedRecipes.length <= 0) {
+        _hasMore = false;
+      } else {
+        _recipes.addAll(parsedRecipes);
+      }
+      _isLoading = false;
+    });
   }
 
   void _scrollListener() {
@@ -68,7 +102,7 @@ class HomeViewState extends State<HomeView> {
       setState(() {
         _isLoading = true;
 
-        if (_isLoading) {
+        if (_isLoading && _hasMore) {
           offset = offset + 1;
           _getRecipes(offset);
         }
