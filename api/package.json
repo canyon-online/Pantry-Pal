@@ -12,10 +12,11 @@
   },
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "start-background": "concurrently \"nodemon server.js\" &",
+    "setup": "cp ./.env.template ./.env && echo \"Configuration file .env has been created, please populate this with proper configurtion.\""
   },
   "name": "pantry-pal",
-  "description": "Group 24 App",
+  "description": "A recipe sharing social media api",
   "version": "1.0.0",
   "main": "server.js",
   "repository": {
@@ -24,12 +25,13 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/SPVTNIK-ONLINE/Pantry-Pal/issues"
   },
   "homepage": "https://github.com/SPVTNIK-ONLINE/Pantry-Pal#readme",
   "devDependencies": {
-    "concurrently": "^6.0.0"
+    "concurrently": "^6.0.0",
+    "nodemon": "^2.0.7"
   }
 }
