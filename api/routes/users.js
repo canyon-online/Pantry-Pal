@@ -30,9 +30,15 @@ function authenticatedActions(router) {
         // Modify the query to remove irrelevant (and dangerous) fields from results
         query.select(['__id', 'display', 'recipeList', 'favorites']);
 
-        const foundUsers = await query.exec();
+        await query.exec(function(err, users) {
+            if (err) {
+                res.status(422).json({ error: "Failed to execute query" });
+                return;
+            }
 
-        res.json({ totalRecords: totalRecords, filteredRecords: foundUsers.length, users: foundUsers });
+            // No error in query execution, so respond with typical search output
+            res.json({ totalRecords: totalRecords, filteredRecords: users.length, users: users });
+        });   
     });
 }
 

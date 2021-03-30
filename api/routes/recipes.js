@@ -30,12 +30,19 @@ function safeActions(router) {
         // Modify the query to remove irrelevant fields from results
         query.select('-__v');
 
-        let foundRecipes = await query.exec();
+        await query.exec(async function(err, recipes) {
+            if (err) {
+                res.status(422).json({ error: "Failed to execute query" });
+                return;
+            }
 
-        // Now we want to reveal some user information for each record found
-        foundRecipes = await getUsersForRecipes(foundRecipes);
+            // Now we want to reveal the user display name for each record found
+            // Perhaps not good to mutate the input like done here?
+            recipes = await getUsersForRecipes(recipes);
 
-        res.json({ totalRecords: totalRecords, filteredRecords: foundRecipes.length, recipes: foundRecipes });
+            // No error in query execution, so respond with typical search output
+            res.json({ totalRecords: totalRecords, filteredRecords: recipes.length, recipes: recipes });
+        });
     });
 
     // GET /:id, returns the recipe indicated by the id
@@ -47,28 +54,29 @@ function safeActions(router) {
             mongoose.Types.ObjectId(req.params.id);
         } catch(err) {
             // Not a valid id, so tell the user
-            res.status(422).json({ error: "The id is malformed" });
+            res.status(422).json({ error: "The provided id is not a valid id" });
             return;
         }
 
         // Attempt to retrieve the recipe
-        try {
-            foundRecipe = await Recipe.findById(req.params.id);
-        } catch(err) {
-            foundRecipe = null;
-        }
-        
-        // Id does not point to an existing recipe
-        if (!foundRecipe) {
-            res.status(404).json({ error: "There is no recipe with that id" });
-            return;
-        }
+        Recipe.findById(req.params.id, async function(err, recipe) {
+            if (err) {
+                res.status(422).json({ error: "Failed to execute query" });
+                return;
+            }
 
-        // Now we want to reveal some user information for the recipe found
-        // We transform the recipe into a list temporarily so this function works for it
-        foundRecipe = await getUsersForRecipes([foundRecipe]);
+            // Id does not point to an existing recipe
+            if (!recipe) {
+                res.status(404).json({ error: "There is no recipe with that id" });
+                return;
+            }
 
-        res.json(foundRecipe[0]);
+            // Now we want to reveal some user information for the recipe found
+            // We transform the recipe into a list temporarily so this function works for it
+            recipe = await getUsersForRecipes([recipe]);
+
+            res.json(recipe[0]);
+        });
     });
 }
 

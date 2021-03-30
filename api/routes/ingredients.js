@@ -30,12 +30,19 @@ function safeActions(router) {
         // Modify the query to remove irrelevant fields from results
         query.select(['-__v', '-image']);
 
-        let foundIngredients = await query.exec();
+        await query.exec(async function(err, ingredients) {
+            if (err) {
+                res.status(422).json({ error: "Failed to execute query" });
+                return;
+            }
 
-        // Now we want to reveal some user information for each record found
-        foundIngredients = await getUsersForIngredients(foundIngredients);
+            // Now we want to reveal the user display name for each record found
+            // Perhaps not good to mutate the input like done here?
+            ingredients = await getUsersForIngredients(ingredients);
 
-        res.json({ totalRecords: totalRecords, filteredRecords: foundIngredients.length, ingredients: foundIngredients });
+            // No error in query execution, so respond with typical search output
+            res.json({ totalRecords: totalRecords, filteredRecords: ingredients.length, ingredients: ingredients });
+        });
     });
 }
 
