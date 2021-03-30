@@ -14,9 +14,8 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: function(req, file, cb) {
-        // For now, save all images as ending in .png
-        // Generate a sha1 hash of the file name and the current date so there are no collisions
-        // TODO: figure out what formats are ideal for frontend
+        // Save all images as ending in .png for current simplicity
+        // Generate a sha1 hash of the file name and the current date so there are no collisions with filenames
         const suffix = '.png';
         let fileName = crypto.createHash('sha1').update(`${file.originalname}-${Date.now() + Math.random()}`).digest('hex');
         cb(null, `${fileName}${suffix}`);
@@ -62,18 +61,29 @@ const endpointPath = '/upload';
 function authenticatedActions(router) {
     // POST /, attempts a file upload, then returns a URL if successful
     router.post(constructPath(endpointPath, '/'), async function(req, res) { 
-        imageUpload(req, res, function(err) {
-            if (err) {
-                console.log(err);
-                // Basic error handling for now. TODO: Add responses for all types of multerErrors
-                res.status(413).json({ error: `File too large (Max ${(process.env.MAX_UPLOAD_SIZE || 1E7) / 1E6} MB)`});
+        imageUpload(req, res, function(error) {
+            if (error) {
+                if (error instanceof multer.MulterError) {
+                    switch (error.code) {
+                        case 'LIMIT_FILE_SIZE':
+                            res.status(413).json({ error: `File too large (Max ${(process.env.MAX_UPLOAD_SIZE || 1E7) / 1E6} MB)` });
+                            break;
+                        
+                        default:
+                            res.status(400).json({ error: error.message });
+                    }
+                } else if (err) {
+                    res.status(500).json({ error: "Unknown error has occurred during file upload" });
+                }
+                
+                // If any upload errors occur do not attempt to create an Image
                 return;
             }
 
             // Invalid file type
             if (req.fileValidationError) {
                 // This response is hard-coded for now, but could be made to dynamically print the 'allowed' list
-                res.status(422).json({ error: "File is not a supported image (Allowed: bmp, gif, jpg, png, tiff, webp)"})
+                res.status(422).json({ error: "File is not a supported image (Allowed: bmp, gif, jpg, png, tiff, webp)" })
                 return;
             }
 
@@ -97,6 +107,8 @@ function authenticatedActions(router) {
 
             image.save().then(function(img) {
                 res.json({ image: `/images/${req.file.filename}` });
+            }).catch(function(error) {
+                res.json({ error: error });
             });
         });
     });
