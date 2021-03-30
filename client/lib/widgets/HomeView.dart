@@ -18,8 +18,6 @@ class HomeViewState extends State<HomeView> {
   late ScrollController controller;
   final limit = 10;
 
-  List<RecipeCard> items = <RecipeCard>[];
-
   bool _isLoading = false;
   bool _hasMore = true;
   List<Recipe> _recipes = <Recipe>[];
@@ -30,7 +28,6 @@ class HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     _token = Provider.of<UserProvider>(context, listen: false).user.token;
-    items = List.generate(limit, (index) => RecipeCard(Recipe.defaultRecipe()));
 
     _getRecipes(0);
 
@@ -69,9 +66,6 @@ class HomeViewState extends State<HomeView> {
   }
 
   void _getRecipes(int offset) async {
-    items.addAll(
-        List.generate(10, (index) => RecipeCard(Recipe.defaultRecipe())));
-
     Map<String, String> params = {
       'limit': limit.toString(),
       'offset': offset.toString(),

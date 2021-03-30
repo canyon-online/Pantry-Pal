@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
+import 'Ingredient.dart';
 
 class Recipe {
   final String recipeId;
   final String author;
   final String name;
-  // List<Ingredient> ingredients;
+  List<Ingredient> ingredients;
   final String directions;
   final List<String> tags;
-  final Image image;
+  final String image;
   final int difficulty;
   int favorites;
   int hits;
@@ -17,11 +17,13 @@ class Recipe {
       this.name = 'New Dish',
       this.author = 'Pantry Pal',
       this.directions = 'There are no directions.',
+      this.ingredients = const <Ingredient>[],
       this.favorites = 0,
       this.difficulty = 1,
       this.hits = 0,
-      this.image = const Image(
-          image: AssetImage('assets/images/noodles.jpg'), fit: BoxFit.fitWidth),
+      this.image = '/images/4bade9c7fb6df087d927e753f77ae354da950f3e.png',
+      // this.image = const Image(
+      //     image: AssetImage('assets/images/noodles.jpg'), fit: BoxFit.cover),
       this.tags = const <String>[]});
 
   factory Recipe.fromJson(Map<String, dynamic> data) {
@@ -36,7 +38,7 @@ class Recipe {
       directions: data['directions'],
       favorites: data['numFavorites'],
       hits: data['numHits'],
-      // image: data['image'],
+      image: data['image'],
       tags: data['tags'].map<String>((item) => item.toString()).toList(),
       difficulty: data['difficulty'],
     );
@@ -48,8 +50,6 @@ class Recipe {
       name: 'Soy Sauce Garlic Butter Noodles',
       author: 'super_amazing_cook12',
       directions: 'cook it',
-      image: Image(
-          image: AssetImage('assets/images/noodles.jpg'), fit: BoxFit.fitWidth),
       favorites: 1230,
       difficulty: 2,
       tags: ['Vegetarian', '🥡'],

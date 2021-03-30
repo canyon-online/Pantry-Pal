@@ -1,4 +1,5 @@
 import 'package:client/models/Recipe.dart';
+import 'package:client/utils/API.dart';
 import 'package:client/widgets/TextPill.dart';
 import 'package:flutter/material.dart';
 import 'package:like_button/like_button.dart';
@@ -23,12 +24,11 @@ class RecipeCardState extends State<RecipeCard> {
                 size: 30,
                 likeCountAnimationDuration: Duration(milliseconds: 200),
                 onTap: (value) {
-                  // favorited = !favorited;
                   return Future.value(!value);
                 },
                 likeCount: widget.recipe.favorites,
                 countBuilder: (count, bool isLiked, String text) {
-                  var color = isLiked ? Colors.pink : Colors.grey;
+                  var color = isLiked ? Colors.pink : Colors.black;
                   return Text(text, style: TextStyle(color: color));
                 }),
             Wrap(
@@ -90,7 +90,17 @@ class RecipeCardState extends State<RecipeCard> {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                widget.recipe.image,
+                Container(
+                  width: 500,
+                  height: 194,
+                  child: FittedBox(
+                    clipBehavior: Clip.hardEdge,
+                    // child: widget.recipe.image,
+                    child: Image.network(
+                        'https://' + API.baseURL + widget.recipe.image),
+                    fit: BoxFit.fill,
+                  ),
+                ),
                 Container(
                   padding: EdgeInsets.all(15.0),
                   child: Column(
