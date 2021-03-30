@@ -71,7 +71,7 @@ function safeActions(router) {
         await bcryptUtil.encryptPassword(req.body.password, function(err, hash) {
             // If an error occured during password encryption, display an error
             if (err) {
-                res.status(422).json({ error: err });
+                res.status(500).json({ error: err });
                 return;
             }
 

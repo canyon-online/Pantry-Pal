@@ -43,23 +43,20 @@ async function loginLocal(email, password, res) {
     }
 
     // Compare the password passed with the one in the database
-    // onLogin is given as a callback function.
-    // It will be called after the comparison is completed if they match
-    bcryptUtil.comparePassword(password, user, onLogin, res);
+    bcryptUtil.comparePassword(password, user.password, async function(err, doPasswordsMatch) {
+        if (err) {
+            res.status(500).json({ error: err });
+            return;
+        }
 
-    return;
-}
+        if (!doPasswordsMatch) {
+            res.status(404).json({ error: "Email and password combination failed to match any existing records" });
+            return;
+        }
 
-// Callback function called on any login attempt
-async function onLogin(error, user, res)
-{
-    if (error != null) {
-        res.status(404).json({ error: "Email and password combination failed to match any existing records" });
-        return;
-    }
-
-    // No error, so we can generate and send a JWT
-    await jwt.sendJWTBody(user, res);
+        // No error, so we can generate and send a JWT
+        await jwt.sendJWTBody(user, res);
+    });
 
     return;
 }
