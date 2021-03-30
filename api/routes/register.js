@@ -58,36 +58,6 @@ function verifyLocal(body, res)
     return true;
 }
 
-// Callback function for local registration, called from the encryptPassword
-// function. It saves the user to the database and will begin the login process.
-async function onPasswordEncrypt(error, body, res, hashword)
-{
-    // If an error occured during password encryption, display an error
-    if (error != null)
-        res.status(422).json({ error: error });
-
-    // Attempt to save registered user
-    let user = new User({
-        display: body.name,
-        email: body.email,
-        password: hashword
-    });
-
-    user.save()
-    .then(async user => {
-        // If we get here, then the user was successfully registered
-        // Now, the user has to be sent a verification email
-
-        // No error, so we can generate and send a JWT
-        await jwt.sendJWTBody(user, res);
-    })
-    .catch(function(err) {
-        // Sends the error as output. If there is no ._message attribute, then
-        // the error has to do with duplicate emails.
-        res.status(422).json({ error: err._message || "Duplicate email" });
-    });
-}
-
 // Assumed a user might not be logged in to access any of these endpoints
 // Registration is always an unauthenticated action initially
 function safeActions(router) {
@@ -98,8 +68,34 @@ function safeActions(router) {
             return;
 
         // Begin registration process
-        // onPasswordEncrypt is given as a callback, called after the password is encrypted
-        await bcryptUtil.encryptPassword(req.body, onPasswordEncrypt, res);
+        await bcryptUtil.encryptPassword(req.body.password, function(err, hash) {
+            // If an error occured during password encryption, display an error
+            if (err) {
+                res.status(422).json({ error: err });
+                return;
+            }
+
+            // Attempt to save registered user
+            let user = new User({
+                display: req.body.name,
+                email: req.body.email,
+                password: hash
+            });
+        
+            user.save()
+            .then(async user => {
+                // If we get here, then the user was successfully registered
+                // No error, so we can generate and send a JWT
+                await jwt.sendJWTBody(user, res);
+            })
+            .catch(function(err) {
+                // Sends the error as output
+                if (err.keyPattern && err.keyPattern.email)
+                    res.status(422).json({ error: "An account with this email already exists" });
+                else
+                    res.status(422).json({ error: err });
+            });
+        });
     });
 
     router.post(constructPath(endpointPath, '/google'), async function(req, res) {

@@ -3,13 +3,12 @@ const bcrypt = require('bcrypt');
 
 // Given a password, encrypt it with a salt
 // Will execute the callback function with error reporting
-function encryptPassword(body, callback, res) {
-    const password = body.password;
-    return bcrypt.hash(password, 10, function(err, hash) {
+function encryptPassword(password, callback) {
+    bcrypt.hash(password, 10, function(err, hash) {
         if (err)
-            return callback(err, body, res);
+            return callback(err);
 
-        return callback(null, body, res, hash);
+        return callback(null, hash);
     });
 }
 
