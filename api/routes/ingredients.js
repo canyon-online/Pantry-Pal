@@ -27,6 +27,9 @@ function safeActions(router) {
     router.get(constructPath(endpointPath, '/'), async function(req, res) {
         const { totalRecords, query } = await search(Ingredient, req);
 
+        // Modify the query to remove irrelevant fields from results
+        query.select(['-__v', '-image']);
+
         let foundIngredients = await query.exec();
 
         // Now we want to reveal some user information for each record found
