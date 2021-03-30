@@ -30,9 +30,9 @@ class Recipe {
 
   factory Recipe.fromMap(Map<String, dynamic> data) {
     return Recipe(
-      recipeId: data['recipeId'],
+      recipeId: data['_id'],
       name: data['name'],
-      author: data['author'],
+      author: data['author']['display'],
       directions: data['directions'],
       favorites: data['favorites'],
       image: data['image'],

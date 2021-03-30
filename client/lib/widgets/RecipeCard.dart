@@ -17,6 +17,7 @@ class RecipeCardState extends State<RecipeCard> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             LikeButton(
                 size: 30,
@@ -28,9 +29,7 @@ class RecipeCardState extends State<RecipeCard> {
                 likeCount: widget.recipe.favorites,
                 countBuilder: (count, bool isLiked, String text) {
                   var color = isLiked ? Colors.pink : Colors.grey;
-                  return count == 0
-                      ? Text('love', style: TextStyle(color: color))
-                      : Text(text);
+                  return Text(text, style: TextStyle(color: color));
                 }),
             Wrap(
               crossAxisAlignment: WrapCrossAlignment.center,

@@ -13,15 +13,25 @@ class HomeViewState extends State<HomeView> {
   List<RecipeCard> items =
       new List.generate(10, (index) => RecipeCard(Recipe.defaultRecipe()));
 
+  bool _isLoading = false;
+  bool _hasMore = true;
+  List<Future<Recipe>> recipes = <Future<Recipe>>[];
+  int offset = 0;
+
   @override
   void initState() {
     super.initState();
-    controller = new ScrollController()..addListener(_scrollListener);
+
+    _getRecipes(0);
+
+    controller = new ScrollController(initialScrollOffset: 1)
+      ..addListener(_scrollListener);
   }
 
   @override
   void dispose() {
     controller.removeListener(_scrollListener);
+    controller.dispose();
     super.dispose();
   }
 
@@ -46,11 +56,22 @@ class HomeViewState extends State<HomeView> {
     );
   }
 
+  void _getRecipes(int offset) async {
+    items.addAll(
+        List.generate(10, (index) => RecipeCard(Recipe.defaultRecipe())));
+    _isLoading = false;
+  }
+
   void _scrollListener() {
-    if (controller.position.extentAfter < 500) {
+    if (controller.offset >= controller.position.maxScrollExtent &&
+        !controller.position.outOfRange) {
       setState(() {
-        items.addAll(
-            List.generate(10, (index) => RecipeCard(Recipe.defaultRecipe())));
+        _isLoading = true;
+
+        if (_isLoading) {
+          offset = offset + 1;
+          _getRecipes(offset);
+        }
       });
     }
   }
