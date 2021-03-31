@@ -1,5 +1,4 @@
 // Import libraries for handling database operations
-const jwt = require('./lib/jwtUtils');
 const mongoose = require('mongoose');
 const search = require('./lib/search');
 
@@ -47,13 +46,7 @@ function safeActions(router) {
 
     // GET /:id, returns the ingredient indicated by the id
     router.get(constructPath(endpointPath, '/:id'), async function(req, res) {
-        var foundIngredient;
-
-        // Attempt to form an object id from the input
-        try{
-            mongoose.Types.ObjectId(req.params.id);
-        } catch(err) {
-            //Not a valid id, so tell the user
+        if (!validateObjectId(req.params.id)) {
             res.status(422).json({ error: "The provided id is not a valid id" });
             return;
         }
@@ -91,9 +84,8 @@ function authenticatedActions(router) {
             return;
         }
 
-        // Get the userid from the JWT (can assume that there is a valid token)
-        const token = req.headers.authorization.split(' ')[1];
-        const { userId } = jwt.verifyJWT(token);
+        // Get the userid from the headers
+        const userId = req.headers.userId;
 
         // Attempt to create a new ingredient
         const ingredient = new Ingredient({

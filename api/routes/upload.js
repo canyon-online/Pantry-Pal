@@ -1,6 +1,5 @@
 // Library for handling file uploads and cryptography
 const crypto = require('crypto');
-const jwt = require('./lib/jwtUtils');
 const mongoose = require('mongoose');
 const multer = require('multer');
 
@@ -93,9 +92,8 @@ function authenticatedActions(router) {
                 return;
             }
 
-            // Get the userid from the JWT (can assume that there is a valid token)
-            const token = req.headers.authorization.split(' ')[1];
-            const { userId } = jwt.verifyJWT(token);
+            // Get the userid from the headers
+            const userId = req.headers.userId;
 
             // Upload was successful, store this in the database and return the relative url
             const image = new Image({
