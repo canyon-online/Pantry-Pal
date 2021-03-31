@@ -79,25 +79,6 @@ class RecipeModalState extends State<RecipeModal> {
 
           SizedBox(height: 10),
 
-          Row(
-            children: [
-              Text('Ingredients: ',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
-          Wrap(
-            // INGREDIENTS
-            spacing: 10,
-            children: widget.recipe.ingredients
-                .map(
-                  (item) => TextPill(item, size: 12),
-                )
-                .toList(),
-          ),
-
-          // Vertical spacing in the column
-          SizedBox(height: 10),
-
           // This constrained box maes it so the listview doesn't take up unlimited
           // vertical height. Max height can be calculated to be some percent of
           // the screen.
@@ -106,6 +87,22 @@ class RecipeModalState extends State<RecipeModal> {
             // Add a scroll bar to the listview.
             child: Scrollbar(
               child: ListView(children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Ingredients: ',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                SizedBox(height: 5),
+                Wrap(
+                  // INGREDIENTS
+                  spacing: 10,
+                  children: widget.recipe.ingredients
+                      .map(
+                        (item) => TextPill(item, size: 12),
+                      )
+                      .toList(),
+                ),
+                Divider(),
                 // The only child will be the text since it might become long.
                 Text(
                   widget.recipe.directions,
