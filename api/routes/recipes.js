@@ -112,6 +112,43 @@ function authenticatedActions(router) {
             res.status(422).json({ error: "Failed to create a recipe with provided properties" });
         });
     });
+
+    // PATCH /:id, modifies recipe fields by id
+    router.patch(constructPath(endpointPath, '/:id'), async function(req, res) {
+        // Attempt to update recipe
+        Recipe.findByIdAndUpdate(req.params.id, req.body)
+        .then(function(recipe) {
+            res.json(recipe);
+        })
+        .catch(function() {
+            res.status(422).send("Recipe update failed.");
+        });
+    });
+
+    //DELETE /:id, deletes a recipe by id
+    router.delete(constructPath(endpointPath, '/:id'), async function(req, res) {
+        const token = req.headers.authorization.split(' ')[1];
+        const { userId } = jwt.verifyJWT(token);
+
+        // Check if the user ids match
+        if (userId != req.params.id) {
+            res.status(422).json({ error: "The User IDs do not match."});
+            return;
+        }
+
+        // Attempt to delete recipe
+        Recipe.findById(req.params.id, async function(err, recipe) {
+            if (!recipe) {
+                res.status(404).send('Recipe not found');
+            } else {
+                Recipe.findByIdAndRemove(req.params.id)
+                .then(function() {res.status(200).json("Recipe deleted.") })
+                .catch(function(err) {
+                    res.status(400).send("Recipe delete failed.");
+                })
+            }
+        });
+    });
 }
 
 function use(router, authenticatedRouter) {
