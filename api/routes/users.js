@@ -22,6 +22,23 @@ const stripUnsafeQuery = (query) => {
     return query;
 }
 
+// Error handler for /users/me endpoints
+function handleSelfUserErrors(err, user, res, cb) {
+    if (err) {
+        res.status(422).json({ error: "Failed to execute query" });
+        return;
+    }
+
+    // Id does not point to an existing user
+    if (!user) {
+        res.status(404).json({ error: "Unable to find the current user" });
+        return;
+    }
+
+    // Call the callback if there were no errors
+    cb();
+}
+
 // Assumed a user is logged in to access any of these endpoints
 // Any user endpoint should be authenticated to help prevent abuse
 function authenticatedActions(router) {
@@ -53,18 +70,10 @@ function authenticatedActions(router) {
 
         // Attempt to retrieve the current user
         User.findById(userId, '-password -__v', async function(err, user) {
-            if (err) {
-                res.status(422).json({ error: "Failed to execute query" });
-                return;
-            }
-
-            // Id does not point to an existing user
-            if (!user) {
-                res.status(404).json({ error: "Unable to find the current user" });
-                return;
-            }
-
-            res.json(user);
+            // Use an error handler 
+            handleSelfUserErrors(err, user, res, function() {
+                res.json(user);
+            });
         }); 
     });
 
@@ -78,21 +87,12 @@ function authenticatedActions(router) {
             display: req.body.name,
             private: req.body.private
         }, { omitUndefined: true, new: true }, async function(err, user) {
-            if (err) {
-                res.status(422).json({ error: "Failed to execute query" });
-                return;
-            }
+            handleSelfUserErrors(err, user, res, function() {
+                // Strip the response of the password field
+                user.password = null;
 
-            // Id does not point to an existing user
-            if (!user) {
-                res.status(404).json({ error: "Unable to find the current user" });
-                return;
-            }
-
-            // Strip the response of the password field
-            user.password = null;
-
-            res.json(user);
+                res.json(user);
+            });
         }); 
     });
 
@@ -106,18 +106,9 @@ function authenticatedActions(router) {
         User.findByIdAndUpdate(userId, {
             disabled: true
         }, { omitUndefined: true, new: true }, async function(err, user) {
-            if (err) {
-                res.status(422).json({ error: "Failed to execute query" });
-                return;
-            }
-
-            // Id does not point to an existing user
-            if (!user) {
-                res.status(404).json({ error: "Unable to find the current user" });
-                return;
-            }
-
-            res.json({ success: "Current user has been disabled" });
+            handleSelfUserErrors(err, user, res, function() {
+                res.json({ success: "Current user has been disabled" });
+            });            
         }); 
     });
 
@@ -129,24 +120,21 @@ function authenticatedActions(router) {
 
         // Attempt to retrieve the current user
         User.findById(userId, 'recipeList', async function(err, user) {
-            if (err) {
-                res.status(422).json({ error: "Failed to execute query" });
-                return;
-            }
+            handleSelfUserErrors(err, user, res, async function() {
+                // If we successfully got our recipes, convert the ids to their associated recipes
+                let recipeList = user.recipeList;
 
-            // Id does not point to an existing user
-            if (!user) {
-                res.status(404).json({ error: "Unable to find the current user" });
-                return;
-            }
+                for (var i = 0; i < recipeList.length; i++) {
+                    recipeList[i] = { _id: recipeList[i] }
+                }
 
-            let recipeList = user.recipeList;
-
-            for (var i = 0; i < recipeList.length; i++) {
-                recipeList[i] = await Recipe.findById(recipeList[i], '-__v');
-            }
-
-            res.json({ recipes: recipeList });
+                if (recipeList.length != 0) {
+                    // Do it in one query this way, unsure if this is computationally efficient
+                    recipeList = await Recipe.find({ $or: recipeList }, '-__v');
+                }
+                    
+                res.json({ recipes: recipeList });
+            });  
         }); 
     });
 
@@ -157,24 +145,21 @@ function authenticatedActions(router) {
 
         // Attempt to retrieve the current user
         User.findById(userId, 'favorites', async function(err, user) {
-            if (err) {
-                res.status(422).json({ error: "Failed to execute query" });
-                return;
-            }
+            handleSelfUserErrors(err, user, res, async function() {
+                // If we successfully got our favorites, convert the ids to their associated recipes
+                let recipeList = user.favorites;
 
-            // Id does not point to an existing user
-            if (!user) {
-                res.status(404).json({ error: "Unable to find the current user" });
-                return;
-            }
+                for (var i = 0; i < recipeList.length; i++) {
+                    recipeList[i] = { _id: recipeList[i] }
+                }
 
-            let recipeList = user.favorites;
+                if (recipeList.length != 0) {
+                    // Do it in one query this way, unsure if this is computationally efficient
+                    recipeList = await Recipe.find({ $or: recipeList }, '-__v');
+                }
 
-            for (var i = 0; i < recipeList.length; i++) {
-                recipeList[i] = await Recipe.findById(recipeList[i], '-__v');
-            }
-
-            res.json({ recipes: recipeList });
+                res.json({ recipes: recipeList });
+            });
         }); 
     });
 }
