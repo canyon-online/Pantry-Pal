@@ -21,10 +21,18 @@ async function getUsersForRecipes(recipes) {
     return recipes;
 }
 
+// Given a list of recipes, recover the ingredients and return a list of them
 async function getIngredientsForRecipes(recipes) {
     for (var i = 0; i < recipes.length; i++) {
-        for (var j = 0; j  < recipes[i].ingredients.length; j++) {
-            recipes[i].ingredients[j] = await Ingredient.findById(recipes[i].ingredients[j]).exec();
+        let currentIngredients = recipes[i].ingredients;
+
+        for (var j = 0; j < currentIngredients.length; j++) {
+            currentIngredients[j] = { _id: currentIngredients[i] }
+        }
+
+        if (currentIngredients.length != 0) {
+            // Do it in one query this way, unsure if this is computationally efficient
+            recipes[i].ingredients = await Ingredient.find({ $or: currentIngredients }, '-__v');
         }
     }
 
