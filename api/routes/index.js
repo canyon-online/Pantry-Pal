@@ -24,8 +24,8 @@ authenticatedRouter.use(async function(req, res, next) {
         }
 
         // If the user is not in the process of verification, ensure that the user is verified
+        const { userId } = jwt.verifyJWT(token);
         if (!req.path.includes("/verify")) {
-            const { userId } = jwt.verifyJWT(token);
             const user = await User.findById(userId).exec();
             if (!user.verified) {
                 res.status(401).json({ error: "Your account must be verified to perform this action" });
@@ -33,6 +33,8 @@ authenticatedRouter.use(async function(req, res, next) {
             }
         }
 
+        // If the user is logged in, include the userId in the header so future endpoints can get it
+        req.headers.userId = userId;
     } else {
         res.status(401).json({ error: "You must be logged in to perform this action" });
         return;

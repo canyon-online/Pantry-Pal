@@ -23,10 +23,11 @@ class Ingredient {
     return '#${this.id} ${this.name}';
   }
 
-  bool isEqual(Ingredient model) {
-    return this.id == model.id;
-  }
-
   @override
   String toString() => name;
+
+  bool operator ==(Object other) => other is Ingredient && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

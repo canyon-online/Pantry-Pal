@@ -43,6 +43,14 @@ const userSchema = new mongoose.Schema({
     verified: {
         type: Boolean,
         default: false
+    },
+    disabled: {
+        type: Boolean,
+        default: false
+    },
+    private: {
+        type: Boolean,
+        default: false
     }
 });
 

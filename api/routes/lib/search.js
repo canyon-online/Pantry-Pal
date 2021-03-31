@@ -1,8 +1,8 @@
 // The maximum number of records allowed to be returned in one request
 const maxRecords = process.env.MAX_RECORD_RETURNS || 50;
 
-// The length of ObjectIds in the database
-const ObjectIdLength = 24;
+// Function to check the validity of an ObjectId passed
+const validateObjectId = require('./validateObjectId');
 
 // Robust searching for varying Mongoose models
 async function search(model, req) {
@@ -53,7 +53,7 @@ async function search(model, req) {
             // Ensure only valid strings that can be cast to ObjectIds are passed
             for (var i = 0; i < ingredients.length; i++)
             {
-                if (ingredients[i].length == ObjectIdLength) {
+                if (validateObjectId(ingredients[i])) {
                     validIngredientsList.push(ingredients[i]);
                     validIngredientsOr.push({ ingredients: ingredients[i] });
                 }

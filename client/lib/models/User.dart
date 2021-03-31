@@ -26,6 +26,11 @@ class User {
     return '#${this.userId} ${this.name}';
   }
 
+  bool operator ==(Object other) => other is User && other.userId == userId;
+
+  @override
+  int get hashCode => userId.hashCode;
+
   @override
   String toString() => userAsString();
 }
