@@ -1,9 +1,8 @@
 import 'package:client/models/Recipe.dart';
 import 'package:client/utils/API.dart';
-import 'package:client/widgets/LikeButton.dart';
-import 'package:client/widgets/RecipeModal.dart';
 import 'package:client/widgets/TextPill.dart';
 import 'package:flutter/material.dart';
+import 'package:like_button/like_button.dart';
 
 class RecipeCard extends StatefulWidget {
   final Recipe recipe;
@@ -21,7 +20,17 @@ class RecipeCardState extends State<RecipeCard> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            RecipeLikeButton(recipe: widget.recipe),
+            LikeButton(
+                size: 30,
+                likeCountAnimationDuration: Duration(milliseconds: 200),
+                onTap: (value) {
+                  return Future.value(!value);
+                },
+                likeCount: widget.recipe.favorites,
+                countBuilder: (count, bool isLiked, String text) {
+                  var color = isLiked ? Colors.pink : Colors.black;
+                  return Text(text, style: TextStyle(color: color));
+                }),
             Wrap(
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
@@ -44,10 +53,36 @@ class RecipeCardState extends State<RecipeCard> {
     return Card(
         child: InkWell(
             onTap: () {
+              print('Card tapped');
               showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return RecipeModal(recipe: widget.recipe);
+                    return Dialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0)),
+                      child: Container(
+                        constraints: BoxConstraints(maxHeight: 350),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RichText(
+                                textAlign: TextAlign.justify,
+                                text: TextSpan(
+                                    text:
+                                        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                        wordSpacing: 1)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
                   });
             },
             child: Column(
@@ -63,7 +98,7 @@ class RecipeCardState extends State<RecipeCard> {
                     // child: widget.recipe.image,
                     child: Image.network(
                         'https://' + API.baseURL + widget.recipe.image),
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fill,
                   ),
                 ),
                 Container(

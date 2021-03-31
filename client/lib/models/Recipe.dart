@@ -4,7 +4,7 @@ class Recipe {
   final String recipeId;
   final String author;
   final String name;
-  final List<Ingredient> ingredients;
+  List<Ingredient> ingredients;
   final String directions;
   final List<String> tags;
   final String image;
@@ -31,7 +31,6 @@ class Recipe {
   }
 
   factory Recipe.fromMap(Map<String, dynamic> data) {
-    print(data['ingredients']);
     return Recipe(
       recipeId: data['_id'],
       name: data['name'],
@@ -40,9 +39,6 @@ class Recipe {
       favorites: data['numFavorites'],
       hits: data['numHits'],
       image: data['image'],
-      ingredients: data['ingredients']
-          .map<Ingredient>((item) => Ingredient.fromJson(item))
-          .toList(),
       tags: data['tags'].map<String>((item) => item.toString()).toList(),
       difficulty: data['difficulty'],
     );
@@ -69,11 +65,9 @@ class Recipe {
     return '#${this.recipeId} ${this.name}';
   }
 
-  bool operator ==(Object other) =>
-      other is Recipe && other.recipeId == recipeId;
-
-  @override
-  int get hashCode => recipeId.hashCode;
+  bool isEqual(Recipe model) {
+    return this.recipeId == model.recipeId;
+  }
 
   @override
   String toString() => recipeId;

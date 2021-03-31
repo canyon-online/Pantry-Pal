@@ -69,51 +69,31 @@ class IngredientFieldState extends State<IngredientField> {
             },
           )
         ]),
-        Wrap(
-          spacing: 5,
-          runSpacing: -15,
-          children: widget.controller.list
-              .map((item) => Wrap(
-                      spacing: -10,
-                      runSpacing: -10,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        TextPill(item.name),
-                        IconButton(
-                          icon: const Icon(Icons.remove),
-                          tooltip: 'Remove this ingredient',
-                          onPressed: () {
-                            setState(() {
-                              widget.controller.list.remove(item);
-                            });
-                          },
-                        )
-                      ]))
-              .toList(),
+        // Using a ListView builder here is extremely dubious and might cause
+        // some problems in the future.
+        Container(
+          height: widget.controller.list.length * 50 < 150
+              ? widget.controller.list.length * 50
+              : 150,
+          child: ListView.builder(
+              itemCount: widget.controller.list.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                var item = widget.controller.list.elementAt(index);
+                return Row(children: [
+                  TextPill(item.name),
+                  IconButton(
+                    icon: const Icon(Icons.remove),
+                    tooltip: 'Remove this ingredient',
+                    onPressed: () {
+                      setState(() {
+                        widget.controller.list.remove(item);
+                      });
+                    },
+                  )
+                ]);
+              }),
         )
-        // Container(
-        //   height: widget.controller.list.length * 50 < 150
-        //       ? widget.controller.list.length * 50
-        //       : 150,
-        //   child: ListView.builder(
-        //       itemCount: widget.controller.list.length,
-        //       shrinkWrap: true,
-        //       itemBuilder: (context, index) {
-        //         var item = widget.controller.list.elementAt(index);
-        //         return Row(children: [
-        //           TextPill(item.name),
-        //           IconButton(
-        //             icon: const Icon(Icons.remove),
-        //             tooltip: 'Remove this ingredient',
-        //             onPressed: () {
-        //               setState(() {
-        //                 widget.controller.list.remove(item);
-        //               });
-        //             },
-        //           )
-        //         ]);
-        //       }),
-        // )
       ]),
     );
   }

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 class TextPill extends StatelessWidget {
   final String text;
-  final double size;
-  const TextPill(this.text, {this.size = 14});
+  const TextPill(this.text);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +17,7 @@ class TextPill extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(2, 0, 2, 0),
           child: Text(
             text,
-            style: TextStyle(color: Colors.white, fontSize: size),
+            style: TextStyle(color: Colors.white, fontSize: 14),
           )),
     );
   }

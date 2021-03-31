@@ -3,9 +3,6 @@ const mongoose = require('mongoose');
 // Require the Image model to properly keep track of what images are in use
 const Image = require('./image');
 
-// Require the User model to keep track of recipes in a list
-const User = require('./user');
-
 const recipeSchema = new mongoose.Schema({ 
     author: {
         type: mongoose.Schema.Types.ObjectId,
@@ -79,43 +76,19 @@ recipeSchema.pre('validate', function(next) {
 });
 
 // On successful save, mark the indicated image as used so it won't be deleted
-// Also update the user's recipe list with the new recipe
 recipeSchema.post('save', async function(recipe) {
     const image = recipe.image;
-    await Image.findOneAndUpdate({ uriLocation: image }, { unused: false });
 
-    User.findByIdAndUpdate(recipe.author, {
-        $push: { recipeList: recipe._id }
-    }, function(err, user) {
-        if (err)
-            throw new Error(err);
-    });
+    let updatedImg = await Image.findOneAndUpdate({ uriLocation: image }, { unused: false });
 
     return;
 });
 
 // On intent to delete a recipe, mark the indicated image as unused so it will be deleted
-recipeSchema.post('delete', async function(recipe) {
-    const image = recipe.image;
-    await Image.findOneAndUpdate({ uriLocation: image }, { unused: true });
+recipeSchema.pre('delete', async function(next) {
+    const image = this.image;
 
-    // Also update the user's recipe list to indicate removal
-    User.findByIdAndUpdate(recipe.author, {
-        $pull: { recipeList: this._id }
-    }, function(err, user) {
-        if (err)
-            throw new Error(err);
-    });
-
-    // Remove this from any any favorites list (unsure of how computationally intense this may be)
-    User.updateMany({ 
-        favorites: { $all: [recipe._id]}
-    }, {
-        $pull: {favorites: recipe._id}
-    }, function(err, user) {
-        if (err)
-            throw new Error(err);
-    });
+    let updatedImg = await Image.findOneAndUpdate({ uriLocation: image }, { unused: true });
 
     next();
 });
