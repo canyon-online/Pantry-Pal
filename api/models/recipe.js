@@ -95,13 +95,23 @@ recipeSchema.post('save', async function(recipe) {
 });
 
 // On intent to delete a recipe, mark the indicated image as unused so it will be deleted
-// Also update the user's recipe list to indicate removal
 recipeSchema.post('delete', async function(recipe) {
     const image = recipe.image;
     await Image.findOneAndUpdate({ uriLocation: image }, { unused: true });
 
+    // Also update the user's recipe list to indicate removal
     User.findByIdAndUpdate(recipe.author, {
         $pull: { recipeList: this._id }
+    }, function(err, user) {
+        if (err)
+            throw new Error(err);
+    });
+
+    // Remove this from any any favorites list (unsure of how computationally intense this may be)
+    User.updateMany({ 
+        favorites: { $all: [recipe._id]}
+    }, {
+        $pull: {favorites: recipe._id}
     }, function(err, user) {
         if (err)
             throw new Error(err);
