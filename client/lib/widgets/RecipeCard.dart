@@ -4,7 +4,6 @@ import 'package:client/widgets/LikeButton.dart';
 import 'package:client/widgets/RecipeModal.dart';
 import 'package:client/widgets/TextPill.dart';
 import 'package:flutter/material.dart';
-import 'package:like_button/like_button.dart';
 
 class RecipeCard extends StatefulWidget {
   final Recipe recipe;
@@ -64,7 +63,7 @@ class RecipeCardState extends State<RecipeCard> {
                     // child: widget.recipe.image,
                     child: Image.network(
                         'https://' + API.baseURL + widget.recipe.image),
-                    fit: BoxFit.fill,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 Container(
