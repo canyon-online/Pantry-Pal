@@ -2,6 +2,8 @@ import 'package:client/models/Recipe.dart';
 import 'package:client/widgets/LikeButton.dart';
 import 'package:flutter/material.dart';
 
+import 'TextPill.dart';
+
 class RecipeModal extends StatefulWidget {
   final Recipe recipe;
   RecipeModal({required this.recipe});
@@ -32,6 +34,13 @@ class RecipeModalState extends State<RecipeModal> {
                 fontSize: 18,
               )),
 
+          Text('A recipe by ${widget.recipe.author}',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+                fontSize: 12,
+              )),
+
           Divider(),
 
           // This row if for aligning the heart and click icons.
@@ -45,8 +54,45 @@ class RecipeModalState extends State<RecipeModal> {
                   Icon(Icons.touch_app, color: Colors.grey, size: 30),
                   Text(widget.recipe.hits.round().toString()),
                 ],
-              )
+              ),
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Icon(Icons.science, color: Colors.grey, size: 30),
+                  Text(widget.recipe.difficulty.toString()),
+                ],
+              ),
             ],
+          ),
+
+          SizedBox(height: 10),
+
+          Wrap(
+            // TAGS
+            spacing: 10,
+            children: widget.recipe.tags
+                .map(
+                  (item) => TextPill(item, size: 12),
+                )
+                .toList(),
+          ),
+
+          SizedBox(height: 10),
+
+          Row(
+            children: [
+              Text('Ingredients: ',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          Wrap(
+            // INGREDIENTS
+            spacing: 10,
+            children: widget.recipe.ingredients
+                .map(
+                  (item) => TextPill(item, size: 12),
+                )
+                .toList(),
           ),
 
           // Vertical spacing in the column

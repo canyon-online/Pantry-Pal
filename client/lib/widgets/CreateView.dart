@@ -36,8 +36,12 @@ class CreateViewState extends State<CreateView> {
   Widget _buildNameField() {
     return TextFormField(
       controller: _name,
+      maxLength: 32,
       textInputAction: TextInputAction.next,
-      decoration: InputDecoration(labelText: 'Name of Dish'),
+      decoration: InputDecoration(
+          labelText: 'Dish Name',
+          labelStyle: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16)),
       // The validator receives the text that the user has entered.
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -51,11 +55,16 @@ class CreateViewState extends State<CreateView> {
   Widget _buildInstructionsField() {
     return TextFormField(
       controller: _directions,
+      maxLength: 2000,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.multiline,
-      minLines: 1,
-      maxLines: 5,
-      decoration: InputDecoration(labelText: 'Directions'),
+      minLines: 5,
+      maxLines: 10,
+      decoration: InputDecoration(
+          labelText: 'Directions',
+          alignLabelWithHint: true,
+          labelStyle: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16)),
       // The validator receives the text that the user has entered.
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -71,7 +80,7 @@ class CreateViewState extends State<CreateView> {
       value: _currentSliderValue,
       min: 1,
       max: 10,
-      divisions: 9,
+      divisions: 200,
       label: _currentSliderValue.round().toString(),
       onChanged: (double value) {
         setState(() {
@@ -131,13 +140,18 @@ class CreateViewState extends State<CreateView> {
             Divider(),
             IngredientField(controller: _ingredients),
             _buildInstructionsField(),
-            Divider(),
             TagField(controller: _tags),
+            Text('Difficulty:', style: TextStyle(fontWeight: FontWeight.bold)),
             _buildSlider(),
+            SizedBox(height: 16),
+            Text('Image:', style: TextStyle(fontWeight: FontWeight.bold)),
             ImageButton(
               controller: _image,
             ),
-            _buildSubmitButton(context)
+            Divider(),
+            Align(
+                alignment: Alignment.bottomRight,
+                child: _buildSubmitButton(context))
           ],
         ),
       ),
