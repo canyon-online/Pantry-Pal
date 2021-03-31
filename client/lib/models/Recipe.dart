@@ -65,9 +65,11 @@ class Recipe {
     return '#${this.recipeId} ${this.name}';
   }
 
-  bool isEqual(Recipe model) {
-    return this.recipeId == model.recipeId;
-  }
+  bool operator ==(Object other) =>
+      other is Recipe && other.recipeId == recipeId;
+
+  @override
+  int get hashCode => recipeId.hashCode;
 
   @override
   String toString() => recipeId;
