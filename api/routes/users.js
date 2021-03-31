@@ -22,8 +22,8 @@ const stripUnsafeQuery = (query) => {
     return query;
 }
 
-// Error handler for /users/me endpoints
-function handleSelfUserErrors(err, user, res, cb) {
+// Error handler for most /users endpoints
+function handleUserQueryErrors(err, user, res, cb) {
     if (err) {
         res.status(422).json({ error: "Failed to execute query" });
         return;
@@ -31,7 +31,7 @@ function handleSelfUserErrors(err, user, res, cb) {
 
     // Id does not point to an existing user
     if (!user) {
-        res.status(404).json({ error: "Unable to find the current user" });
+        res.status(404).json({ error: "Unable to find the user" });
         return;
     }
 
@@ -71,7 +71,7 @@ function authenticatedActions(router) {
         // Attempt to retrieve the current user
         User.findById(userId, '-password -__v', async function(err, user) {
             // Use an error handler 
-            handleSelfUserErrors(err, user, res, function() {
+            handleUserQueryErrors(err, user, res, function() {
                 res.json(user);
             });
         }); 
@@ -87,7 +87,7 @@ function authenticatedActions(router) {
             display: req.body.name,
             private: req.body.private
         }, { omitUndefined: true, new: true }, async function(err, user) {
-            handleSelfUserErrors(err, user, res, function() {
+            handleUserQueryErrors(err, user, res, function() {
                 // Strip the response of the password field
                 user.password = null;
 
@@ -106,7 +106,7 @@ function authenticatedActions(router) {
         User.findByIdAndUpdate(userId, {
             disabled: true
         }, { omitUndefined: true, new: true }, async function(err, user) {
-            handleSelfUserErrors(err, user, res, function() {
+            handleUserQueryErrors(err, user, res, function() {
                 res.json({ success: "Current user has been disabled" });
             });            
         }); 
@@ -120,7 +120,7 @@ function authenticatedActions(router) {
 
         // Attempt to retrieve the current user
         User.findById(userId, 'recipeList', async function(err, user) {
-            handleSelfUserErrors(err, user, res, async function() {
+            handleUserQueryErrors(err, user, res, async function() {
                 // If we successfully got our recipes, convert the ids to their associated recipes
                 let recipeList = user.recipeList;
 
@@ -145,8 +145,77 @@ function authenticatedActions(router) {
 
         // Attempt to retrieve the current user
         User.findById(userId, 'favorites', async function(err, user) {
-            handleSelfUserErrors(err, user, res, async function() {
+            handleUserQueryErrors(err, user, res, async function() {
                 // If we successfully got our favorites, convert the ids to their associated recipes
+                let recipeList = user.favorites;
+
+                for (var i = 0; i < recipeList.length; i++) {
+                    recipeList[i] = { _id: recipeList[i] }
+                }
+
+                if (recipeList.length != 0) {
+                    // Do it in one query this way, unsure if this is computationally efficient
+                    recipeList = await Recipe.find({ $or: recipeList }, '-__v');
+                }
+
+                res.json({ recipes: recipeList });
+            });
+        }); 
+    });
+
+    // GET /:id, returns information about the specified user
+    router.get(constructPath(endpointPath, '/:id'), async function(req, res) {
+        if (req.params.id.length != 24) {
+            res.status(422).json({ error: "The provided id is not a valid id" });
+            return;
+        }
+
+        // Attempt to retrieve the specified user
+        User.findById(req.params.id, 'display recipeList favorites', async function(err, user) {
+            handleUserQueryErrors(err, user, res, async function() {
+                res.json(user);
+            });  
+        }); 
+    });
+
+    // GET /:id/recipes, returns information about the specified user's created recipes
+    router.get(constructPath(endpointPath, '/:id/recipes'), async function(req, res) {
+        if (req.params.id.length != 24) {
+            res.status(422).json({ error: "The provided id is not a valid id" });
+            return;
+        }       
+
+        // Attempt to retrieve the specified user
+        User.findById(req.params.id, 'recipeList', async function(err, user) {
+            handleUserQueryErrors(err, user, res, async function() {
+                // If we successfully got the recipes, convert the ids to their associated recipes
+                let recipeList = user.recipeList;
+
+                for (var i = 0; i < recipeList.length; i++) {
+                    recipeList[i] = { _id: recipeList[i] }
+                }
+
+                if (recipeList.length != 0) {
+                    // Do it in one query this way, unsure if this is computationally efficient
+                    recipeList = await Recipe.find({ $or: recipeList }, '-__v');
+                }
+                    
+                res.json({ recipes: recipeList });
+            });  
+        }); 
+    });
+
+    // GET /:id/favorites, returns information about the specified user's favorite recipes
+    router.get(constructPath(endpointPath, '/:id/favorites'), async function(req, res) {
+        if (req.params.id.length != 24) {
+            res.status(422).json({ error: "The provided id is not a valid id" });
+            return;
+        }       
+
+        // Attempt to retrieve the specified user
+        User.findById(req.params.id, 'favorites', async function(err, user) {
+            handleUserQueryErrors(err, user, res, async function() {
+                // If we successfully got the favorites, convert the ids to their associated recipes
                 let recipeList = user.favorites;
 
                 for (var i = 0; i < recipeList.length; i++) {
