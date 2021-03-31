@@ -86,9 +86,8 @@ function authenticatedActions(router) {
             return;
         }
 
-        // Get the userid from the JWT (can assume that there is a valid token)
-        const token = req.headers.authorization.split(' ')[1];
-        const { userId } = jwt.verifyJWT(token);
+        // Get the userid from the headers
+        const userId = req.headers.userId;
 
         // Attempt to find the code by the request body
         const retrievedCode = await getCode(req.body.code, userId, "Email Verification");
@@ -110,9 +109,8 @@ function authenticatedActions(router) {
     });
 
     router.post(constructPath(endpointPath, '/verify/requestEmail'), async function(req, res) {
-        // Get the userid from the JWT (can assume that there is a valid token)
-        const token = req.headers.authorization.split(' ')[1];
-        const { userId } = jwt.verifyJWT(token);
+        // Get the userid from the headers
+        const userId = req.headers.userId;
         const user = await User.findById(userId);
 
         // Ensure that the user is not already verified
@@ -132,7 +130,7 @@ function authenticatedActions(router) {
                 // Log email error
             }
 
-            res.json({ success: "Email has been sent" })
+            res.json({ success: "Email has been sent" });
             return;
         }
 

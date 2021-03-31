@@ -1,5 +1,4 @@
 // Import libraries for handling database operations
-const jwt = require('./lib/jwtUtils');
 const mongoose = require('mongoose');
 const search = require('./lib/search');
 
@@ -49,9 +48,8 @@ function authenticatedActions(router) {
 
     // GET /me, returns information about the current user
     router.get(constructPath(endpointPath, '/me'), async function(req, res) {
-        // Get the userid from the JWT (can assume that there is a valid token)
-        const token = req.headers.authorization.split(' ')[1];
-        const { userId } = jwt.verifyJWT(token);        
+        // Get the userid from the headers
+        const userId = req.headers.userId;       
 
         // Attempt to retrieve the current user
         User.findById(userId, '-password -__v', async function(err, user) {
@@ -72,9 +70,8 @@ function authenticatedActions(router) {
 
     // PATCH /me, returns information about the current user after modifying it
     router.patch(constructPath(endpointPath, '/me'), async function(req, res) {
-        // Get the userid from the JWT (can assume that there is a valid token)
-        const token = req.headers.authorization.split(' ')[1];
-        const { userId } = jwt.verifyJWT(token);        
+        // Get the userid from the headers
+        const userId = req.headers.userId;      
 
         // Attempt to retrieve the current user
         User.findByIdAndUpdate(userId, {
@@ -101,9 +98,8 @@ function authenticatedActions(router) {
 
     // DELETE /me, returns success or error upon trying to delete the current user account
     router.patch(constructPath(endpointPath, '/me'), async function(req, res) {
-        // Get the userid from the JWT (can assume that there is a valid token)
-        const token = req.headers.authorization.split(' ')[1];
-        const { userId } = jwt.verifyJWT(token);        
+        // Get the userid from the headers
+        const userId = req.headers.userId;       
 
         // Attempt to retrieve the current user
         // TODO: secure this with a verification code
@@ -128,9 +124,8 @@ function authenticatedActions(router) {
 
     // GET /me/recipes, returns information about the current user's created recipes
     router.get(constructPath(endpointPath, '/me/recipes'), async function(req, res) {
-        // Get the userid from the JWT (can assume that there is a valid token)
-        const token = req.headers.authorization.split(' ')[1];
-        const { userId } = jwt.verifyJWT(token);        
+        // Get the userid from the headers
+        const userId = req.headers.userId;       
 
         // Attempt to retrieve the current user
         User.findById(userId, 'recipeList', async function(err, user) {
@@ -157,9 +152,8 @@ function authenticatedActions(router) {
 
     // GET /me/favorites, returns information about the current user's favorite recipes
     router.get(constructPath(endpointPath, '/me/favorites'), async function(req, res) {
-        // Get the userid from the JWT (can assume that there is a valid token)
-        const token = req.headers.authorization.split(' ')[1];
-        const { userId } = jwt.verifyJWT(token);        
+        // Get the userid from the headers
+        const userId = req.headers.userId;        
 
         // Attempt to retrieve the current user
         User.findById(userId, 'favorites', async function(err, user) {
