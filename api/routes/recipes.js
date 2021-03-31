@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const search = require('./lib/search');
 
 // Import the relevant models
+const Ingredient = require('../models/ingredient');
 const User = require('../models/user'); 
 const Recipe = require('../models/recipe'); 
 
@@ -16,6 +17,16 @@ const endpointPath = '/recipes';
 async function getUsersForRecipes(recipes) {
     for (var i = 0; i < recipes.length; i++) {
         recipes[i].author = await User.findById(recipes[i].author, '_id display').exec();
+    }
+
+    return recipes;
+}
+
+async function getIngredientsForRecipes(recipes) {
+    for (var i = 0; i < recipes.length; i++) {
+        for (var j = 0; j  < recipes[i].ingredients.length; j++) {
+            recipes[i].ingredients[j] = await Ingredient.findById(recipes[i].ingredients[j]).exec();
+        }
     }
 
     return recipes;
@@ -40,6 +51,9 @@ function safeActions(router) {
             // Perhaps not good to mutate the input like done here?
             recipes = await getUsersForRecipes(recipes);
 
+            // We also want to expose ingredient information
+            recipes = await getIngredientsForRecipes(recipes);
+
             // No error in query execution, so respond with typical search output
             res.json({ totalRecords: totalRecords, filteredRecords: recipes.length, recipes: recipes });
         });
@@ -47,8 +61,6 @@ function safeActions(router) {
 
     // GET /:id, returns the recipe indicated by the id
     router.get(constructPath(endpointPath, '/:id'), async function(req, res) {
-        var foundRecipe;
-        
         // Attempt to form an object id from the input
         try {
             mongoose.Types.ObjectId(req.params.id);
@@ -75,6 +87,9 @@ function safeActions(router) {
             // We transform the recipe into a list temporarily so this function works for it
             recipe = await getUsersForRecipes([recipe]);
 
+            // We also want to expose ingredient information
+            recipe = await getIngredientsForRecipes([recipe[0]]);
+
             res.json(recipe[0]);
         });
     });
@@ -83,6 +98,37 @@ function safeActions(router) {
 // Assumed a user is logged in to access any of these endpoints
 function authenticatedActions(router) {
     // POST /, creates a recipe and returns it
+    router.post(constructPath(endpointPath, '/'), async function(req, res) { 
+        // Ensure that a recipe was properly passed to this endpoint
+        if (!req.body || !req.body.name || !req.body.directions || !req.body.image) {
+            // Could probably rely on the recipe schema to throw this error on saving
+            res.status(422).json({ error: "Missing required recipe properties in request" });
+            return;
+        }
+
+        // Get the userid from the JWT (can assume that there is a valid token)
+        const token = req.headers.authorization.split(' ')[1];
+        const { userId } = jwt.verifyJWT(token);
+
+        // Attempt to create a new recipe
+        const recipe = new Recipe({
+            author: mongoose.Types.ObjectId(userId),
+            name: req.body.name,
+            ingredients: req.body.ingredients,
+            directions: req.body.directions,
+            tags: req.body.tags,
+            image: req.body.image,
+            difficulty: req.body.difficulty
+        });
+
+        recipe.save().then(function(recipe) {
+            res.json(recipe);
+        }).catch(function(err) {
+            res.status(422).json({ error: "Failed to create a recipe with provided properties" });
+        });
+    });
+
+    // POST /:id/favorite, creates a recipe and returns it
     router.post(constructPath(endpointPath, '/'), async function(req, res) { 
         // Ensure that a recipe was properly passed to this endpoint
         if (!req.body || !req.body.name || !req.body.directions || !req.body.image) {
