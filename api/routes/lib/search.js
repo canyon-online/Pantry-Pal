@@ -16,6 +16,10 @@ async function search(model, req) {
         if (!model.schema.obj[param])
             continue;
 
+        // Ensure that there is even content in the query
+        if (!req.query[param])
+            continue;
+
         // Currently only support querying string, numbers, and ObjectIds
         if (model.schema.obj[param].type == String)
             query.where(param, new RegExp(`${req.query[param]}`, "i"));

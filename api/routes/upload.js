@@ -8,15 +8,14 @@ const multer = require('multer');
 const Image = require('../models/image');
 
 // Control the disk storage and upload filenames
-const uploadDir = process.env.UPLOADS_DIRECTORY || 'uploads/';
+const uploadDir = process.env.UPLOADS_DIRECTORY || 'uploads';
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, uploadDir);
     },
     filename: function(req, file, cb) {
-        // For now, save all images as ending in .png
-        // Generate a sha1 hash of the file name and the current date so there are no collisions
-        // TODO: figure out what formats are ideal for frontend
+        // Save all images as ending in .png for current simplicity
+        // Generate a sha1 hash of the file name and the current date so there are no collisions with filenames
         const suffix = '.png';
         let fileName = crypto.createHash('sha1').update(`${file.originalname}-${Date.now() + Math.random()}`).digest('hex');
         cb(null, `${fileName}${suffix}`);
@@ -54,30 +53,37 @@ const allowedTypes = {
 
 // The root path of this endpoint, which is concatenated to the router path
 // In the current version, this is /api/upload
+const constructPath = require('./lib/constructpath');
 const endpointPath = '/upload';
 
-// Function to concatenate paths
-function constructPath(pathRoot, path) {
-    return pathRoot + path;
-}
-
 // TODO: make this actually secure (e.g. logging a lot of information, read/write perms, etc.)
-function use(router) {
-    // This endpoint is authenticated actions
+// Uploading is always an authenticated action
+function authenticatedActions(router) {
     // POST /, attempts a file upload, then returns a URL if successful
     router.post(constructPath(endpointPath, '/'), async function(req, res) { 
-        imageUpload(req, res, function(err) {
-            if (err) {
-                console.log(err);
-                // Basic error handling for now. TODO: Add responses for all types of multerErrors
-                res.status(413).json({ error: `File too large (Max ${(process.env.MAX_UPLOAD_SIZE || 1E7) / 1E6} MB)`});
+        imageUpload(req, res, function(error) {
+            if (error) {
+                if (error instanceof multer.MulterError) {
+                    switch (error.code) {
+                        case 'LIMIT_FILE_SIZE':
+                            res.status(413).json({ error: `File too large (Max ${(process.env.MAX_UPLOAD_SIZE || 1E7) / 1E6} MB)` });
+                            break;
+                        
+                        default:
+                            res.status(400).json({ error: error.message });
+                    }
+                } else if (err) {
+                    res.status(500).json({ error: "Unknown error has occurred during file upload" });
+                }
+                
+                // If any upload errors occur do not attempt to create an Image
                 return;
             }
 
             // Invalid file type
             if (req.fileValidationError) {
                 // This response is hard-coded for now, but could be made to dynamically print the 'allowed' list
-                res.status(422).json({ error: "File is not a supported image (Allowed: bmp, gif, jpg, png, tiff, webp)"})
+                res.status(422).json({ error: "File is not a supported image (Allowed: bmp, gif, jpg, png, tiff, webp)" })
                 return;
             }
 
@@ -101,9 +107,17 @@ function use(router) {
 
             image.save().then(function(img) {
                 res.json({ image: `/images/${req.file.filename}` });
+            }).catch(function(error) {
+                res.json({ error: error });
             });
         });
     });
+}
+
+
+function use(router, authenticatedRouter) {
+    // Assign the routers to be used
+    authenticatedActions(authenticatedRouter); 
 }
 
 // Export the use function, enabling the upload endpoint

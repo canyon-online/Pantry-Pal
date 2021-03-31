@@ -3,24 +3,14 @@ const express = require('express');
 const jwt = require('./lib/jwtUtils');
 const User = require('../models/user'); 
 
+// Create our two routers
 const router = express.Router(); 
+const authenticatedRouter = express.Router(); 
 
-// Make the router refresh the JWT for all endpoints
+// Make the authenticated router refresh the JWT for all endpoints
 // TODO: make JWT functions asynchronous so this does not bog down the server
-router.use(async function(req, res, next) {
-    // Do not try to refresh a token when dealing with endpoints that do not require authorization
-    // Probably better to create two routers: one for authenticated actions and the other for others
-    if (req.path.startsWith('/register') || req.path.startsWith('/login')) {
-        next();
-        return;
-    }
-
-    // Exclusions for unauthenticated pages
-    if (req.path.includes("/forgotPassword")) {
-        next();
-        return;
-    }
-
+// TODO: refresh tokens instead of this constant updating
+authenticatedRouter.use(async function(req, res, next) {
     if (req.headers.authorization) {
         // Extract the token from the header
         const token = req.headers.authorization.split(' ')[1];
@@ -62,14 +52,16 @@ const apiEndpoints = {
     users: require('./users')
 }
 
-// Pass the router to the endpoints, allowing them to use it
+// Pass the routers to the endpoints, allowing them to use them
 for (var endpoint in apiEndpoints) {
-    apiEndpoints[endpoint].use(router);
+    apiEndpoints[endpoint].use(router, authenticatedRouter);
 }
 
 // Export the router object
-module.exports = router;
-
+module.exports = {
+    router: router,
+    authenticatedRouter: authenticatedRouter   
+}
 
 // Article endpoints are left below but disabled
 // They are just sort of templates for CRUD operations

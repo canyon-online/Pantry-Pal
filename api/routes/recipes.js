@@ -9,12 +9,8 @@ const Recipe = require('../models/recipe');
 
 // The root path of this endpoint, which is concatenated to the router path
 // In the current version, this is /api/recipes
+const constructPath = require('./lib/constructpath');
 const endpointPath = '/recipes';
-
-// Function to concatenate paths
-function constructPath(pathRoot, path) {
-    return pathRoot + path;
-}
 
 // Given a list of recipes, recover the users and return a list of them
 async function getUsersForRecipes(recipes) {
@@ -25,20 +21,67 @@ async function getUsersForRecipes(recipes) {
     return recipes;
 }
 
-function use(router) {
-    // All of these endpoints are authenticated actions
+// Assumed a user might not be logged in to access any of these endpoints
+function safeActions(router) {
     // GET /, returns list of recipes matching given query parameters
     router.get(constructPath(endpointPath, '/'), async function(req, res) {
         const { totalRecords, query } = await search(Recipe, req);
 
-        let foundRecipes = await query.exec();
+        // Modify the query to remove irrelevant fields from results
+        query.select('-__v');
 
-        // Now we want to reveal some user information for each record found
-        foundRecipes = await getUsersForRecipes(foundRecipes);
+        await query.exec(async function(err, recipes) {
+            if (err) {
+                res.status(422).json({ error: "Failed to execute query" });
+                return;
+            }
 
-        res.json({ totalRecords: totalRecords, filteredRecords: foundRecipes.length, recipes: foundRecipes });
+            // Now we want to reveal the user display name for each record found
+            // Perhaps not good to mutate the input like done here?
+            recipes = await getUsersForRecipes(recipes);
+
+            // No error in query execution, so respond with typical search output
+            res.json({ totalRecords: totalRecords, filteredRecords: recipes.length, recipes: recipes });
+        });
     });
 
+    // GET /:id, returns the recipe indicated by the id
+    router.get(constructPath(endpointPath, '/:id'), async function(req, res) {
+        var foundRecipe;
+        
+        // Attempt to form an object id from the input
+        try {
+            mongoose.Types.ObjectId(req.params.id);
+        } catch(err) {
+            // Not a valid id, so tell the user
+            res.status(422).json({ error: "The provided id is not a valid id" });
+            return;
+        }
+
+        // Attempt to retrieve the recipe
+        Recipe.findById(req.params.id, async function(err, recipe) {
+            if (err) {
+                res.status(422).json({ error: "Failed to execute query" });
+                return;
+            }
+
+            // Id does not point to an existing recipe
+            if (!recipe) {
+                res.status(404).json({ error: "There is no recipe with that id" });
+                return;
+            }
+
+            // Now we want to reveal some user information for the recipe found
+            // We transform the recipe into a list temporarily so this function works for it
+            recipe = await getUsersForRecipes([recipe]);
+
+            res.json(recipe[0]);
+        });
+    });
+}
+
+// Assumed a user is logged in to access any of these endpoints
+function authenticatedActions(router) {
     // POST /, creates a recipe and returns it
     router.post(constructPath(endpointPath, '/'), async function(req, res) { 
         // Ensure that a recipe was properly passed to this endpoint
@@ -69,39 +112,12 @@ function use(router) {
             res.status(422).json({ error: "Failed to create a recipe with provided properties" });
         });
     });
+}
 
-    // GET /:id, returns the recipe indicated by the id
-    router.get(constructPath(endpointPath, '/:id'), async function(req, res) {
-        var foundRecipe;
-        
-        // Attempt to form an object id from the input
-        try {
-            mongoose.Types.ObjectId(req.params.id);
-        } catch(err) {
-            // Not a valid id, so tell the user
-            res.status(422).json({ error: "The id is malformed" });
-            return;
-        }
-
-        // Attempt to retrieve the recipe
-        try {
-            foundRecipe = await Recipe.findById(req.params.id);
-        } catch(err) {
-            foundRecipe = null;
-        }
-        
-        // Id does not point to an existing recipe
-        if (!foundRecipe) {
-            res.status(404).json({ error: "There is no recipe with that id" });
-            return;
-        }
-
-        // Now we want to reveal some user information for the recipe found
-        // We transform the recipe into a list temporarily so this function works for it
-        foundRecipe = await getUsersForRecipes([foundRecipe]);
-
-        res.json(foundRecipe[0]);
-    });
+function use(router, authenticatedRouter) {
+    // Assign the routers to be used
+    safeActions(router);
+    authenticatedActions(authenticatedRouter); 
 }
 
 // Export the use function, enabling the recipe endpoint

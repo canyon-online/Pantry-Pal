@@ -8,12 +8,8 @@ const User = require('../models/user');
 
 // The root path of this endpoint, which is concatenated to the router path
 // In the current version, this is /api/login
+const constructPath = require('./lib/constructpath');
 const endpointPath = '/login';
-
-// Function to concatenate paths
-function constructPath(pathRoot, path) {
-    return pathRoot + path;
-}
 
 // Ensures that passed data is formatted nicely and non-maliciously
 function verifyLocal(body, res)
@@ -47,29 +43,27 @@ async function loginLocal(email, password, res) {
     }
 
     // Compare the password passed with the one in the database
-    // onLogin is given as a callback function.
-    // It will be called after the comparison is completed if they match
-    bcryptUtil.comparePassword(password, user, onLogin, res);
+    bcryptUtil.comparePassword(password, user.password, async function(err, doPasswordsMatch) {
+        if (err) {
+            res.status(500).json({ error: err });
+            return;
+        }
+
+        if (!doPasswordsMatch) {
+            res.status(404).json({ error: "Email and password combination failed to match any existing records" });
+            return;
+        }
+
+        // No error, so we can generate and send a JWT
+        await jwt.sendJWTBody(user, res);
+    });
 
     return;
 }
 
-// Callback function called on any login attempt
-async function onLogin(error, user, res)
-{
-    if (error != null) {
-        res.status(404).json({ error: "Email and password combination failed to match any existing records" });
-        return;
-    }
-
-    // No error, so we can generate and send a JWT
-    await jwt.sendJWTBody(user, res);
-
-    return;
-}
-
-
-function use(router) {
+// Assumed a user might not be logged in to access any of these endpoints
+// Loggin in is always an unauthenticated action initially
+function safeActions(router) {
     router.post(constructPath(endpointPath, '/'), async function(req, res) { 
         // Verify neccessary information is provided
         let isValid = verifyLocal(req.body, res);
@@ -89,6 +83,12 @@ function use(router) {
         // Begin login process
         await googleOAuth.loginGoogle(res, ticket);
     });
+}
+
+
+function use(router, authenticatedRouter) {
+    // Assign the router to be used
+    safeActions(router);
 }
 
 // Export the use function, enabling the login endpoint
