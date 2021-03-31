@@ -98,7 +98,7 @@ class RecipeModalState extends State<RecipeModal> {
                   spacing: 10,
                   children: widget.recipe.ingredients
                       .map(
-                        (item) => TextPill(item, size: 12),
+                        (item) => TextPill(item.name, size: 12),
                       )
                       .toList(),
                 ),
