@@ -44,6 +44,40 @@ function safeActions(router) {
             res.json({ totalRecords: totalRecords, filteredRecords: ingredients.length, ingredients: ingredients });
         });
     });
+
+    // GET /:id, returns the ingredient indicated by the id
+    router.get(constructPath(endpointPath, '/:id'), async function(req, res) {
+        var foundIngredient;
+
+        // Attempt to form an object id from the input
+        try{
+            mongoose.Types.ObjectId(req.params.id);
+        } catch(err) {
+            //Not a valid id, so tell the user
+            res.status(422).json({ error: "The provided id is not a valid id" });
+            return;
+        }
+
+        // Attempt to retrive the ingredient
+        Ingredient.findById(req.params.id, async function(err, ingredient) {
+            if (err) {
+                res.status(422).json({ error: "Failed to execute query" });
+                return;
+            }
+
+            // Id does not point to an existing ingredient
+            if (!ingredient) {
+                res.status(404).json({ error: "There is no ingredient with that id" });
+                return;
+            }
+
+            // Now we want to reveal some user information for the ingredient found
+            // We transform the ingredient into a list temporarily so this function works for it
+            ingredient = await getUsersForIngredients([ingredient]);
+
+            res.json(ingredient[0]);
+        });
+    });
 }
 
 // Assumed a user is logged in to access any of these endpoints
@@ -72,6 +106,34 @@ function authenticatedActions(router) {
             res.json(ingredient);
         }).catch(function(err) {
             res.status(422).json({ error: "Failed to create an ingredient with provided properties" });
+        });
+    });
+
+    // PATCH /:id, modifies ingredient fields by id
+    router.patch(constructPath(endpointPath, '/:id'), async function(req, res) {
+        // Attempt to update ingredient
+        Ingredient.findByIdAndUpdate(req.params.id, req.body)
+        .then(function() {
+            res.json('Ingredient updated');
+        })
+        .catch(function() {
+            res.status(422).send("Ingredient update failed.");
+        });
+    });
+
+    // DELETE /:id, deletes an ingredient by id
+    router.delete(constructPath(endpointPath, '/:id'), async function(req, res) {
+        // Attempt to delete ingredient
+        Ingredient.findById(req.params.id, async function(err, ingredient) {
+            if (!ingredient) {
+                res.status(404).send('Ingredient not found');
+            } else {
+                Ingredient.findByIdAndRemove(req.params.id)
+                .then(function() {res.status(200).json("Article deleted") })
+                .catch(function(err) {
+                    res.status(400).send("Article delete failed.");
+                })
+            }
         });
     });
 }
