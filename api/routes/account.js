@@ -28,15 +28,57 @@ async function getCode(verifCode, userId, purpose) {
 function safeActions(router) {
     router.post(constructPath(endpointPath, '/forgotPassword'), async function(req, res) {
         // Ensure that a code and new password have been provided
+        if (!req.body || !req.body.email || !req.body.password) {
+            res.status(422).json({ error: "Missing required request parameter" });
+            return;
+        }
 
-        // Check validity of code provided
+        // Get the userid from the email passed
+        // Attempt to find a user with the supplied email
+        const user = await User.findOne({ email: req.body.email });
+
+        if (!user || user.google) {
+            res.status(404).json({ error: "A user registered with that email does not exist" });
+            return;
+        } else if (user.google) {
+            res.status(422).json({ error: "The indicated email is a Google account. Please sign in with Google" });
+            return;
+        }
+
+        // Attempt to find the code by the request body
+        const retrievedCode = await getCode(req.body.code, user._id, "Forgot Password");
 
         // Attempt to update the user from the code given
+        if (retrievedCode) {
+            // Check to make sure the code is not expired
+            if (new Date() >= retrievedCode.expiresAt) {
+                res.status(410).json({ error: "That code has expired" });
+                return;
+            }
+        }
+        else {
+            res.status(422).json({ error: "Invalid code" });
+            return;
+        }
+
+        // The code was valid and a user was found, so now update that user's password
+        bcryptUtil.encryptPassword(req.body.password, function(err, hash) {
+            if (err) {
+                res.status(500).json({ error: "Failed to encrypt the provided password" });
+                return;
+            }
+
+            User.findByIdAndUpdate(user.id, { password: hash }, function(err, user) {
+                if (err) {
+                    res.status(500).json({ error: "Failed to update the password" });
+                    return;
+                }
+
+                res.json({ success: "Passsword has been changed" });
+            })
+        });
     });
 
-    router.post(constructPath(endpointPath, '/forgotPassword/checkCode'), async function(req, res) {
-        // Ensure that a code and an email has been provided
-    });
 
     router.post(constructPath(endpointPath, '/forgotPassword/requestEmail'), async function(req, res) {
         // Ensure that an email has been provided
@@ -50,10 +92,10 @@ function safeActions(router) {
 
         // Ensure that a user with that email exists and is not a Google user
         if (!user || user.google) {
-            res.status(404).json({ error: "A user registered with that email does not exist" })
+            res.status(404).json({ error: "A user registered with that email does not exist" });
             return;
         } else if (user.google) {
-            res.status(422).json({ error: "The indicated email is a Google account. Please sign in with Google" })
+            res.status(422).json({ error: "The indicated email is a Google account. Please sign in with Google" });
             return;
         }
 
@@ -93,7 +135,7 @@ function authenticatedActions(router) {
         const retrievedCode = await getCode(req.body.code, userId, "Email Verification");
 
         if (retrievedCode) {
-            // Check to make sure the code is not expired (could potentially add this as a hook to the schema)
+            // Check to make sure the code is not expired
             if (new Date() >= retrievedCode.expiresAt) {
                 res.status(410).json({ error: "That code has expired" });
                 return;
@@ -115,7 +157,7 @@ function authenticatedActions(router) {
 
         // Ensure that the user is not already verified
         if (user.verified) {
-            res.status(409).json({ error: "The currently logged in user is already verified" })
+            res.status(409).json({ error: "The currently logged in user is already verified" });
             return;
         }
 
