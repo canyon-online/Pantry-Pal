@@ -1,6 +1,7 @@
 // Import libraries for handling database operations
 const mongoose = require('mongoose');
 const search = require('./lib/search');
+const validateObjectId = require('./lib/validateObjectId');
 
 // Import the relevant models
 const User = require('../models/user'); 
@@ -165,7 +166,7 @@ function authenticatedActions(router) {
 
     // GET /:id, returns information about the specified user
     router.get(constructPath(endpointPath, '/:id'), async function(req, res) {
-        if (req.params.id.length != 24) {
+        if (!validateObjectId(req.params.id)) {
             res.status(422).json({ error: "The provided id is not a valid id" });
             return;
         }
@@ -180,7 +181,7 @@ function authenticatedActions(router) {
 
     // GET /:id/recipes, returns information about the specified user's created recipes
     router.get(constructPath(endpointPath, '/:id/recipes'), async function(req, res) {
-        if (req.params.id.length != 24) {
+        if (!validateObjectId(req.params.id)) {
             res.status(422).json({ error: "The provided id is not a valid id" });
             return;
         }       
@@ -207,7 +208,7 @@ function authenticatedActions(router) {
 
     // GET /:id/favorites, returns information about the specified user's favorite recipes
     router.get(constructPath(endpointPath, '/:id/favorites'), async function(req, res) {
-        if (req.params.id.length != 24) {
+        if (!validateObjectId(req.params.id)) {
             res.status(422).json({ error: "The provided id is not a valid id" });
             return;
         }       

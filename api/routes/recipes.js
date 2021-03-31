@@ -1,6 +1,7 @@
 // Import libraries for handling database operations
 const mongoose = require('mongoose');
 const search = require('./lib/search');
+const validateObjectId = require('./lib/validateObjectId');
 
 // Import the relevant models
 const Ingredient = require('../models/ingredient');
@@ -68,11 +69,7 @@ function safeActions(router) {
 
     // GET /:id, returns the recipe indicated by the id
     router.get(constructPath(endpointPath, '/:id'), async function(req, res) {
-        // Attempt to form an object id from the input
-        try {
-            mongoose.Types.ObjectId(req.params.id);
-        } catch(err) {
-            // Not a valid id, so tell the user
+        if (!validateObjectId(req.params.id)) {
             res.status(422).json({ error: "The provided id is not a valid id" });
             return;
         }
