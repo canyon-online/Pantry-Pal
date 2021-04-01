@@ -85,7 +85,7 @@ class API {
     return jsonDecode(response.body);
   }
 
-  Future<Map<String, dynamic>> emailVerification(String email) async {
+  Future<Map<String, dynamic>> sendEmailVerification(String email) async {
     final response = await http.post(
       Uri.https('jsonplaceholder.typicode.com', 'posts'),
       headers: <String, String>{
@@ -125,5 +125,71 @@ class API {
       };
     }
     return result;
+  }
+
+  Future<Map<String, dynamic>> googleVerification(String token) async {
+    final Map<String, dynamic> loginData = {'token': token};
+
+    final response = await http.post(
+      Uri.https(API.baseURL, API.googleLogin),
+      headers: API.postHeader,
+      body: jsonEncode(loginData),
+    );
+
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    return responseData;
+  }
+
+  Future<Map<String, dynamic>> doLogin(String email, String password) async {
+    final Map<String, dynamic> loginData = {
+      'email': email,
+      'password': password
+    };
+
+    final response = await http.post(
+      Uri.https(API.baseURL, API.login),
+      headers: API.postHeader,
+      body: jsonEncode(loginData),
+    );
+
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    return responseData;
+  }
+
+  Future<Map<String, dynamic>> doSignup(
+      String name, String email, String password) async {
+    final Map<String, dynamic> signupData = {
+      'name': name,
+      'email': email,
+      'password': password
+    };
+
+    final response = await http.post(
+      Uri.https(API.baseURL, API.signup),
+      headers: API.postHeader,
+      body: jsonEncode(signupData),
+    );
+
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    return responseData;
+  }
+
+  Future<Map<String, dynamic>> checkVerification(
+      String token, String code) async {
+    final Map<String, dynamic> verifyData = {'code': code};
+
+    final response = await http.post(Uri.https(API.baseURL, API.verify),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          HttpHeaders.authorizationHeader: 'bearer ' + token
+        },
+        body: jsonEncode(verifyData));
+
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    return responseData;
   }
 }

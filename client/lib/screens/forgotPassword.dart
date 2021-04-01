@@ -75,7 +75,7 @@ class ForgotPasswordState extends State<ForgotPassword> {
         var validated = _formKeyEmail.currentState?.validate() ?? false;
         if (validated) {
           API()
-              .emailVerification(_email.text)
+              .sendEmailVerification(_email.text)
               .then((value) => {
                     ScaffoldMessenger.of(context)
                         .showSnackBar(SnackBar(content: Text(value.toString())))
