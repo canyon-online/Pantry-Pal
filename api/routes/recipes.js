@@ -14,9 +14,18 @@ const constructPath = require('./lib/constructpath');
 const endpointPath = '/recipes';
 
 // Given a list of recipes, recover the users and return a list of them
-async function getUsersForRecipes(recipes) {
-    for (var i = 0; i < recipes.length; i++) {
-        recipes[i].author = await User.findById(recipes[i].author, '_id display').exec();
+async function getUsersForRecipes(recipes, userId) {
+    var currentUser, i;
+    if (userId)
+        currentUser = await User.findById(userId);
+
+    for (i = 0; i < recipes.length; i++) {
+        if (currentUser)
+            recipes[i].set('isLiked', currentUser.favorites.includes(recipes[i]._id), { strict: false });
+            
+        await User.findById(recipes[i].author, '_id display', function(err, user) {
+            recipes[i].author = user;
+        });
     }
 
     return recipes;
@@ -57,7 +66,7 @@ function safeActions(router) {
 
             // Now we want to reveal the user display name for each record found
             // Perhaps not good to mutate the input like done here?
-            recipes = await getUsersForRecipes(recipes);
+            recipes = await getUsersForRecipes(recipes, req.headers.userId);
 
             // We also want to expose ingredient information
             recipes = await getIngredientsForRecipes(recipes);

@@ -43,6 +43,22 @@ authenticatedRouter.use(async function(req, res, next) {
     next();
 });
 
+// Allow unauthenticated endpoints to also utilize JWTs if the requester is logged in
+router.use(async function(req, res, next) {
+    if (req.headers.authorization) {
+        // Extract the token from the header
+        const token = req.headers.authorization.split(' ')[1];
+
+        // If the user is not in the process of verification, ensure that the user is verified
+        const { userId } = jwt.verifyJWT(token);
+
+        // If the user is logged in, include the userId in the header so future endpoints can get it
+        req.headers.userId = userId;
+    }
+
+    next();
+});
+
 // Import api endpoints
 const apiEndpoints = {
     account: require('./account'),
