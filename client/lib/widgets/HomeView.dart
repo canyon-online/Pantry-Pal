@@ -1,12 +1,8 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:client/models/Recipe.dart';
 import 'package:client/utils/API.dart';
 import 'package:client/utils/UserProvider.dart';
 import 'package:client/widgets/RecipeCard.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class HomeView extends StatefulWidget {
@@ -66,19 +62,7 @@ class HomeViewState extends State<HomeView> {
   }
 
   void _getRecipes(int offset) async {
-    Map<String, String> params = {
-      'limit': limit.toString(),
-      'offset': offset.toString(),
-      'sortBy': 'numFavorites',
-      'direction': '-1'
-    };
-
-    var response = await http.get(
-        Uri.https(API.baseURL, API.searchRecipe, params),
-        headers: {HttpHeaders.authorizationHeader: 'bearer ' + _token});
-    List<dynamic> recipes = jsonDecode(response.body)['recipes'];
-    List<Recipe> parsedRecipes =
-        recipes.map<Recipe>((item) => Recipe.fromMap(item)).toList();
+    List<Recipe> parsedRecipes = await API().getRecipes(_token, offset, limit);
 
     setState(() {
       if (parsedRecipes.length <= 0) {
