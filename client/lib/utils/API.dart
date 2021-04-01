@@ -2,10 +2,8 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:client/models/Ingredient.dart';
 import 'package:client/models/Recipe.dart';
-import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-
 import 'package:image_picker/image_picker.dart';
 
 class API {
@@ -26,9 +24,10 @@ class API {
   static const String searchRecipe = 'api/recipes';
   static const String createRecipe = 'api/recipes';
 
+  // API call to submit a recipe based using a user token and a map of recipe parts.
   Future<Map<String, dynamic>> submitRecipe(
       String token, Map<String, dynamic> recipe) async {
-    print('sending ' + recipe.toString());
+    print('Sending new recipe ' + recipe.toString());
 
     final response = await http.post(Uri.https(API.baseURL, API.createRecipe),
         headers: <String, String>{
@@ -40,7 +39,9 @@ class API {
     return jsonDecode(response.body);
   }
 
+  // API call to fetch recipes based on an offset and limit.
   Future<List<Recipe>> getRecipes(String token, int offset, int limit) async {
+    // TODO: Add parameters (optional?) to change sortby and direction.
     Map<String, String> params = {
       'limit': limit.toString(),
       'offset': offset.toString(),
@@ -52,18 +53,21 @@ class API {
         Uri.https(API.baseURL, API.searchRecipe, params),
         headers: {HttpHeaders.authorizationHeader: 'bearer ' + token});
 
+    // Return a list of the recipes fetched as recipe objects.
     List<dynamic> recipes = jsonDecode(response.body)['recipes'];
-
     return recipes.map<Recipe>((item) => Recipe.fromMap(item)).toList();
   }
 
+  // API Call to fetch ingredients based off an (optional?) filter.
   Future<List<Ingredient>> getIngredients(String token, String filter) async {
     var response = await http.get(
         Uri.https(API.baseURL, API.searchIngredient, {'name': filter}),
         headers: {HttpHeaders.authorizationHeader: 'bearer ' + token});
+    // Return a list of the ingredients fetched as ingredient objects.
     return Ingredient.fromJsonList(json.decode(response.body)['ingredients']);
   }
 
+  // API call to upload a PickedFile to the imageUpload endpoint.
   Future<Map<String, dynamic>> uploadFile(
       String token, PickedFile file, String name) async {
     var request =
@@ -71,6 +75,7 @@ class API {
     request.headers
         .addAll({HttpHeaders.authorizationHeader: 'bearer ' + token});
 
+    // Add files to the request.
     request.files.add(http.MultipartFile(
       'image',
       file.openRead(),
@@ -79,12 +84,16 @@ class API {
       contentType: MediaType('image', 'jpeg'),
     ));
 
-    http.Response response =
-        await http.Response.fromStream(await request.send());
+    // Send the request.
+    final response = await http.Response.fromStream(await request.send());
 
-    return jsonDecode(response.body);
+    // Fetch response data and add the status code to it.
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    return responseData;
   }
 
+  // API call to send email verification when signing up.
   Future<Map<String, dynamic>> sendEmailVerification(String email) async {
     final response = await http.post(
       Uri.https('jsonplaceholder.typicode.com', 'posts'),
@@ -94,12 +103,13 @@ class API {
       body: jsonEncode(<String, dynamic>{'email': email}),
     );
 
-    return jsonDecode(response.body);
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    return responseData;
   }
 
+  // API call to send email verification when old code expired.
   Future<Map<String, dynamic>> requestVerification(String token) async {
-    var result;
-
     final response = await http.post(
       Uri.https(API.baseURL, API.requestVerify),
       headers: <String, String>{
@@ -108,25 +118,12 @@ class API {
       },
     );
 
-    try {
-      if (response.statusCode == 200) {
-        result = {'status': true, 'message': 'Sent a new verification email'};
-      } else {
-        result = {
-          'status': false,
-          'message': 'Failed to send a new verification email'
-        };
-      }
-    } catch (on, stacktrace) {
-      print(stacktrace.toString());
-      result = {
-        'status': false,
-        'message': 'Failed to send a new verification email'
-      };
-    }
-    return result;
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    return responseData;
   }
 
+  // API call to sign in/up through google.
   Future<Map<String, dynamic>> googleVerification(String token) async {
     final Map<String, dynamic> loginData = {'token': token};
 
@@ -141,6 +138,7 @@ class API {
     return responseData;
   }
 
+  // API call to fetch a JWT to remain logged in.
   Future<Map<String, dynamic>> doLogin(String email, String password) async {
     final Map<String, dynamic> loginData = {
       'email': email,
@@ -158,6 +156,7 @@ class API {
     return responseData;
   }
 
+  // API call to create a new user.
   Future<Map<String, dynamic>> doSignup(
       String name, String email, String password) async {
     final Map<String, dynamic> signupData = {
@@ -177,6 +176,7 @@ class API {
     return responseData;
   }
 
+  // API call to validate verification code to authenticate an account.
   Future<Map<String, dynamic>> checkVerification(
       String token, String code) async {
     final Map<String, dynamic> verifyData = {'code': code};

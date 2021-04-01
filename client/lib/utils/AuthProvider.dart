@@ -29,6 +29,7 @@ enum Status {
   NotRegistered
 }
 
+// Helper function to return the decoded base 64 string.
 String _decodeBase64(String str) {
   String output = str.replaceAll('-', '+').replaceAll('_', '/');
 
@@ -48,6 +49,7 @@ String _decodeBase64(String str) {
   return utf8.decode(base64Url.decode(output));
 }
 
+// Returns the middle section of a JWT containing mostly the user data
 Map<String, dynamic> parseJwt(String token) {
   final parts = token.split('.');
   final payload = _decodeBase64(parts[1]);
@@ -66,6 +68,7 @@ class AuthProvider with ChangeNotifier {
   set registeredStatus(value) => _registeredStatus = value;
   set verificationStatus(value) => _verificationStatus = value;
 
+  // Saves login data given a response's token
   User saveLogin(Map<String, dynamic> responseData) {
     var userData = parseJwt(responseData['token']);
     userData['token'] = responseData['token'];
@@ -74,16 +77,27 @@ class AuthProvider with ChangeNotifier {
     return authUser;
   }
 
+  // Helper function to perform login after an API call. Mostly checks response
+  // codes, sets AuthProvider state, and such.
   Map<String, dynamic> _login(Map<String, dynamic> responseData) {
     var result;
 
-    // If there was no issue with registering or verifying
+    // If there was no issue with registering or verifying...
     if (responseData['code'] == 200 && responseData['error'] == null) {
       User user = saveLogin(responseData);
 
-      if (user.verified == false) {
-        print('user is not verified');
-
+      if (user.verified) {
+        // User is verified
+        _loggedInStatus = Status.LoggedIn;
+        _verificationStatus = Status.Verified;
+        _registeredStatus = Status.Registered;
+        result = {
+          'status': true,
+          'message': 'Successfully logged in',
+          'user': user
+        };
+      } else {
+        // User is not verified
         _loggedInStatus = Status.NotLoggedIn;
         _verificationStatus = Status.Verifying;
         _registeredStatus = Status.Registered;
@@ -93,20 +107,15 @@ class AuthProvider with ChangeNotifier {
           'message': 'Please verify your account',
           'user': user
         };
-      } else {
-        print('user is verified');
-        _loggedInStatus = Status.LoggedIn;
-        _verificationStatus = Status.Verified;
-        _registeredStatus = Status.Registered;
-        result = {
-          'status': true,
-          'message': 'Successfully logged in',
-          'user': user
-        };
       }
     } else {
+      // There was likely some error with the API call if we get here
       _loggedInStatus = Status.NotLoggedIn;
-      result = {'status': false, 'message': responseData['error']};
+      result = {
+        'status': false,
+        'code': responseData['code'],
+        'message': responseData['error']
+      };
     }
 
     return result;

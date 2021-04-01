@@ -39,8 +39,37 @@ class VerificationState extends State<Verification> {
   }
 
   Future<Map<String, dynamic>> handleRequestCode(context) async {
+    var result;
     String token = Provider.of<UserProvider>(context, listen: false).user.token;
-    return await API().requestVerification(token);
+
+    final Map<String, dynamic> responseData =
+        await API().requestVerification(token);
+
+    try {
+      switch (responseData['code']) {
+        case 200:
+          result = {
+            'status': true,
+            'code': responseData['code'],
+            'message': 'Sent a new verification email'
+          };
+          break;
+        default:
+          result = {
+            'status': false,
+            'code': responseData['code'],
+            'message': 'Failed to send a new verification email'
+          };
+      }
+    } catch (on, stacktrace) {
+      print(stacktrace.toString());
+      result = {
+        'status': false,
+        'message': 'Failed to send a new verification email'
+      };
+    }
+
+    return result;
   }
 
   Widget _buildRequestCode(context) {

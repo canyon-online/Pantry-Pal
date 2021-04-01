@@ -36,7 +36,7 @@ class HomeState extends State<Home> {
 
     // Hacky way of forcing people to login is to display the login screen if the
     // app is not logged in...
-    return auth.loggedInStatus == Status.LoggedIn
+    return auth.verificationStatus == Status.Verified
         ? SafeArea(
             child: Scaffold(
             resizeToAvoidBottomInset: true,
