@@ -75,7 +75,7 @@ function safeActions(router) {
         }
 
         // Attempt to retrieve the recipe
-        Recipe.findById(req.params.id, async function(err, recipe) {
+        Recipe.findByIdAndUpdate(req.params.id, { $inc: { 'numHits': 1 } }, { new: true }, async function(err, recipe) {
             if (err) {
                 res.status(422).json({ error: "Failed to execute query" });
                 return;
