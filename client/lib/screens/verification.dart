@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:client/models/User.dart';
 import 'package:client/screens/landing.dart';
 import 'package:client/utils/API.dart';
@@ -9,7 +7,6 @@ import 'package:client/utils/UserProvider.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 
 class Verification extends StatefulWidget {
   @override
@@ -42,25 +39,27 @@ class VerificationState extends State<Verification> {
   }
 
   Future<Map<String, dynamic>> handleRequestCode(context) async {
-    User user = Provider.of<UserProvider>(context, listen: false).user;
     var result;
+    String token = Provider.of<UserProvider>(context, listen: false).user.token;
 
-    final response = await http.post(
-      Uri.https(API.baseURL, API.requestVerify),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: 'bearer ' + user.token
-      },
-    );
+    final Map<String, dynamic> responseData =
+        await API().requestVerification(token);
 
     try {
-      if (response.statusCode == 200) {
-        result = {'status': true, 'message': 'Sent a new verification email'};
-      } else {
-        result = {
-          'status': false,
-          'message': 'Failed to send a new verification email'
-        };
+      switch (responseData['code']) {
+        case 200:
+          result = {
+            'status': true,
+            'code': responseData['code'],
+            'message': 'Sent a new verification email'
+          };
+          break;
+        default:
+          result = {
+            'status': false,
+            'code': responseData['code'],
+            'message': 'Failed to send a new verification email'
+          };
       }
     } catch (on, stacktrace) {
       print(stacktrace.toString());
@@ -147,7 +146,6 @@ class VerificationState extends State<Verification> {
 
   @override
   Widget build(BuildContext context) {
-    User user = Provider.of<UserProvider>(context).user;
     AuthProvider auth = Provider.of<AuthProvider>(context);
 
     print(auth.loggedInStatus);

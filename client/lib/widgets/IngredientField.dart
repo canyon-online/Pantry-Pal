@@ -1,13 +1,9 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:client/models/Ingredient.dart';
-import 'package:client/models/User.dart';
 import 'package:client/utils/API.dart';
 import 'package:client/utils/UserProvider.dart';
 import 'package:client/widgets/TextPill.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class IngredientFieldController {
@@ -31,7 +27,7 @@ class IngredientFieldState extends State<IngredientField> {
   }
 
   Widget _buildDropDown(context) {
-    User user = Provider.of<UserProvider>(context, listen: false).user;
+    String token = Provider.of<UserProvider>(context, listen: false).user.token;
     return DropdownSearch<Ingredient>(
       label: 'Ingredient',
       showSearchBox: true,
@@ -41,11 +37,7 @@ class IngredientFieldState extends State<IngredientField> {
         labelText: 'Search an ingredient',
       ),
       onFind: (String filter) async {
-        var response = await http.get(
-            Uri.https(API.baseURL, API.searchIngredient, {'name': filter}),
-            headers: {HttpHeaders.authorizationHeader: 'bearer ' + user.token});
-        return Ingredient.fromJsonList(
-            json.decode(response.body)['ingredients']);
+        return API().getIngredients(token, filter);
       },
       onChanged: handleOnChange,
     );
@@ -91,29 +83,6 @@ class IngredientFieldState extends State<IngredientField> {
                       ]))
               .toList(),
         )
-        // Container(
-        //   height: widget.controller.list.length * 50 < 150
-        //       ? widget.controller.list.length * 50
-        //       : 150,
-        //   child: ListView.builder(
-        //       itemCount: widget.controller.list.length,
-        //       shrinkWrap: true,
-        //       itemBuilder: (context, index) {
-        //         var item = widget.controller.list.elementAt(index);
-        //         return Row(children: [
-        //           TextPill(item.name),
-        //           IconButton(
-        //             icon: const Icon(Icons.remove),
-        //             tooltip: 'Remove this ingredient',
-        //             onPressed: () {
-        //               setState(() {
-        //                 widget.controller.list.remove(item);
-        //               });
-        //             },
-        //           )
-        //         ]);
-        //       }),
-        // )
       ]),
     );
   }

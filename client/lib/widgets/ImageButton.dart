@@ -1,10 +1,6 @@
-import 'dart:io';
 import 'package:client/models/User.dart';
 import 'package:client/utils/API.dart';
 import 'package:client/utils/UserProvider.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -42,32 +38,18 @@ class ImageButtonState extends State<ImageButton> {
     });
 
     if (file != null)
-      _upload(file!, fileName, token);
+      _upload(token, file!, fileName);
     else
       setState(() {
         uploading = false;
       });
   }
 
-  void _upload(PickedFile file, String name, String token) async {
-    var request =
-        http.MultipartRequest('POST', Uri.https(API.baseURL, API.imageUpload));
-    request.headers
-        .addAll({HttpHeaders.authorizationHeader: 'bearer ' + token});
+  void _upload(String token, PickedFile file, String name) async {
+    Map<String, dynamic> response = await API().uploadFile(token, file, name);
 
-    request.files.add(http.MultipartFile(
-      'image',
-      file.openRead(),
-      await file.readAsBytes().then((value) => value.length),
-      filename: name,
-      contentType: MediaType('image', 'jpeg'),
-    ));
-
-    http.Response response =
-        await http.Response.fromStream(await request.send());
-
-    print("Result: ${response.body}");
-    widget.controller.url = json.decode(response.body)['image'];
+    print("Result: $response");
+    widget.controller.url = response['image'];
     widget.controller.fileName = name;
 
     setState(() {

@@ -1,10 +1,6 @@
 import 'package:client/utils/RouteNames.dart';
 import 'package:flutter/material.dart';
 
-// TODO:
-// Google sign on
-// - https://medium.com/flutterdevs/google-sign-in-with-flutter-8960580dec96
-
 // Landing page class that extends stateless widget because it won't change itself.
 // Think back to static vs. nonstatic in Java.
 class Landing extends StatelessWidget {

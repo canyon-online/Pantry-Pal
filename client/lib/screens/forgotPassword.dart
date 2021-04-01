@@ -1,34 +1,12 @@
+import 'package:client/utils/API.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utils/StringValidator.dart';
-import 'package:http/http.dart' as http;
-import 'dart:async';
-import 'dart:convert';
 
 // This screen is stateful becuase it changes the contents of itself depending
 // on user interaction. The first stage involves providing an email, the seconds
 // a verification password, and the last (and TODO) a page to update the password.
 enum Step { email, verification, login }
-
-// Function called to return some Future object that tells the API to send a verification
-// password. This may be able to offsourced into another file along with other API calls.
-Future<http.Response> emailUser(String email) async {
-  final response = await http.post(
-    Uri.https('jsonplaceholder.typicode.com', 'posts'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8'
-    },
-    body: jsonEncode(<String, dynamic>{'email': email}),
-  );
-
-  if (response.statusCode == 201) {
-    // TODO: Save verification code in a secure way (inquire Jordan).
-    return response;
-  } else {
-    // TODO: Catch exception in the submit button to create an error message.
-    throw Exception('Failed to email user');
-  }
-}
 
 // This is the state of the ForgotPassword screen. This changes depending on
 // the selectedStep. The function setState() forces an update of the widget.
@@ -96,10 +74,11 @@ class ForgotPasswordState extends State<ForgotPassword> {
       case Step.email:
         var validated = _formKeyEmail.currentState?.validate() ?? false;
         if (validated) {
-          emailUser(_email.text)
+          API()
+              .sendEmailVerification(_email.text)
               .then((value) => {
                     ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(value.body)))
+                        .showSnackBar(SnackBar(content: Text(value.toString())))
                   })
               .catchError((error) => {
                     ScaffoldMessenger.of(context)

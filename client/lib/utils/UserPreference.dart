@@ -11,15 +11,7 @@ class UserPreference {
 
   Future<bool> saveUser(User user) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    print('saved: ' +
-        user.userId +
-        ', ' +
-        user.verified.toString() +
-        ', ' +
-        user.name +
-        ', ' +
-        user.token +
-        '.');
+    print('Saved: ${user.userId} ${user.verified} ${user.name} ${user.token}');
     prefs.setString('userId', user.userId);
     prefs.setString('name', user.name);
     prefs.setBool('verified', user.verified);
@@ -35,22 +27,14 @@ class UserPreference {
     String token = prefs.getString('token') ?? 'null';
     bool verified = prefs.getBool('verified') ?? false;
 
-    print('fetched: ' +
-        userId +
-        ', ' +
-        verified.toString() +
-        ', ' +
-        name +
-        ', ' +
-        token +
-        '.');
+    print('Fetched: $userId $verified $name $token');
 
     return User(userId: userId, name: name, token: token);
   }
 
   void removeUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    print('removed user from preferences');
+    print('Removed user from preferences');
     prefs.remove('userId');
     prefs.remove('name');
     prefs.remove('token');
