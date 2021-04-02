@@ -60,10 +60,17 @@ class MyApp extends StatelessWidget {
                             UserPreference().removeUser();
                             return Landing();
                           } else {
-                            Provider.of<AuthProvider>(context, listen: false)
-                                .loggedInStatus = Status.LoggedIn;
-                            Provider.of<UserProvider>(context, listen: false)
-                                .initializeUser(snapshot.data!);
+                            var auth = Provider.of<AuthProvider>(context,
+                                listen: false);
+                            var user = Provider.of<UserProvider>(context,
+                                listen: false);
+
+                            auth.loggedInStatus = Status.LoggedIn;
+                            user.initializeUser(snapshot.data!);
+                            print(user.user.verified);
+                            auth.verificationStatus = user.user.verified
+                                ? Status.Verified
+                                : Status.NotVerified;
                           }
                           return Home();
                       }
