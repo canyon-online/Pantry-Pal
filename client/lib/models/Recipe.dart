@@ -34,7 +34,7 @@ class Recipe {
     return Recipe(
       recipeId: data['_id'],
       name: data['name'],
-      author: data['author'].toString(), //['display'],
+      author: data['author']['display'],
       directions: data['directions'],
       favorites: data['numFavorites'],
       hits: data['numHits'],
