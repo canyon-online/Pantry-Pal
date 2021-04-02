@@ -20,13 +20,11 @@ async function getUsersForRecipes(recipes, userId) {
         currentUser = await User.findById(userId);
 
     recipes.forEach(async function(recipe) {
-        await User.findById(recipe.author, '_id display', function(err, user) {
-            recipe.author = user;
-        });
+        recipe.populaatee('author', 'display').execPopulate();
 
         if (currentUser)
             recipe.set('isLiked', currentUser.favorites.includes(recipe._id), { strict: false });
-    }) 
+    }); 
 
     return recipes;
 }
@@ -99,7 +97,7 @@ function safeActions(router) {
 
             // Now we want to reveal some user information for the recipe found
             // We transform the recipe into a list temporarily so this function works for it
-            recipe = await getUsersForRecipes([recipe]);
+            recipe = await getUsersForRecipes([recipe], req.headers.userId);
 
             // We also want to expose ingredient information
             recipe = await getIngredientsForRecipes([recipe[0]]);
