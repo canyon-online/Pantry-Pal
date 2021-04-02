@@ -18,6 +18,7 @@ class RecipeLikeButtonState extends State<RecipeLikeButton> {
   late int likeCount = 0;
   late String token;
   late bool isLiked;
+  bool liking = false;
 
   void initState() {
     super.initState();
@@ -32,6 +33,7 @@ class RecipeLikeButtonState extends State<RecipeLikeButton> {
     setState(() {
       likeCount = response['numFavorites'];
       isLiked = !value;
+      liking = false;
     });
 
     return Future.value(isLiked);
@@ -44,7 +46,12 @@ class RecipeLikeButtonState extends State<RecipeLikeButton> {
         size: 30,
         likeCountAnimationDuration: Duration(milliseconds: 200),
         onTap: (value) {
-          return _toggleLike(token, value);
+          if (liking)
+            return Future.value(value);
+          else {
+            liking = true;
+            return _toggleLike(token, value);
+          }
         },
         isLiked: isLiked,
         likeCount: likeCount,
