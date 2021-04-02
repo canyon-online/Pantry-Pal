@@ -5,6 +5,7 @@ import 'package:client/screens/signup.dart';
 import 'package:client/screens/forgotPassword.dart';
 import 'package:client/screens/verification.dart';
 import 'package:client/utils/AuthProvider.dart';
+import 'package:client/utils/IngredientModel.dart';
 import 'package:client/utils/UserProvider.dart';
 import 'package:client/utils/UserPreference.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
 
     return MultiProvider(
         providers: [
+          ChangeNotifierProvider(create: (context) => IngredientModel()),
           ChangeNotifierProvider(create: (_) => AuthProvider()),
           ChangeNotifierProvider(create: (_) => UserProvider())
         ],

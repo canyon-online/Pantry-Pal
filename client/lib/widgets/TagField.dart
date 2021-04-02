@@ -48,8 +48,10 @@ class TagFieldState extends State<TagField> {
                 tooltip: 'Add the selected tag',
                 onPressed: () {
                   setState(() {
-                    if (widget.controller.list.length < 3)
+                    if (widget.controller.list.length < 3) {
                       widget.controller.list.add(_tag.text);
+                      _tag.clear();
+                    }
                     print(widget.controller.list);
                   });
                 },

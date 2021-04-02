@@ -62,9 +62,9 @@ class HomeViewState extends State<HomeView> {
   }
 
   void _getRecipes(int offset) async {
-    if (!mounted) return;
     List<Recipe> parsedRecipes = await API().getRecipes(_token, offset, limit);
 
+    if (!mounted) return;
     setState(() {
       if (parsedRecipes.length <= 0) {
         _hasMore = false;

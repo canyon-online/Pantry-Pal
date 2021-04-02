@@ -29,7 +29,6 @@ class RecipeLikeButtonState extends State<RecipeLikeButton> {
   Future<bool> _toggleLike(String token, bool value) async {
     Map<String, dynamic> response =
         await API().doLikeRecipe(token, widget.recipe.recipeId);
-    print(response);
     setState(() {
       likeCount = response['numFavorites'];
       isLiked = !value;

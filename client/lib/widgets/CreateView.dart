@@ -15,7 +15,6 @@ class CreateView extends StatefulWidget {
 // Creates a state class relating to the addRecipeForm widget
 class CreateViewState extends State<CreateView> {
   // Ingredient list & get, add, remove, and console print fxns
-  List<String> ingredients = ['carrot', 'second carrot', 'something else'];
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _name = TextEditingController();
   final TextEditingController _directions = TextEditingController();
@@ -23,10 +22,6 @@ class CreateViewState extends State<CreateView> {
   final TagFieldController _tags = TagFieldController();
   final ImageButtonController _image = ImageButtonController();
   double _currentSliderValue = 5;
-
-  void addIngredient(String ingredient) {
-    ingredients.add(ingredient);
-  }
 
   Widget _buildNameField() {
     return TextFormField(
@@ -92,7 +87,7 @@ class CreateViewState extends State<CreateView> {
 
           final Map<String, dynamic> recipe = {
             'name': _name.text,
-            'ingredients': Ingredient.toIdString(_ingredients.list),
+            // 'ingredients': Ingredient.toIdString(_ingredients.list),
             'directions': _directions.text,
             'tags': _tags.list.toList(),
             'image': _image.url,

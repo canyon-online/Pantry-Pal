@@ -3,6 +3,7 @@ import 'package:client/utils/AuthProvider.dart';
 import 'package:client/widgets/CreateView.dart';
 import 'package:client/widgets/HomeView.dart';
 import 'package:client/widgets/ProfileView.dart';
+import 'package:client/widgets/SearchView.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +18,7 @@ class HomeState extends State<Home> {
   final List<Widget> _children = [
     HomeView(),
     CreateView(),
-    Text('Index 2: Search'),
+    SearchView(),
     ProfileView(),
   ];
 

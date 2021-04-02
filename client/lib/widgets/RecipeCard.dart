@@ -59,7 +59,6 @@ class RecipeCardState extends State<RecipeCard> {
       Recipe newRecipe = Recipe.fromJson(response);
       setState(() {
         _recipe = newRecipe;
-        print(_recipe.hits);
       });
     }
 

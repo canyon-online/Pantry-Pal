@@ -27,6 +27,22 @@ class API {
       'api/recipes'; // + '/recipeID + '/favorite' (Post)
   static const String clickRecipe = 'api/recipes'; // + '/recipeID (Get)
 
+  // API call to submit an ingredient based using a user token and the name.
+  Future<Map<String, dynamic>> submitIngredient(
+      String token, String name) async {
+    Map<String, String> ingredient = {'name': name};
+
+    final response =
+        await http.post(Uri.https(API.baseURL, API.createIngredient),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              HttpHeaders.authorizationHeader: 'bearer ' + token
+            },
+            body: jsonEncode(ingredient));
+
+    return jsonDecode(response.body);
+  }
+
   // API call to submit a recipe based using a user token and a map of recipe parts.
   Future<Map<String, dynamic>> submitRecipe(
       String token, Map<String, dynamic> recipe) async {
@@ -40,6 +56,25 @@ class API {
         body: jsonEncode(recipe));
 
     return jsonDecode(response.body);
+  }
+
+  Future<List<Recipe>> searchFromIngredients(
+      String token, int offset, int limit, Set<Ingredient> ingredients) async {
+    Map<String, String> params = {
+      'limit': limit.toString(),
+      'offset': offset.toString(),
+      'sortBy': 'numFavorites',
+      'direction': '-1',
+      'ingredients':
+          ingredients.fold('any', (prev, element) => prev + ',${element.id}')
+    };
+
+    var response = await http.get(
+        Uri.https(API.baseURL, API.searchRecipe, params),
+        headers: {HttpHeaders.authorizationHeader: 'bearer ' + token});
+
+    print(response.body);
+    return Future.value([]);
   }
 
   // API call to fetch recipes based on an offset and limit.
