@@ -14,9 +14,18 @@ const constructPath = require('./lib/constructpath');
 const endpointPath = '/recipes';
 
 // Given a list of recipes, recover the users and return a list of them
-async function getUsersForRecipes(recipes) {
-    for (var i = 0; i < recipes.length; i++) {
-        recipes[i].author = await User.findById(recipes[i].author, '_id display').exec();
+async function getUsersForRecipes(recipes, userId) {
+    var currentUser, i;
+    if (userId)
+        currentUser = await User.findById(userId);
+
+    for (i = 0; i < recipes.length; i++) {
+        if (currentUser)
+            recipes[i].set('isLiked', currentUser.favorites.includes(recipes[i]._id), { strict: false });
+            
+        await User.findById(recipes[i].author, '_id display', function(err, user) {
+            recipes[i].author = user;
+        });
     }
 
     return recipes;
@@ -57,7 +66,7 @@ function safeActions(router) {
 
             // Now we want to reveal the user display name for each record found
             // Perhaps not good to mutate the input like done here?
-            recipes = await getUsersForRecipes(recipes);
+            recipes = await getUsersForRecipes(recipes, req.headers.userId);
 
             // We also want to expose ingredient information
             recipes = await getIngredientsForRecipes(recipes);
@@ -75,7 +84,7 @@ function safeActions(router) {
         }
 
         // Attempt to retrieve the recipe
-        Recipe.findById(req.params.id, async function(err, recipe) {
+        Recipe.findByIdAndUpdate(req.params.id, { $inc: { 'numHits': 1 } }, { new: true }, async function(err, recipe) {
             if (err) {
                 res.status(422).json({ error: "Failed to execute query" });
                 return;
@@ -131,33 +140,54 @@ function authenticatedActions(router) {
         });
     });
 
-    // POST /:id/favorite, creates a recipe and returns it
-    router.post(constructPath(endpointPath, '/'), async function(req, res) { 
-        // Ensure that a recipe was properly passed to this endpoint
-        if (!req.body || !req.body.name || !req.body.directions || !req.body.image) {
-            // Could probably rely on the recipe schema to throw this error on saving
-            res.status(422).json({ error: "Missing required recipe properties in request" });
+    // POST /:id/favorite, add the specified recipe to the current user's favorites
+    // TODO: refactor this greatly - very poorly implemented
+    router.post(constructPath(endpointPath, '/:id/favorite'), async function(req, res) { 
+        if (!validateObjectId(req.params.id)) {
+            res.status(422).json({ error: "The provided id is not a valid id" });
             return;
         }
 
         // Get the userid from the headers
         const userId = req.headers.userId;
 
-        // Attempt to create a new recipe
-        const recipe = new Recipe({
-            author: mongoose.Types.ObjectId(userId),
-            name: req.body.name,
-            ingredients: req.body.ingredients,
-            directions: req.body.directions,
-            tags: req.body.tags,
-            image: req.body.image,
-            difficulty: req.body.difficulty
-        });
+        // Attempt to retrieve the specified recipe
+        Recipe.findById(req.params.id, 'numFavorite', async function(err, recipe) {
+            if (err) {
+                res.status(422).json({ error: "Failed to execute query" });
+                return;
+            }
+        
+            // Id does not point to an existing recipe
+            if (!recipe) {
+                res.status(404).json({ error: "Unable to find the recipe" });
+                return;
+            }
 
-        recipe.save().then(function(recipe) {
-            res.json(recipe);
-        }).catch(function(err) {
-            res.status(422).json({ error: "Failed to create a recipe with provided properties" });
+            // Get the current user and add this to their favorites
+            User.find({ _id: userId, favorites: req.params.id }, function(err, user) {
+                if (err) {
+                    res.status(422).json({ error: "Failed to execute query" });
+                    return;
+                }
+
+                if (user.length == 0) {
+                    // Current user does not have this as a favorite, so add it
+                    User.findByIdAndUpdate(userId, { $push: { favorites: req.params.id } }, async function(err, u) {
+                        Recipe.findByIdAndUpdate(req.params.id, { $inc: { 'numFavorites': 1 } }, { new: true }, function(err, recipe) {
+                            res.json({ numFavorites: recipe.numFavorites });
+                        });
+                    });
+                } else {
+                    // Current user does has this as a favorite, so remove it
+                    User.findByIdAndUpdate(userId, { $pull: { favorites: req.params.id } }, async function(err, u) {
+                        Recipe.findByIdAndUpdate(req.params.id, { $inc: { 'numFavorites': -1 } }, { new: true }, function(err, recipe) {
+                            res.json({ numFavorites: recipe.numFavorites });
+                        });
+                    });
+                }
+            });
+
         });
     });
 
