@@ -252,7 +252,7 @@ class API {
     var response = await http.get(
         Uri.https(API.baseURL, API.likeRecipe + '/$recipeId'),
         headers: {HttpHeaders.authorizationHeader: 'bearer ' + token});
-    print(response);
+
     Map<String, dynamic> responseData = jsonDecode(response.body);
     responseData['code'] = response.statusCode;
     return responseData;

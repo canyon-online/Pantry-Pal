@@ -70,7 +70,6 @@ class MyApp extends StatelessWidget {
                             auth.loggedInStatus = Status.LoggedIn;
                             auth.registeredStatus = Status.Registered;
                             user.initializeUser(snapshot.data!);
-                            print(user.user.verified);
                             auth.verificationStatus = user.user.verified
                                 ? Status.Verified
                                 : Status.NotVerified;

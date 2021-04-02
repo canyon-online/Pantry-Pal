@@ -30,41 +30,39 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    AuthProvider auth = Provider.of<AuthProvider>(context);
-
-    // Hacky way of forcing people to login is to display the login screen if the
-    // app is not logged in...
-    return auth.verificationStatus == Status.Verified
-        ? SafeArea(
-            child: Scaffold(
-            resizeToAvoidBottomInset: true,
-            appBar: AppBar(
-              title: Center(child: const Text('Pantry Pal')),
-            ),
-            body: _children[_currentIndex],
-            bottomNavigationBar: BottomNavigationBar(
-              onTap: onTabTapped,
-              showUnselectedLabels: true,
-              iconSize: 1,
-              currentIndex: _currentIndex,
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
-                  label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.add),
-                  label: 'Create',
-                ),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.search), label: 'Search'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.person), label: 'Profile')
-              ],
-              selectedItemColor: Colors.black,
-              unselectedItemColor: Colors.black38,
-            ),
-          ))
-        : Landing();
+    return Consumer<AuthProvider>(
+        builder: (context, auth, child) =>
+            auth.verificationStatus == Status.Verified
+                ? SafeArea(
+                    child: Scaffold(
+                    resizeToAvoidBottomInset: true,
+                    appBar: AppBar(
+                      title: Center(child: const Text('Pantry Pal')),
+                    ),
+                    body: _children[_currentIndex],
+                    bottomNavigationBar: BottomNavigationBar(
+                      onTap: onTabTapped,
+                      showUnselectedLabels: true,
+                      iconSize: 1,
+                      currentIndex: _currentIndex,
+                      items: [
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.home),
+                          label: 'Home',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.add),
+                          label: 'Create',
+                        ),
+                        BottomNavigationBarItem(
+                            icon: Icon(Icons.search), label: 'Search'),
+                        BottomNavigationBarItem(
+                            icon: Icon(Icons.person), label: 'Profile')
+                      ],
+                      selectedItemColor: Colors.black,
+                      unselectedItemColor: Colors.black38,
+                    ),
+                  ))
+                : Landing());
   }
 }
