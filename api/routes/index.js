@@ -44,7 +44,7 @@ authenticatedRouter.use(async function(req, res, next) {
 });
 
 // Allow unauthenticated endpoints to also utilize JWTs if the requester is logged in
-router.use(async function(req, res, next) {
+router.use(function(req, res, next) {
     if (req.headers.authorization) {
         // Extract the token from the header
         const token = req.headers.authorization.split(' ')[1];
