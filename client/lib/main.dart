@@ -66,6 +66,7 @@ class MyApp extends StatelessWidget {
                                 listen: false);
 
                             auth.loggedInStatus = Status.LoggedIn;
+                            auth.registeredStatus = Status.Registered;
                             user.initializeUser(snapshot.data!);
                             print(user.user.verified);
                             auth.verificationStatus = user.user.verified

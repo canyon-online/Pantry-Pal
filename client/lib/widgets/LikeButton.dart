@@ -1,5 +1,4 @@
 import 'package:client/models/Recipe.dart';
-import 'package:client/models/User.dart';
 import 'package:client/utils/API.dart';
 import 'package:client/utils/UserProvider.dart';
 import 'package:flutter/cupertino.dart';

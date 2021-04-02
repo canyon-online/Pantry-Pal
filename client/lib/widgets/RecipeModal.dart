@@ -51,7 +51,8 @@ class RecipeModalState extends State<RecipeModal> {
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Icon(Icons.touch_app, color: Colors.grey, size: 30),
+                  Icon(Icons.visibility, color: Colors.grey, size: 30),
+                  SizedBox(width: 3),
                   Text(widget.recipe.hits.round().toString()),
                 ],
               ),

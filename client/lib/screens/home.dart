@@ -1,7 +1,5 @@
-import 'package:client/models/User.dart';
 import 'package:client/screens/landing.dart';
 import 'package:client/utils/AuthProvider.dart';
-import 'package:client/utils/UserProvider.dart';
 import 'package:client/widgets/CreateView.dart';
 import 'package:client/widgets/HomeView.dart';
 import 'package:client/widgets/ProfileView.dart';
@@ -31,7 +29,6 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    User user = Provider.of<UserProvider>(context).user;
     AuthProvider auth = Provider.of<AuthProvider>(context);
 
     // Hacky way of forcing people to login is to display the login screen if the
