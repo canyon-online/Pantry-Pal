@@ -29,7 +29,7 @@ class UserPreference {
 
     print('Fetched: $userId $verified $name $token');
 
-    return User(userId: userId, name: name, token: token);
+    return User(userId: userId, name: name, token: token, verified: verified);
   }
 
   void removeUser() async {

@@ -9,6 +9,7 @@ class Recipe {
   final List<String> tags;
   final String image;
   final int difficulty;
+  bool isLiked;
   int favorites;
   int hits;
 
@@ -21,9 +22,8 @@ class Recipe {
       this.favorites = 0,
       this.difficulty = 1,
       this.hits = 0,
+      this.isLiked = false,
       this.image = '/images/4bade9c7fb6df087d927e753f77ae354da950f3e.png',
-      // this.image = const Image(
-      //     image: AssetImage('assets/images/noodles.jpg'), fit: BoxFit.cover),
       this.tags = const <String>[]});
 
   factory Recipe.fromJson(Map<String, dynamic> data) {
@@ -31,15 +31,15 @@ class Recipe {
   }
 
   factory Recipe.fromMap(Map<String, dynamic> data) {
-    print(data['ingredients']);
     return Recipe(
       recipeId: data['_id'],
       name: data['name'],
-      author: data['author']['display'],
+      author: data['author'].toString(), //['display'],
       directions: data['directions'],
       favorites: data['numFavorites'],
       hits: data['numHits'],
       image: data['image'],
+      isLiked: data['isLiked'] ?? false,
       ingredients: data['ingredients']
           .map<Ingredient>((item) => Ingredient.fromJson(item))
           .toList(),
