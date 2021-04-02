@@ -15,18 +15,18 @@ const endpointPath = '/recipes';
 
 // Given a list of recipes, recover the users and return a list of them
 async function getUsersForRecipes(recipes, userId) {
-    var currentUser, i;
+    var currentUser;
     if (userId)
         currentUser = await User.findById(userId);
 
-    for (i = 0; i < recipes.length; i++) {
-        if (currentUser)
-            recipes[i].set('isLiked', currentUser.favorites.includes(recipes[i]._id), { strict: false });
-            
-        await User.findById(recipes[i].author, '_id display', function(err, user) {
-            recipes[i].author = user;
+    recipes.forEach(async function(recipe) {
+        await User.findById(recipe.author, '_id display', function(err, user) {
+            recipe.author = user;
         });
-    }
+
+        if (currentUser)
+            recipe.set('isLiked', currentUser.favorites.includes(recipe._id), { strict: false });
+    }) 
 
     return recipes;
 }
@@ -58,7 +58,7 @@ function safeActions(router) {
         // Modify the query to remove irrelevant fields from results
         query.select('-__v');
 
-        await query.exec(async function(err, recipes) {
+        query.exec(async function(err, recipes) {
             if (err) {
                 res.status(422).json({ error: "Failed to execute query" });
                 return;
@@ -67,6 +67,7 @@ function safeActions(router) {
             // Now we want to reveal the user display name for each record found
             // Perhaps not good to mutate the input like done here?
             recipes = await getUsersForRecipes(recipes, req.headers.userId);
+
 
             // We also want to expose ingredient information
             recipes = await getIngredientsForRecipes(recipes);
