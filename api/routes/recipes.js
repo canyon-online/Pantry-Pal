@@ -212,7 +212,7 @@ function authenticatedActions(router) {
                 res.status(404).json({ error: "There is no recipe with that id" });
             } else if (recipe.author != req.headers.userId) {
                 // Check if the user ids match (user is authorized to modify this resource)
-                res.status(403).json({ error: "The currently logged in user is not authorized to modify this recipe"});
+                res.status(403).json({ error: "The currently logged in user is not authorized to modify this recipe" });
                 return;
             } else {
                 Recipe.findByIdAndRemove(req.params.id)

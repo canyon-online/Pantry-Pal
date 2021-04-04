@@ -105,25 +105,22 @@ function authenticatedActions(router) {
 
     // DELETE /:id, deletes an ingredient by id
     router.delete(constructPath(endpointPath, '/:id'), async function(req, res) {
-        const token = req.headers.authorization.split(' ')[1];
-        const { userId } = jwt.verifyJWT(token);
-
-        // Check if the user ids match
-        if (userId != req.params.id) {
-            res.status(422).json({ error: "The User IDs do not match."});
-            return;
-        }
-
         // Attempt to delete ingredient
         Ingredient.findById(req.params.id, async function(err, ingredient) {
             if (!ingredient) {
-                res.status(404).send('Ingredient not found');
+                res.status(404).json({ error: "There is no ingredient with that id" });
+            } else if (ingredient.author != req.headers.userId) {
+                // Check if the user ids match (user is authorized to modify this resource)
+                res.status(403).json({ error: "The currently logged in user is not authorized to modify this ingredient" });
+                return;
             } else {
                 Ingredient.findByIdAndRemove(req.params.id)
-                .then(function() {res.status(200).json("Ingredient deleted.") })
-                .catch(function(err) {
-                    res.status(400).send("Ingredient delete failed.");
+                .then(function() {
+                    res.json({ success: "Ingredient successfully deleted" }); 
                 })
+                .catch(function(err) {
+                    res.status(500).json( { error: "Ingredient deletion failed." });
+                });
             }
         });
     });
