@@ -57,10 +57,10 @@ const recipeSchema = new mongoose.Schema({
         max: 5,
         default: 0
     },
-    difficulty: {
+    serves: {
         type: Number,
         min: 0,
-        max: 10
+        max: 50
     }
 });
 
