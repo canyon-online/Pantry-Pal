@@ -182,8 +182,7 @@ function authenticatedActions(router) {
                 res.status(404).json({ error: "There is no recipe with that id" });
             } else if (recipe.author != req.headers.userId) {
                 // Check if the user ids match (user is authorized to modify this resource)
-                res.status(403).json({ error: "The currently logged in user is not authorized to modify this recipe"});
-                return;
+                res.status(403).json({ error: "The currently logged in user is not authorized to modify this recipe" });
             } else {
                 Recipe.findByIdAndUpdate(req.params.id, {
                     tags: req.body.tags,
@@ -197,11 +196,10 @@ function authenticatedActions(router) {
                     res.json(recipe);
                 })
                 .catch(function() {
-                    res.status(422).send("Recipe update failed.");
+                    res.status(500).json({ error: "Recipe update failed" });
                 });
             }
         });
-        
     });
 
     // DELETE /:id, deletes a recipe by id
@@ -213,7 +211,6 @@ function authenticatedActions(router) {
             } else if (recipe.author != req.headers.userId) {
                 // Check if the user ids match (user is authorized to modify this resource)
                 res.status(403).json({ error: "The currently logged in user is not authorized to modify this recipe" });
-                return;
             } else {
                 Recipe.findByIdAndRemove(req.params.id)
                 .then(function() { 

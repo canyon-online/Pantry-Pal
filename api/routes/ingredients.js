@@ -93,13 +93,25 @@ function authenticatedActions(router) {
 
     // PATCH /:id, modifies ingredient fields by id
     router.patch(constructPath(endpointPath, '/:id'), async function(req, res) {
-        // Attempt to update ingredient
-        Ingredient.findByIdAndUpdate(req.params.id, req.body)
-        .then(function(ingredient) {
-            res.json(ingredient);
-        })
-        .catch(function() {
-            res.status(422).send("Ingredient update failed.");
+        // Attempt to update ingredient, limiting the parameters that can be modified
+        Ingredient.findById(req.params.id, async function(err, ingredient) {
+            if (!ingredient) {
+                res.status(404).json({ error: "There is no ingredient with that id" });
+            } else if (ingredient.author != req.headers.userId) {
+                // Check if the user ids match (user is authorized to modify this resource)
+                res.status(403).json({ error: "The currently logged in user is not authorized to modify this ingredient" });
+            } else {
+                Ingredient.findByIdAndUpdate(req.params.id, {
+                    name: req.body.name,
+                    image: req.body.image,
+                }, { omitUndefined: true, new: true })
+                .then(function(ingredient) {
+                    res.json(ingredient);
+                })
+                .catch(function() {
+                    res.status(500).json({ error: "Ingredient update failed." });
+                });
+            }
         });
     });
 
@@ -112,7 +124,6 @@ function authenticatedActions(router) {
             } else if (ingredient.author != req.headers.userId) {
                 // Check if the user ids match (user is authorized to modify this resource)
                 res.status(403).json({ error: "The currently logged in user is not authorized to modify this ingredient" });
-                return;
             } else {
                 Ingredient.findByIdAndRemove(req.params.id)
                 .then(function() {
