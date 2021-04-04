@@ -1,6 +1,7 @@
 // Import libraries for handling database operations
 const mongoose = require('mongoose');
 const search = require('./lib/search');
+const validateObjectId = require('./lib/validateObjectId');
 
 // Import the relevant models
 const User = require('../models/user'); 
@@ -10,15 +11,6 @@ const Ingredient = require('../models/ingredient');
 // In the current version, this is /api/ingredients
 const constructPath = require('./lib/constructpath');
 const endpointPath = '/ingredients';
-
-// Given a list of ingredients, recover the users and return a list of them
-async function getUsersForIngredients(ingredients) {
-    for (var i = 0; i < ingredients.length; i++) {
-        ingredients[i].author = await User.findById(ingredients[i].author, '_id display').exec();
-    }
-
-    return ingredients;
-}
 
 // Assumed a user might not be logged in to access any of these endpoints
 function safeActions(router) {
@@ -36,8 +28,7 @@ function safeActions(router) {
             }
 
             // Now we want to reveal the user display name for each record found
-            // Perhaps not good to mutate the input like done here?
-            ingredients = await getUsersForIngredients(ingredients);
+            await User.populate(ingredients, { path: 'author', model: 'User', select: 'display' });
 
             // No error in query execution, so respond with typical search output
             res.json({ totalRecords: totalRecords, filteredRecords: ingredients.length, ingredients: ingredients });
@@ -65,10 +56,9 @@ function safeActions(router) {
             }
 
             // Now we want to reveal some user information for the ingredient found
-            // We transform the ingredient into a list temporarily so this function works for it
-            ingredient = await getUsersForIngredients([ingredient]);
+            await User.populate(ingredient, { path: 'author', model: 'User', select: 'display' });
 
-            res.json(ingredient[0]);
+            res.json(ingredient);
         });
     });
 }

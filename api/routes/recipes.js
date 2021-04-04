@@ -84,7 +84,7 @@ function safeActions(router) {
 
             // Now we want to reveal the user display name for each record found
             // We also want to reveal ingredient data for each record found
-            await populateRecipes([recipe], req.headers.userId);
+            await populateRecipes(recipe, req.headers.userId);
 
             res.json(recipe);
         });
