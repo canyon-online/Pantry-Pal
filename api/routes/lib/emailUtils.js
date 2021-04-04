@@ -7,6 +7,9 @@ const crypto = require('crypto');
 // Nodemailer module for actual emailing
 const nodemailer = require('nodemailer');
 
+// Allow us to log mail events and failures
+const logger = require('./logging').genericLogger;
+
 // Mail transporter object
 const transporter = (process.env.DO_EMAIL == 1) ? nodemailer.createTransport({
     host: process.env.MAIL_SERVER,
@@ -44,15 +47,13 @@ async function sendVerificationEmail(id, name, email) {
     if (process.env.DO_EMAIL == 0)
         return;
     
-    let info = await transporter.sendMail({
+    await transporter.sendMail({
         from: '"PantryPal" <no-reply@pantry.pal>',
         to: email,
         subject: 'Email Verification Requested',
         text: `Hello ${name}, your verification code is ${verifCode}`,
         html: `Hello ${name}, your verification code is ${verifCode}`
     });
-
-    // Keep info for logging later
 
     return;
 }
@@ -65,15 +66,13 @@ async function sendForgotPasswordEmail(id, name, email) {
     if (process.env.DO_EMAIL == 0)
         return;
     
-    let info = await transporter.sendMail({
+    await transporter.sendMail({
         from: '"PantryPal" <no-reply@pantry.pal>',
         to: email,
         subject: 'Forgot Password',
         text: `Hello ${name}, your code is ${verifCode}`,
         html: `Hello ${name}, your code is ${verifCode}`
     });
-
-    // Keep info for logging later
 
     return;
 }

@@ -49,7 +49,7 @@ router.use(function(req, res, next) {
         // Extract the token from the header
         const token = req.headers.authorization.split(' ')[1];
 
-        // If the user is not in the process of verification, ensure that the user is verified
+        // Use the token to obtain the userId
         const { userId } = jwt.verifyJWT(token);
 
         // If the user is logged in, include the userId in the header so future endpoints can get it

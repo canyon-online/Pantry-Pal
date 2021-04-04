@@ -37,7 +37,7 @@ mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
     useFindAndModify: false,
     useUnifiedTopology: true,
-
+    useCreateIndex: true
  }).catch(function(error) {
     // If we fail to connect, we should exit the app, as the database is vital to all operations
     console.log('Mongoose Connection Error : ' + error);
