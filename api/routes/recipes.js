@@ -11,38 +11,28 @@ const Recipe = require('../models/recipe');
 // The root path of this endpoint, which is concatenated to the router path
 // In the current version, this is /api/recipes
 const constructPath = require('./lib/constructpath');
+const ingredient = require('../models/ingredient');
 const endpointPath = '/recipes';
 
-// Given a list of recipes, recover the users and return a list of them
-async function getUsersForRecipes(recipes, userId) {
+// Given a list of recipes, populate the authors, ingredients, and isLiked field
+async function populateRecipes(recipes, userId) {
     var currentUser;
+
+    // If the user is logged in, we want to get the user to create an isLiked field
     if (userId)
         currentUser = await User.findById(userId);
 
-    recipes.forEach(async function(recipe) {
-        recipe.populaatee('author', 'display').execPopulate();
-
-        if (currentUser)
+    // Use the models to populate an array
+    await User.populate(recipes, { path: 'author', model: 'User', select: 'display' });
+    await Ingredient.populate(recipes, { path: 'ingredients', model: 'Ingredient', select: 'name' });
+    
+    // Populates an isLiked field based on the current user
+    // There is likely a better way to do this
+    if (currentUser) {
+        recipes.forEach(async function(recipe) {
             recipe.set('isLiked', currentUser.favorites.includes(recipe._id), { strict: false });
-    }); 
-
-    return recipes;
-}
-
-// Given a list of recipes, recover the ingredients and return a list of them
-async function getIngredientsForRecipes(recipes) {
-    for (var i = 0; i < recipes.length; i++) {
-        let currentIngredients = recipes[i].ingredients;
-
-        for (var j = 0; j < currentIngredients.length; j++) {
-            currentIngredients[j] = { _id: currentIngredients[i] }
-        }
-
-        if (currentIngredients.length != 0) {
-            // Do it in one query this way, unsure if this is computationally efficient
-            recipes[i].ingredients = await Ingredient.find({ $or: currentIngredients }, '-__v');
-        }
-    }
+        }); 
+    }  
 
     return recipes;
 }
@@ -51,6 +41,7 @@ async function getIngredientsForRecipes(recipes) {
 function safeActions(router) {
     // GET /, returns list of recipes matching given query parameters
     router.get(constructPath(endpointPath, '/'), async function(req, res) {
+        var currentUser;
         const { totalRecords, query } = await search(Recipe, req);
 
         // Modify the query to remove irrelevant fields from results
@@ -63,12 +54,8 @@ function safeActions(router) {
             }
 
             // Now we want to reveal the user display name for each record found
-            // Perhaps not good to mutate the input like done here?
-            recipes = await getUsersForRecipes(recipes, req.headers.userId);
-
-
-            // We also want to expose ingredient information
-            recipes = await getIngredientsForRecipes(recipes);
+            // We also want to reveal ingredient data for each record found
+            await populateRecipes(recipes, req.headers.userId);
 
             // No error in query execution, so respond with typical search output
             res.json({ totalRecords: totalRecords, filteredRecords: recipes.length, recipes: recipes });
@@ -95,14 +82,11 @@ function safeActions(router) {
                 return;
             }
 
-            // Now we want to reveal some user information for the recipe found
-            // We transform the recipe into a list temporarily so this function works for it
-            recipe = await getUsersForRecipes([recipe], req.headers.userId);
+            // Now we want to reveal the user display name for each record found
+            // We also want to reveal ingredient data for each record found
+            await populateRecipes([recipe], req.headers.userId);
 
-            // We also want to expose ingredient information
-            recipe = await getIngredientsForRecipes([recipe[0]]);
-
-            res.json(recipe[0]);
+            res.json(recipe);
         });
     });
 }
@@ -204,9 +188,7 @@ function authenticatedActions(router) {
 
     //DELETE /:id, deletes a recipe by id
     router.delete(constructPath(endpointPath, '/:id'), async function(req, res) {
-        const token = req.headers.authorization.split(' ')[1];
-        const { userId } = jwt.verifyJWT(token);
-
+        
         // Check if the user ids match
         if (userId != req.params.id) {
             res.status(422).json({ error: "The User IDs do not match."});
