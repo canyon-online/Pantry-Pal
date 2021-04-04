@@ -143,7 +143,7 @@ function authenticatedActions(router) {
         
             // Id does not point to an existing recipe
             if (!recipe) {
-                res.status(404).json({ error: "Unable to find the recipe" });
+                res.status(404).json({ error: "There is no recipe with that id" });
                 return;
             }
 
@@ -186,24 +186,23 @@ function authenticatedActions(router) {
         });
     });
 
-    //DELETE /:id, deletes a recipe by id
+    // DELETE /:id, deletes a recipe by id
     router.delete(constructPath(endpointPath, '/:id'), async function(req, res) {
-        
-        // Check if the user ids match
-        if (userId != req.params.id) {
-            res.status(422).json({ error: "The User IDs do not match."});
-            return;
-        }
-
         // Attempt to delete recipe
         Recipe.findById(req.params.id, async function(err, recipe) {
             if (!recipe) {
-                res.status(404).send('Recipe not found');
+                res.status(404).json({ error: "There is no recipe with that id" });
+            } else if (recipe.author != req.headers.userId) {
+                // Check if the user ids match (user is authorized to modify this resource)
+                res.status(403).json({ error: "The currently logged in user is not authorized to modify this recipe"});
+                return;
             } else {
                 Recipe.findByIdAndRemove(req.params.id)
-                .then(function() {res.status(200).json("Recipe deleted.") })
+                .then(function() { 
+                    res.json({ success: "Recipe successfully deleted" }); 
+                })
                 .catch(function(err) {
-                    res.status(400).send("Recipe delete failed.");
+                    res.status(500).json( { error: "Recipe deletion failed." });
                 })
             }
         });
