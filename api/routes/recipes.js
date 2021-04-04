@@ -176,14 +176,32 @@ function authenticatedActions(router) {
 
     // PATCH /:id, modifies recipe fields by id
     router.patch(constructPath(endpointPath, '/:id'), async function(req, res) {
-        // Attempt to update recipe
-        Recipe.findByIdAndUpdate(req.params.id, req.body)
-        .then(function(recipe) {
-            res.json(recipe);
-        })
-        .catch(function() {
-            res.status(422).send("Recipe update failed.");
+        // Attempt to update recipe, limiting the parameters that can be modified
+        Recipe.findById(req.params.id, async function(err, recipe) {
+            if (!recipe) {
+                res.status(404).json({ error: "There is no recipe with that id" });
+            } else if (recipe.author != req.headers.userId) {
+                // Check if the user ids match (user is authorized to modify this resource)
+                res.status(403).json({ error: "The currently logged in user is not authorized to modify this recipe"});
+                return;
+            } else {
+                Recipe.findByIdAndUpdate(req.params.id, {
+                    tags: req.body.tags,
+                    rating: req.body.rating,
+                    name: req.body.name,
+                    directions: req.body.directions,
+                    image: req.body.image,
+                    serves: req.body.serves
+                }, { omitUndefined: true, new: true })
+                .then(function(recipe) {
+                    res.json(recipe);
+                })
+                .catch(function() {
+                    res.status(422).send("Recipe update failed.");
+                });
+            }
         });
+        
     });
 
     // DELETE /:id, deletes a recipe by id
