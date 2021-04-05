@@ -125,22 +125,23 @@ class AuthProvider with ChangeNotifier {
   Future<Map<String, dynamic>> googleLogin() async {
     var result;
     GoogleSignInAccount? account;
+    GoogleSignInAuthentication googleSignInAuthentication;
     GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
     // Attempt fetching a google account
     try {
       account = await _googleSignIn.signIn();
+      // Grab the authentication details and update state of the provider
+      googleSignInAuthentication = await account!.authentication;
+      _loggedInStatus = Status.Authenticating;
+      notifyListeners();
     } catch (e, stacktrace) {
       // Failed to select an account
+      _loggedInStatus = Status.NotLoggedIn;
+      notifyListeners();
       print(stacktrace.toString());
       return {'status': false, 'message': 'Failed to complete google sign in'};
     }
-
-    // Grab the authentication details and update state of the provider
-    GoogleSignInAuthentication googleSignInAuthentication =
-        await account!.authentication;
-    _loggedInStatus = Status.Authenticating;
-    notifyListeners();
 
     // Handle responses
     try {

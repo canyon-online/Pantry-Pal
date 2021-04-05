@@ -58,7 +58,7 @@ class API {
     return jsonDecode(response.body);
   }
 
-  Future<List<Recipe>> searchFromIngredients(
+  Future<Map<String, dynamic>> searchFromIngredients(
       String token, int offset, int limit, Set<Ingredient> ingredients) async {
     Map<String, String> params = {
       'limit': limit.toString(),
@@ -74,7 +74,9 @@ class API {
         headers: {HttpHeaders.authorizationHeader: 'bearer ' + token});
 
     print(response.body);
-    return Future.value([]);
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    return responseData;
   }
 
   // API call to fetch recipes based on an offset and limit.
