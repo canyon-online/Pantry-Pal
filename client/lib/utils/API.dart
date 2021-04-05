@@ -58,13 +58,14 @@ class API {
     return jsonDecode(response.body);
   }
 
-  Future<Map<String, dynamic>> searchFromIngredients(
-      String token, int offset, int limit, Set<Ingredient> ingredients) async {
+  Future<Map<String, dynamic>> searchFromIngredients(String token, int offset,
+      int limit, Set<Ingredient> ingredients, String query) async {
     Map<String, String> params = {
       'limit': limit.toString(),
       'offset': offset.toString(),
       'sortBy': 'numFavorites',
       'direction': '-1',
+      'name': query,
       'ingredients':
           ingredients.fold('any', (prev, element) => prev + ',${element.id}')
     };
@@ -80,7 +81,6 @@ class API {
 
   // API call to fetch recipes based on an offset and limit.
   Future<List<Recipe>> getRecipes(String token, int offset, int limit) async {
-    // TODO: Add parameters (optional?) to change sortby and direction.
     Map<String, String> params = {
       'limit': limit.toString(),
       'offset': offset.toString(),

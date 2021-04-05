@@ -15,10 +15,31 @@ class SearchView extends StatefulWidget {
 }
 
 class SearchViewState extends State<SearchView> {
+  final TextEditingController _search = TextEditingController();
+  String _query = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Start listening to changes.
+    _search.addListener(() {
+      setState(() {
+        _query = _search.text.trim();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
   Future<Map<String, dynamic>> _getRecipes(
       String token, int offset, int limit, Set<Ingredient> ingredients) {
     var response =
-        API().searchFromIngredients(token, offset, limit, ingredients);
+        API().searchFromIngredients(token, offset, limit, ingredients, _query);
 
     return response;
   }
@@ -48,7 +69,9 @@ class SearchViewState extends State<SearchView> {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.waiting:
-            return CircularProgressIndicator();
+            return Padding(
+                padding: EdgeInsets.all(10),
+                child: CircularProgressIndicator());
           default:
             if (snapshot.hasError)
               return Text('Error: ${snapshot.error}');
@@ -56,12 +79,24 @@ class SearchViewState extends State<SearchView> {
               var data = Map.from(snapshot.data!);
               var recipes = Recipe.fromJsonList(data['recipes']);
               if (recipes.length <= 0)
-                return Text('no recipes');
+                return Text('No recipes matched the current criteria');
               else
-                return _buildScrollview(recipes);
+                return Expanded(child: _buildScrollview(recipes));
             }
         }
       },
+    );
+  }
+
+  Widget _buildSearchField() {
+    return TextFormField(
+      controller: _search,
+      textInputAction: TextInputAction.done,
+      decoration: InputDecoration(
+        hintText: 'Search for a recipe',
+        border: OutlineInputBorder(),
+        contentPadding: EdgeInsets.only(left: 15.0),
+      ),
     );
   }
 
@@ -75,10 +110,15 @@ class SearchViewState extends State<SearchView> {
                 SizedBox(height: 8),
                 // Use the child here, without rebuilding everytime.
                 child ?? Text('No child found.'),
-                Expanded(child: _buildFuture(_token, ingredients.ingredients))
+                _buildFuture(_token, ingredients.ingredients)
               ],
             ),
         // Build the expensive widget here.
-        child: IngredientSelecter());
+        child: Column(
+          children: [
+            _buildSearchField(),
+            IngredientSelecter(),
+          ],
+        ));
   }
 }
