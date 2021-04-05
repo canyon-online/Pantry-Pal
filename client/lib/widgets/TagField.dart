@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 
 class TagFieldController {
   Set<String> list = Set();
+
+  void clear() {
+    list.clear();
+  }
 }
 
 class TagField extends StatefulWidget {
@@ -20,7 +24,7 @@ class TagFieldState extends State<TagField> {
   Widget _buildTextField() {
     return TextFormField(
         keyboardType: TextInputType.text,
-        maxLength: 12,
+        maxLength: 16,
         controller: _tag,
         // textInputAction: TextInputAction.next,
         decoration: const InputDecoration(

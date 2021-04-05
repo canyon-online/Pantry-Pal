@@ -8,6 +8,10 @@ import 'package:provider/provider.dart';
 
 class IngredientFieldController {
   Set<Ingredient> list = Set();
+
+  void clear() {
+    list.clear();
+  }
 }
 
 class IngredientField extends StatefulWidget {
@@ -51,6 +55,7 @@ class IngredientFieldState extends State<IngredientField> {
 
     setState(() {
       widget.controller.list.add(i);
+      _ingredient.clear();
     });
   }
 
