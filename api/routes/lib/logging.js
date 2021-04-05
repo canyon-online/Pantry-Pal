@@ -15,9 +15,8 @@ exports.errorLogging = (app) => {
             new winston.transports.Console(), // Log to the console
             new winston.transports.File({
                 name: 'error-file',
-                filename: `${logDir}/error.log`,
-                maxsize: logSize,
-                zippedArchive: true
+                filename: `${logDir}/express-error.log`,
+                maxsize: logSize
             })
         ],
         format: winston.format.json(),
@@ -34,8 +33,7 @@ exports.httpLogging = (app) => {
             new winston.transports.File({
                 name: 'http-file',
                 filename: `${logDir}/access.log`,
-                maxsize: logSize,
-                zippedArchive: true
+                maxsize: logSize
             })
         ],
         format: winston.format.json(),
@@ -43,3 +41,22 @@ exports.httpLogging = (app) => {
         colorize: false
     }));
 }
+
+// Create logging action for custom logged actions
+// This is to be used whenever we do a loggable action, such as sending an email
+exports.genericLogger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    transports: [
+        new winston.transports.File({
+            filename: `${logDir}/events.log`,
+            maxsize: logSize
+        }),
+        new winston.transports.File({
+            filename: `${logDir}/error.log`,
+            level: 'error',
+            maxsize: logSize
+        }),
+        new winston.transports.Console()
+    ]
+});
