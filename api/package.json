@@ -15,7 +15,8 @@
   "scripts": {
     "start": "node server.js",
     "start-background": "concurrently \"nodemon server.js\" &",
-    "setup": "cp ./.env.template ./.env && echo \"Configuration file .env has been created, please populate this with proper configurtion.\""
+    "setup": "cp ./.env.template ./.env && echo \"Configuration file .env has been created, please populate this with proper configuration.\"",
+    "test": "jasmine"
   },
   "name": "pantry-pal",
   "description": "A recipe sharing social media api",
@@ -34,6 +35,7 @@
   "homepage": "https://github.com/SPVTNIK-ONLINE/Pantry-Pal#readme",
   "devDependencies": {
     "concurrently": "^6.0.0",
+    "jasmine": "^3.7.0",
     "nodemon": "^2.0.7"
   }
 }
