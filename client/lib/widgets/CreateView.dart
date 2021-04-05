@@ -1,4 +1,4 @@
-import 'package:client/models/Ingredient.dart';
+import 'package:client/utils/StringCap.dart';
 import 'package:client/utils/API.dart';
 import 'package:client/utils/UserProvider.dart';
 import 'package:client/widgets/ImageButton.dart';
@@ -86,9 +86,9 @@ class CreateViewState extends State<CreateView> {
               Provider.of<UserProvider>(context, listen: false).user.token;
 
           final Map<String, dynamic> recipe = {
-            'name': _name.text,
+            'name': _name.text.trim().capitalizeFirstofEach,
             // 'ingredients': Ingredient.toIdString(_ingredients.list),
-            'directions': _directions.text,
+            'directions': _directions.text.trim(),
             'tags': _tags.list.toList(),
             'image': _image.url,
             'difficulty': _currentSliderValue.round()
@@ -114,21 +114,30 @@ class CreateViewState extends State<CreateView> {
           children: <Widget>[
             Text('Dish Name:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            SizedBox(height: 4),
             _buildNameField(),
+            SizedBox(height: 4),
             Text('Ingredients:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            SizedBox(height: 4),
             IngredientField(controller: _ingredients),
+            SizedBox(height: 4),
             Text('Instructions:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            SizedBox(height: 4),
             _buildInstructionsField(),
+            SizedBox(height: 4),
             Text('Tags:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            SizedBox(height: 4),
             TagField(controller: _tags),
-            Text('Difficulty:',
+            SizedBox(height: 4),
+            Text('Serves:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             _buildSlider(),
             Text('Image:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            SizedBox(height: 4),
             ImageButton(
               controller: _image,
             ),

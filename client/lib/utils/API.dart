@@ -36,7 +36,7 @@ class API {
         await http.post(Uri.https(API.baseURL, API.createIngredient),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
-              HttpHeaders.authorizationHeader: 'bearer ' + token
+              HttpHeaders.authorizationHeader: 'bearer $token'
             },
             body: jsonEncode(ingredient));
 
@@ -51,7 +51,7 @@ class API {
     final response = await http.post(Uri.https(API.baseURL, API.createRecipe),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          HttpHeaders.authorizationHeader: 'bearer ' + token
+          HttpHeaders.authorizationHeader: 'bearer $token'
         },
         body: jsonEncode(recipe));
 
@@ -71,9 +71,8 @@ class API {
 
     var response = await http.get(
         Uri.https(API.baseURL, API.searchRecipe, params),
-        headers: {HttpHeaders.authorizationHeader: 'bearer ' + token});
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
 
-    print(response.body);
     Map<String, dynamic> responseData = jsonDecode(response.body);
     responseData['code'] = response.statusCode;
     return responseData;
@@ -91,7 +90,7 @@ class API {
 
     var response = await http.get(
         Uri.https(API.baseURL, API.searchRecipe, params),
-        headers: {HttpHeaders.authorizationHeader: 'bearer ' + token});
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
 
     // Return a list of the recipes fetched as recipe objects.
     List<dynamic> recipes = jsonDecode(response.body)['recipes'];
@@ -102,7 +101,7 @@ class API {
   Future<List<Ingredient>> getIngredients(String token, String filter) async {
     var response = await http.get(
         Uri.https(API.baseURL, API.searchIngredient, {'name': filter}),
-        headers: {HttpHeaders.authorizationHeader: 'bearer ' + token});
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
     // Return a list of the ingredients fetched as ingredient objects.
     return Ingredient.fromJsonList(json.decode(response.body)['ingredients']);
   }
@@ -112,8 +111,7 @@ class API {
       String token, PickedFile file, String name) async {
     var request =
         http.MultipartRequest('POST', Uri.https(API.baseURL, API.imageUpload));
-    request.headers
-        .addAll({HttpHeaders.authorizationHeader: 'bearer ' + token});
+    request.headers.addAll({HttpHeaders.authorizationHeader: 'bearer $token'});
 
     // Add files to the request.
     request.files.add(http.MultipartFile(
@@ -154,7 +152,7 @@ class API {
       Uri.https(API.baseURL, API.requestVerify),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: 'bearer ' + token
+        HttpHeaders.authorizationHeader: 'bearer $token'
       },
     );
 
@@ -224,7 +222,7 @@ class API {
     final response = await http.post(Uri.https(API.baseURL, API.verify),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          HttpHeaders.authorizationHeader: 'bearer ' + token
+          HttpHeaders.authorizationHeader: 'bearer $token'
         },
         body: jsonEncode(verifyData));
 
@@ -240,7 +238,7 @@ class API {
         Uri.https(API.baseURL, API.likeRecipe + '/$recipeId/favorite'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          HttpHeaders.authorizationHeader: 'bearer ' + token
+          HttpHeaders.authorizationHeader: 'bearer $token'
         });
 
     Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -253,7 +251,7 @@ class API {
       String token, String recipeId) async {
     var response = await http.get(
         Uri.https(API.baseURL, API.likeRecipe + '/$recipeId'),
-        headers: {HttpHeaders.authorizationHeader: 'bearer ' + token});
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
 
     Map<String, dynamic> responseData = jsonDecode(response.body);
     responseData['code'] = response.statusCode;
