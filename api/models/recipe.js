@@ -13,14 +13,26 @@ const recipeSchema = new mongoose.Schema({
     },
     name: {
         type: String,
-        required: [true, "Recipe name is required"]
+        required: [true, "Recipe name is required"],
+        validate: {
+            validator: function(v) {
+                return /^[\p{L}\p{M}0-9-, ]{2,64}$/u.test(v);
+            },
+            message: props => `${props.value} is not an accepted name`
+        }
     },
     ingredients: {
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ingredient' }]
     },
     directions: {
         type: String,
-        required: [true, "Recipes require directions"]
+        required: [true, "Recipes require directions"],
+        validate: {
+            validator: function(v) {
+                return /^.{1,2000}$/u.test(v);
+            },
+            message: props => `These directions are too long`
+        }
     },
     dateCreated: {
         type: Date,
@@ -28,7 +40,13 @@ const recipeSchema = new mongoose.Schema({
         // Should not have a "required" field, as default should generate it
     },
     tags: {
-        type: [String]
+        type: [String],
+        validate: {
+            validator: function(v) {
+                return /^[\p{L}\p{M}0-9-,  \p{Emoji_Presentation}]{1,16}$/u.test(v);
+            },
+            message: props => `${props.value} is not an accepted tag name`
+        }
     },
     image: {
         type: String,

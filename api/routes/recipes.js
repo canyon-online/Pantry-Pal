@@ -119,6 +119,7 @@ function authenticatedActions(router) {
         recipe.save().then(function(recipe) {
             res.json(recipe);
         }).catch(function(err) {
+            console.log(err);
             res.status(422).json({ error: "Failed to create a recipe with provided properties" });
         });
     });

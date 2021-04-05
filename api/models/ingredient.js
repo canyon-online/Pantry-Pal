@@ -10,7 +10,13 @@ const ingredientSchema = new mongoose.Schema({
         type: String,
         required: [true, "Ingredient name is required"],
         unique: true,
-        dropDups: true
+        dropDups: true,
+        validate: {
+            validator: function(v) {
+                return /^[\p{L}\p{M}0-9-, ]{2,64}$/u.test(v);
+            },
+            message: props => `${props.value} is not an accepted name`
+        }
     },
     dateCreated: {
         type: Date,

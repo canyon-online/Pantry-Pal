@@ -92,6 +92,8 @@ function safeActions(router) {
                 // Sends the error as output
                 if (err.keyPattern && err.keyPattern.email)
                     res.status(422).json({ error: "An account with this email already exists" });
+                //else if (err._message == "User validation failed")
+                //    res.status(422).json({ error: "Failed to create an account with this name or email" });
                 else
                     res.status(422).json({ error: err });
             });

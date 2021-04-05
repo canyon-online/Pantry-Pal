@@ -4,25 +4,31 @@ const emailUtil = require('../routes/lib/emailUtils');
 const userSchema = new mongoose.Schema({ 
     display: {
         type: String,
-        required: [true, "Display name is required"]
+        required: [true, "Display name is required"],
+        validate: {
+            validator: function(v) {
+                return /^[\p{L}\p{M}0-9-,  ]{2,16}$/u.test(v);
+            },
+            message: props => `${props.value} is not an accepted display name`
+        }
     },
     email: {
         type: String,
         required: [true, "Email is required"],
         unique: true,
-        dropDups: true
+        dropDups: true,
+        validate: {
+            validator: function(v) {
+                return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v);
+            },
+            message: props => `${props.value} is not an accepted email format`
+        }
     },
-    // Could perhaps generate a "display id" for each user, as Mongo already automatically generates
-    // a ObjectId primary key, which *is* usable, but is kind of ugly and reveals when a user was created
-    // displayId: {
-    //     type: int
-    // },
     password: {
         type: String
     },
     avatar: {
         type: String
-        // Can put a default here, but don't currently have one
     },
     google: {
         type: Boolean,
