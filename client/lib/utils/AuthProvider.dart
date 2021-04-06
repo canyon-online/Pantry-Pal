@@ -79,11 +79,12 @@ class AuthProvider with ChangeNotifier {
 
   // Helper function to perform login after an API call. Mostly checks response
   // codes, sets AuthProvider state, and such.
-  Map<String, dynamic> _login(Map<String, dynamic> responseData) {
+  Map<String, dynamic> authLogin(Map<String, dynamic> responseData) {
     var result;
 
     // If there was no issue with registering or verifying...
     if (responseData['code'] == 200 && responseData['error'] == null) {
+      print(responseData);
       User user = saveLogin(responseData);
 
       if (user.verified) {
@@ -125,29 +126,30 @@ class AuthProvider with ChangeNotifier {
   Future<Map<String, dynamic>> googleLogin() async {
     var result;
     GoogleSignInAccount? account;
+    GoogleSignInAuthentication googleSignInAuthentication;
     GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
     // Attempt fetching a google account
     try {
       account = await _googleSignIn.signIn();
+      // Grab the authentication details and update state of the provider
+      googleSignInAuthentication = await account!.authentication;
+      _loggedInStatus = Status.Authenticating;
+      notifyListeners();
     } catch (e, stacktrace) {
       // Failed to select an account
+      _loggedInStatus = Status.NotLoggedIn;
+      notifyListeners();
       print(stacktrace.toString());
       return {'status': false, 'message': 'Failed to complete google sign in'};
     }
-
-    // Grab the authentication details and update state of the provider
-    GoogleSignInAuthentication googleSignInAuthentication =
-        await account!.authentication;
-    _loggedInStatus = Status.Authenticating;
-    notifyListeners();
 
     // Handle responses
     try {
       // Call to the API to sign up and/or login.
       final Map<String, dynamic> responseData = await API()
           .googleVerification(googleSignInAuthentication.idToken.toString());
-      result = _login(responseData);
+      result = authLogin(responseData);
     } catch (on, stacktrace) {
       result = {'status': false, 'message': stacktrace.toString()};
     }
@@ -165,10 +167,26 @@ class AuthProvider with ChangeNotifier {
     try {
       final Map<String, dynamic> responseData =
           await API().doLogin(email, password);
-      result = _login(responseData);
+      result = authLogin(responseData);
     } catch (on, stacktrace) {
       result = {'status': false, 'message': stacktrace.toString()};
     }
+
+    notifyListeners();
+    return result;
+  }
+
+  // API call to login a user and save login info.
+  Future<Map<String, dynamic>> resetPasswordLogin(
+      String email, String verification, String password) async {
+    var result;
+
+    _verificationStatus = Status.Verifying;
+    notifyListeners();
+
+    _loggedInStatus = Status.NotLoggedIn;
+    _verificationStatus = Status.NotVerified;
+    _registeredStatus = Status.NotRegistered;
 
     notifyListeners();
     return result;

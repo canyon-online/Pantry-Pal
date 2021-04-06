@@ -1,8 +1,13 @@
 import 'package:client/widgets/TextPill.dart';
+import 'package:client/utils/StringCap.dart';
 import 'package:flutter/material.dart';
 
 class TagFieldController {
   Set<String> list = Set();
+
+  void clear() {
+    list.clear();
+  }
 }
 
 class TagField extends StatefulWidget {
@@ -19,7 +24,7 @@ class TagFieldState extends State<TagField> {
   Widget _buildTextField() {
     return TextFormField(
         keyboardType: TextInputType.text,
-        maxLength: 12,
+        maxLength: 16,
         controller: _tag,
         // textInputAction: TextInputAction.next,
         decoration: const InputDecoration(
@@ -47,13 +52,19 @@ class TagFieldState extends State<TagField> {
                 ),
                 tooltip: 'Add the selected tag',
                 onPressed: () {
-                  setState(() {
-                    if (widget.controller.list.length < 3) {
-                      widget.controller.list.add(_tag.text);
-                      _tag.clear();
-                    }
-                    print(widget.controller.list);
-                  });
+                  String text = _tag.text.trim();
+
+                  if (text.length != 0) {
+                    setState(() {
+                      if (widget.controller.list.length < 3) {
+                        widget.controller.list
+                            .add(_tag.text.trim().capitalizeFirstofEach);
+                        _tag.clear();
+                      }
+                    });
+                  }
+
+                  print(widget.controller.list);
                 },
               )
             ]),

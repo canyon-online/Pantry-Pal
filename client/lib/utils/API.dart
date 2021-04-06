@@ -26,6 +26,8 @@ class API {
   static const String likeRecipe =
       'api/recipes'; // + '/recipeID + '/favorite' (Post)
   static const String clickRecipe = 'api/recipes'; // + '/recipeID (Get)
+  static const String requestReset = 'api/account/forgotpassword/requestemail';
+  static const String resetPassword = 'api/account/forgotpassword';
 
   // API call to submit an ingredient based using a user token and the name.
   Future<Map<String, dynamic>> submitIngredient(
@@ -36,7 +38,7 @@ class API {
         await http.post(Uri.https(API.baseURL, API.createIngredient),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
-              HttpHeaders.authorizationHeader: 'bearer ' + token
+              HttpHeaders.authorizationHeader: 'bearer $token'
             },
             body: jsonEncode(ingredient));
 
@@ -51,35 +53,36 @@ class API {
     final response = await http.post(Uri.https(API.baseURL, API.createRecipe),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          HttpHeaders.authorizationHeader: 'bearer ' + token
+          HttpHeaders.authorizationHeader: 'bearer $token'
         },
         body: jsonEncode(recipe));
 
     return jsonDecode(response.body);
   }
 
-  Future<List<Recipe>> searchFromIngredients(
-      String token, int offset, int limit, Set<Ingredient> ingredients) async {
+  Future<Map<String, dynamic>> searchFromIngredients(String token, int offset,
+      int limit, Set<Ingredient> ingredients, String query) async {
     Map<String, String> params = {
       'limit': limit.toString(),
       'offset': offset.toString(),
       'sortBy': 'numFavorites',
       'direction': '-1',
+      'name': query,
       'ingredients':
           ingredients.fold('any', (prev, element) => prev + ',${element.id}')
     };
 
     var response = await http.get(
         Uri.https(API.baseURL, API.searchRecipe, params),
-        headers: {HttpHeaders.authorizationHeader: 'bearer ' + token});
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
 
-    print(response.body);
-    return Future.value([]);
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    return responseData;
   }
 
   // API call to fetch recipes based on an offset and limit.
   Future<List<Recipe>> getRecipes(String token, int offset, int limit) async {
-    // TODO: Add parameters (optional?) to change sortby and direction.
     Map<String, String> params = {
       'limit': limit.toString(),
       'offset': offset.toString(),
@@ -89,7 +92,7 @@ class API {
 
     var response = await http.get(
         Uri.https(API.baseURL, API.searchRecipe, params),
-        headers: {HttpHeaders.authorizationHeader: 'bearer ' + token});
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
 
     // Return a list of the recipes fetched as recipe objects.
     List<dynamic> recipes = jsonDecode(response.body)['recipes'];
@@ -100,7 +103,7 @@ class API {
   Future<List<Ingredient>> getIngredients(String token, String filter) async {
     var response = await http.get(
         Uri.https(API.baseURL, API.searchIngredient, {'name': filter}),
-        headers: {HttpHeaders.authorizationHeader: 'bearer ' + token});
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
     // Return a list of the ingredients fetched as ingredient objects.
     return Ingredient.fromJsonList(json.decode(response.body)['ingredients']);
   }
@@ -110,8 +113,7 @@ class API {
       String token, PickedFile file, String name) async {
     var request =
         http.MultipartRequest('POST', Uri.https(API.baseURL, API.imageUpload));
-    request.headers
-        .addAll({HttpHeaders.authorizationHeader: 'bearer ' + token});
+    request.headers.addAll({HttpHeaders.authorizationHeader: 'bearer $token'});
 
     // Add files to the request.
     request.files.add(http.MultipartFile(
@@ -131,14 +133,34 @@ class API {
     return responseData;
   }
 
-  // API call to send email verification when signing up.
-  Future<Map<String, dynamic>> sendEmailVerification(String email) async {
+  // API call to send email verification when resetting password.
+  Future<Map<String, dynamic>> sendPasswordReset(String email) async {
     final response = await http.post(
-      Uri.https('jsonplaceholder.typicode.com', 'posts'),
+      Uri.https(API.baseURL, API.requestReset),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8'
       },
       body: jsonEncode(<String, dynamic>{'email': email}),
+    );
+
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    return responseData;
+  }
+
+  // API call to send email verification when resetting password.
+  Future<Map<String, dynamic>> verifyPasswordReset(
+      String email, String verification, String password) async {
+    final Map<String, dynamic> loginData = {
+      'email': email,
+      'code': verification,
+      'password': password
+    };
+
+    final response = await http.post(
+      Uri.https(API.baseURL, API.resetPassword),
+      headers: API.postHeader,
+      body: jsonEncode(loginData),
     );
 
     Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -152,7 +174,7 @@ class API {
       Uri.https(API.baseURL, API.requestVerify),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: 'bearer ' + token
+        HttpHeaders.authorizationHeader: 'bearer $token'
       },
     );
 
@@ -222,7 +244,7 @@ class API {
     final response = await http.post(Uri.https(API.baseURL, API.verify),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          HttpHeaders.authorizationHeader: 'bearer ' + token
+          HttpHeaders.authorizationHeader: 'bearer $token'
         },
         body: jsonEncode(verifyData));
 
@@ -238,7 +260,7 @@ class API {
         Uri.https(API.baseURL, API.likeRecipe + '/$recipeId/favorite'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          HttpHeaders.authorizationHeader: 'bearer ' + token
+          HttpHeaders.authorizationHeader: 'bearer $token'
         });
 
     Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -251,7 +273,7 @@ class API {
       String token, String recipeId) async {
     var response = await http.get(
         Uri.https(API.baseURL, API.likeRecipe + '/$recipeId'),
-        headers: {HttpHeaders.authorizationHeader: 'bearer ' + token});
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
 
     Map<String, dynamic> responseData = jsonDecode(response.body);
     responseData['code'] = response.statusCode;

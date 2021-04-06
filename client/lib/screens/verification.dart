@@ -104,6 +104,7 @@ class VerificationState extends State<Verification> {
                       context, RouteName.HOME, (_) => false)
                 }
             })
+        // ignore: return_of_invalid_type_from_catch_error
         .catchError((error) => {
               print(error),
               ScaffoldMessenger.of(context)

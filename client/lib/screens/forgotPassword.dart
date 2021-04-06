@@ -1,12 +1,10 @@
 import 'package:client/utils/API.dart';
+import 'package:client/utils/RouteNames.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utils/StringValidator.dart';
 
-// This screen is stateful becuase it changes the contents of itself depending
-// on user interaction. The first stage involves providing an email, the seconds
-// a verification password, and the last (and TODO) a page to update the password.
-enum Step { email, verification, login }
+enum Step { email, verification }
 
 // This is the state of the ForgotPassword screen. This changes depending on
 // the selectedStep. The function setState() forces an update of the widget.
@@ -15,14 +13,17 @@ class ForgotPasswordState extends State<ForgotPassword> {
   // form's fields. It essentially attaches to each field.
   final _formKeyEmail = GlobalKey<FormState>();
   final _formKeyVerification = GlobalKey<FormState>();
-  final _formKeyResetPassword = GlobalKey<FormState>();
 
   // TextEditingControllers allow for simple getters from the fields.
   final TextEditingController _email = TextEditingController();
   final TextEditingController _verification = TextEditingController();
+  final TextEditingController _pass = TextEditingController();
+  final TextEditingController _confirmPass = TextEditingController();
 
   // The current state of the widget.
   Step selectedStep = Step.email;
+
+  String email = '';
 
   Widget _buildEmailField() {
     return TextFormField(
@@ -41,6 +42,60 @@ class ForgotPasswordState extends State<ForgotPassword> {
           return 'Please enter your email';
         } else if (!value.isValidEmail()) {
           return 'Please enter a valid email';
+        }
+        return null;
+      },
+    );
+  }
+
+  // Function to build and return a password field text box.
+  Widget _buildPasswordField() {
+    return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      textInputAction: TextInputAction.next,
+      controller: _pass,
+      obscureText: true,
+      enableSuggestions: false,
+      autocorrect: false,
+      decoration: const InputDecoration(
+        contentPadding: EdgeInsets.only(left: 15.0),
+        border: OutlineInputBorder(),
+        hintText: 'Password',
+      ),
+      validator: (value) {
+        var empty = value?.isEmpty ?? true;
+        if (empty) {
+          return 'Please enter your password';
+        } else if (!value.isValidPassword()) {
+          return 'Please enter a password with at least eight characters';
+        }
+        return null;
+      },
+    );
+  }
+
+  // Function to build and return a confirm password field text box.
+  Widget _buildConfirmPasswordField() {
+    return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      textInputAction: TextInputAction.done,
+      controller: _confirmPass,
+      obscureText: true,
+      enableSuggestions: false,
+      autocorrect: false,
+      decoration: const InputDecoration(
+        contentPadding: EdgeInsets.only(left: 15.0),
+        border: OutlineInputBorder(),
+        hintText: 'Confirm password',
+        // labelText: 'Name *',
+      ),
+      // The validator receives the text that the user has entered.
+      validator: (value) {
+        var empty = value?.isEmpty ?? true;
+        if (empty) {
+          return 'Please confirm your password';
+        } else if (value != _pass.text) {
+          return 'Passwords do not match';
         }
         return null;
       },
@@ -66,29 +121,57 @@ class ForgotPasswordState extends State<ForgotPassword> {
     );
   }
 
+  void verifyPasswordResult(Map<String, dynamic> responseData) {
+    var result;
+    try {
+      switch (responseData['code']) {
+        case 200:
+          result = {'status': true, 'message': 'Password reset'};
+          break;
+        case 404:
+          result = {'status': false, 'message': 'Email does not exist'};
+          break;
+        case 410:
+          result = {'status': false, 'message': 'Verification code timed out'};
+          break;
+        case 500:
+          result = {'status': false, 'message': 'Server error'};
+          break;
+        case 422:
+          result = {
+            'status': false,
+            'message': 'No valid reset can be made for account'
+          };
+          break;
+        default:
+          result = {'status': false, 'message': responseData.toString()};
+      }
+    } catch (on, stacktrace) {
+      result = {'status': false, 'message': stacktrace.toString()};
+    }
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(result['message'])));
+    print('result');
+    if (result['status'])
+      Navigator.pushNamedAndRemoveUntil(context, RouteName.LOGIN, (_) => false);
+  }
+
   // Important function called to handle submits of the pages. This function
   // will call the setState() on the widget depending on the current state.
-  void handleSubmit() {
+  void handleSubmit(context) {
     switch (selectedStep) {
       // If we are currently on the email state...
       case Step.email:
         var validated = _formKeyEmail.currentState?.validate() ?? false;
-        if (validated) {
-          API()
-              .sendEmailVerification(_email.text)
-              .then((value) => {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(value.toString())))
-                  })
-              .catchError((error) => {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(error)))
-                  });
-
-          // We won't always want to go to the next step. For examples, if the
-          // email wasn't in the database. This is outside just for testing.
+        email = _email.text.trim();
+        if (validated && email != '') {
+          // ignore: return_of_invalid_type_from_catch_error
+          API().sendPasswordReset(email).catchError((error) => {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(error)))
+              });
           setState(() {
-            // TODO: Move this to the valid email section of emailUser.
             selectedStep = Step.verification;
           });
         }
@@ -96,17 +179,11 @@ class ForgotPasswordState extends State<ForgotPassword> {
       // If we are currently on the verification state...
       case Step.verification:
         var validated = _formKeyVerification.currentState?.validate() ?? false;
+
         if (validated) {
-          // TODO: Verify the submitted code.
-          setState(() {
-            selectedStep = Step.login;
-          });
-        }
-        break;
-      case Step.login:
-        var validated = _formKeyResetPassword.currentState?.validate() ?? false;
-        if (validated) {
-          // TODO: Patch password call, navigate to home/login screen.
+          API()
+              .verifyPasswordReset(email, _verification.text.trim(), _pass.text)
+              .then((value) => {verifyPasswordResult(value)});
         }
         break;
     }
@@ -115,7 +192,7 @@ class ForgotPasswordState extends State<ForgotPassword> {
   Widget _buildSubmit(context) {
     return ElevatedButton(
       onPressed: () {
-        handleSubmit();
+        handleSubmit(context);
       },
       child: Text('Next'),
     );
@@ -138,15 +215,9 @@ class ForgotPasswordState extends State<ForgotPassword> {
             <Widget>[
               _buildVerificationField(),
               SizedBox(height: 10),
-            ],
-            _formKeyVerification,
-            _buildSubmit(context));
-      case Step.login:
-        return InputBox(
-            'Enter verification',
-            <Widget>[
-              _buildVerificationField(),
+              _buildPasswordField(),
               SizedBox(height: 10),
+              _buildConfirmPasswordField(),
             ],
             _formKeyVerification,
             _buildSubmit(context));

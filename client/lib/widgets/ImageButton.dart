@@ -6,8 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ImageButtonController {
-  late String fileName;
-  late String url;
+  String fileName = 'No file selected';
+  String url = '/images/4bade9c7fb6df087d927e753f77ae354da950f3e.png';
+
+  void clear() {
+    fileName = 'No file selected';
+    url = '/images/4bade9c7fb6df087d927e753f77ae354da950f3e.png';
+  }
 }
 
 class ImageButton extends StatefulWidget {
@@ -21,27 +26,39 @@ class ImageButton extends StatefulWidget {
 class ImageButtonState extends State<ImageButton> {
   PickedFile? file;
   bool uploading = false;
-  String fileName = 'No file selected';
+  bool uploaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   void _choose(String token) async {
     setState(() {
       uploading = true;
     });
 
-    PickedFile image = (await ImagePicker()
-        .getImage(source: ImageSource.gallery, maxHeight: 320, maxWidth: 400))!;
+    try {
+      PickedFile image = (await ImagePicker().getImage(
+          source: ImageSource.gallery, maxHeight: 320, maxWidth: 400))!;
 
-    setState(() {
-      file = PickedFile(image.path);
-      fileName = file!.path.split('/').last;
-      print(file.toString() + ' ' + fileName);
-    });
+      setState(() {
+        file = PickedFile(image.path);
+        widget.controller.fileName = file!.path.split('/').last;
+        print(file.toString() +
+            '${file.toString()} ${widget.controller.fileName}');
+      });
+    } catch (on) {
+      widget.controller.fileName = 'No file selected';
+      file = null;
+    }
 
     if (file != null)
-      _upload(token, file!, fileName);
+      _upload(token, file!, widget.controller.fileName);
     else
       setState(() {
         uploading = false;
+        uploaded = false;
       });
   }
 
@@ -54,6 +71,7 @@ class ImageButtonState extends State<ImageButton> {
 
     setState(() {
       uploading = false;
+      uploaded = true;
     });
   }
 
@@ -73,9 +91,11 @@ class ImageButtonState extends State<ImageButton> {
                   child: Text('Choose Image'),
                 ),
           SizedBox(width: 10.0),
-          Text(
-            fileName,
-            overflow: TextOverflow.ellipsis,
+          Flexible(
+            child: Text(
+              widget.controller.fileName,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),
