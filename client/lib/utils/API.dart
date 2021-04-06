@@ -26,6 +26,8 @@ class API {
   static const String likeRecipe =
       'api/recipes'; // + '/recipeID + '/favorite' (Post)
   static const String clickRecipe = 'api/recipes'; // + '/recipeID (Get)
+  static const String requestReset = 'api/account/forgotpassword/requestemail';
+  static const String resetPassword = 'api/account/forgotpassword';
 
   // API call to submit an ingredient based using a user token and the name.
   Future<Map<String, dynamic>> submitIngredient(
@@ -131,14 +133,34 @@ class API {
     return responseData;
   }
 
-  // API call to send email verification when signing up.
-  Future<Map<String, dynamic>> sendEmailVerification(String email) async {
+  // API call to send email verification when resetting password.
+  Future<Map<String, dynamic>> sendPasswordReset(String email) async {
     final response = await http.post(
-      Uri.https('jsonplaceholder.typicode.com', 'posts'),
+      Uri.https(API.baseURL, API.requestReset),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8'
       },
       body: jsonEncode(<String, dynamic>{'email': email}),
+    );
+
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    return responseData;
+  }
+
+  // API call to send email verification when resetting password.
+  Future<Map<String, dynamic>> verifyPasswordReset(
+      String email, String verification, String password) async {
+    final Map<String, dynamic> loginData = {
+      'email': email,
+      'code': verification,
+      'password': password
+    };
+
+    final response = await http.post(
+      Uri.https(API.baseURL, API.resetPassword),
+      headers: API.postHeader,
+      body: jsonEncode(loginData),
     );
 
     Map<String, dynamic> responseData = jsonDecode(response.body);

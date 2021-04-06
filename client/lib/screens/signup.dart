@@ -68,7 +68,7 @@ class Signup extends StatelessWidget {
   }
 
   // Function to build and return a password field text box.
-  Widget _buildPassowordField() {
+  Widget _buildPasswordField() {
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
       textInputAction: TextInputAction.next,
@@ -173,7 +173,7 @@ class Signup extends StatelessWidget {
                 SizedBox(height: 10),
                 _buildEmailField(),
                 SizedBox(height: 10),
-                _buildPassowordField(),
+                _buildPasswordField(),
                 SizedBox(height: 10),
                 _buildConfirmPasswordField(),
                 SizedBox(height: 15),
