@@ -98,7 +98,7 @@ function authenticatedActions(router) {
     });
 
     // DELETE /me, returns success or error upon trying to delete the current user account
-    router.patch(constructPath(endpointPath, '/me'), async function(req, res) {
+    router.delete(constructPath(endpointPath, '/me'), async function(req, res) {
         // Get the userid from the headers
         const userId = req.headers.userId;       
 

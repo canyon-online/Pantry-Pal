@@ -75,12 +75,6 @@ async function search(model, req) {
     const countQuery = query.model.find().merge(query);
     const totalRecords = await countQuery.countDocuments();
 
-    // Actually execute query, ensuring it only returns pertinent fields
-    const limit = req.query.limit ? (parseInt(req.query.limit) > maxRecords ? maxRecords : parseInt(req.query.limit)) : maxRecords;
-    const offset = req.query.offset || 0;
-    query.skip(offset * limit);
-    query.limit(limit);
-
     // Allow different methods of sorting
     const sortBy = req.query.sortBy;
     if (sortBy) {
@@ -94,11 +88,18 @@ async function search(model, req) {
             query.sort(`${direction == 1 ? '' : '-'}${sortBy}`);
         }
         else {
-            query.sort({_id: -1}); // default case
+            // default case
         }
     } else {
-        query.sort({_id: -1}); // default case
+        // default case
     }
+    query.sort({ _id: 1 }); 
+
+    // Actually execute query, ensuring it only returns pertinent fields
+    const limit = req.query.limit ? (parseInt(req.query.limit) > maxRecords ? maxRecords : parseInt(req.query.limit)) : maxRecords;
+    const offset = req.query.offset || 0;
+    query.skip(offset * limit);
+    query.limit(limit);
 
     return { totalRecords: totalRecords, query: query };
 }
