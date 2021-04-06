@@ -19,7 +19,6 @@ extension StringValidator on String? {
   }
 
   bool isValidPassword() {
-    // TODO: Maybe make it so a password has more restrictions?
     if (this == null) return false;
     return this!.length >= 8 && this!.length <= 32;
   }

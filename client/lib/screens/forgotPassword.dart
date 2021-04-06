@@ -1,14 +1,9 @@
 import 'package:client/utils/API.dart';
-import 'package:client/utils/AuthProvider.dart';
 import 'package:client/utils/RouteNames.dart';
 import 'package:client/widgets/InputBox.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utils/StringValidator.dart';
-import 'package:provider/provider.dart';
 
-// This screen is stateful becuase it changes the contents of itself depending
-// on user interaction. The first stage involves providing an email, the seconds
-// a verification password, and the last (and TODO) a page to update the password.
 enum Step { email, verification }
 
 // This is the state of the ForgotPassword screen. This changes depending on
@@ -171,6 +166,7 @@ class ForgotPasswordState extends State<ForgotPassword> {
         var validated = _formKeyEmail.currentState?.validate() ?? false;
         email = _email.text.trim();
         if (validated && email != '') {
+          // ignore: return_of_invalid_type_from_catch_error
           API().sendPasswordReset(email).catchError((error) => {
                 ScaffoldMessenger.of(context)
                     .showSnackBar(SnackBar(content: Text(error)))
@@ -183,13 +179,8 @@ class ForgotPasswordState extends State<ForgotPassword> {
       // If we are currently on the verification state...
       case Step.verification:
         var validated = _formKeyVerification.currentState?.validate() ?? false;
-        Map<String, dynamic> responseData = {
-          'status': false,
-          'code': 9000,
-          'message': 'x'
-        };
+
         if (validated) {
-          print('making request');
           API()
               .verifyPasswordReset(email, _verification.text.trim(), _pass.text)
               .then((value) => {verifyPasswordResult(value)});
