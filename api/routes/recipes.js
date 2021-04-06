@@ -116,10 +116,10 @@ function authenticatedActions(router) {
             difficulty: req.body.difficulty
         });
 
-        recipe.save().then(function(recipe) {
+        recipe.save().then(async function(recipe) {
+            await populateRecipes(recipe);
             res.json(recipe);
         }).catch(function(err) {
-            console.log(err);
             res.status(422).json({ error: "Failed to create a recipe with provided properties" });
         });
     });
@@ -193,7 +193,8 @@ function authenticatedActions(router) {
                     image: req.body.image,
                     serves: req.body.serves
                 }, { omitUndefined: true, new: true })
-                .then(function(recipe) {
+                .then(async function(recipe) {
+                    await populateRecipes(recipe);
                     res.json(recipe);
                 })
                 .catch(function() {
