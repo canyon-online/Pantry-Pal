@@ -6,6 +6,7 @@ import 'package:client/widgets/ProfileView.dart';
 import 'package:client/widgets/SearchView.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/cupertino.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -35,32 +36,56 @@ class HomeState extends State<Home> {
             auth.verificationStatus == Status.Verified
                 ? SafeArea(
                     child: Scaffold(
-                    resizeToAvoidBottomInset: true,
                     appBar: AppBar(
-                      title: Center(child: const Text('Pantry Pal')),
+                      title: const Text('Pantry Pal'),
                     ),
                     body: _children[_currentIndex],
-                    bottomNavigationBar: BottomNavigationBar(
-                      onTap: onTabTapped,
-                      showUnselectedLabels: true,
-                      iconSize: 1,
-                      currentIndex: _currentIndex,
-                      items: [
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.home),
-                          label: 'Home',
-                        ),
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.add),
-                          label: 'Create',
-                        ),
-                        BottomNavigationBarItem(
-                            icon: Icon(Icons.search), label: 'Search'),
-                        BottomNavigationBarItem(
-                            icon: Icon(Icons.person), label: 'Profile')
-                      ],
-                      selectedItemColor: Colors.black,
-                      unselectedItemColor: Colors.black38,
+                    drawer: Drawer(
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        children: <Widget>[
+                          DrawerHeader(
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                            ),
+                            child: Text(
+                              'Pantry Pal',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                              ),
+                            ),
+                          ),
+                          ListTile(
+                            title: Text('Home'),
+                            onTap: () {
+                              onTabTapped(0);
+                              Navigator.pop(context);
+                            },
+                          ),
+                          ListTile(
+                            title: Text('Search'),
+                            onTap: () {
+                              onTabTapped(2);
+                              Navigator.pop(context);
+                            },
+                          ),
+                          ListTile(
+                            title: Text('Create'),
+                            onTap: () {
+                              onTabTapped(1);
+                              Navigator.pop(context);
+                            },
+                          ),
+                          ListTile(
+                            title: Text('Profile'),
+                            onTap: () {
+                              onTabTapped(3);
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ))
                 : Landing());
