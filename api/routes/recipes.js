@@ -234,5 +234,6 @@ function use(router, authenticatedRouter) {
 
 // Export the use function, enabling the recipe endpoint
 module.exports = {
+    populateRecipes: populateRecipes,
     use: use
 };

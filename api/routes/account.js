@@ -189,5 +189,6 @@ function use(router, authenticatedRouter) {
 
 // Export the login object containing the use function
 module.exports = {
+    getCode: getCode,
     use: use
 };

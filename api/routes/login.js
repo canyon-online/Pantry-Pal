@@ -93,5 +93,7 @@ function use(router, authenticatedRouter) {
 
 // Export the use function, enabling the login endpoint
 module.exports = {
+    loginLocal: loginLocal,
+    verifyLocal: verifyLocal,
     use: use
 };

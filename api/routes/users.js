@@ -241,5 +241,7 @@ function use(router, authenticatedRouter) {
 
 // Export the use function, enabling the users endpoint
 module.exports = {
+    handleUserQueryErrors: handleUserQueryErrors,
+    stripUnsafe: stripUnsafeQuery,
     use: use
 };
