@@ -103,7 +103,6 @@ function authenticatedActions(router) {
         const userId = req.headers.userId;       
 
         // Attempt to retrieve the current user
-        // TODO: secure this with a verification code
         User.findByIdAndUpdate(userId, {
             disabled: true
         }, { omitUndefined: true, new: true }, async function(err, user) {

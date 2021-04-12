@@ -8,8 +8,6 @@ const router = express.Router();
 const authenticatedRouter = express.Router(); 
 
 // Make the authenticated router refresh the JWT for all endpoints
-// TODO: make JWT functions asynchronous so this does not bog down the server
-// TODO: refresh tokens instead of this constant updating
 authenticatedRouter.use(async function(req, res, next) {
     if (req.headers.authorization) {
         // Extract the token from the header

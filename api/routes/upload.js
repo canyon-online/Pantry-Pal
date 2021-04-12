@@ -55,7 +55,6 @@ const allowedTypes = {
 const constructPath = require('./lib/constructpath');
 const endpointPath = '/upload';
 
-// TODO: make this actually secure (e.g. logging a lot of information, read/write perms, etc.)
 // Uploading is always an authenticated action
 function authenticatedActions(router) {
     // POST /, attempts a file upload, then returns a URL if successful

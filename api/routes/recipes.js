@@ -113,7 +113,7 @@ function authenticatedActions(router) {
             directions: req.body.directions,
             tags: req.body.tags,
             image: req.body.image,
-            difficulty: req.body.difficulty
+            serves: req.body.serves
         });
 
         recipe.save().then(async function(recipe) {
@@ -125,7 +125,6 @@ function authenticatedActions(router) {
     });
 
     // POST /:id/favorite, add the specified recipe to the current user's favorites
-    // TODO: refactor this greatly - very poorly implemented
     router.post(constructPath(endpointPath, '/:id/favorite'), async function(req, res) { 
         if (!validateObjectId(req.params.id)) {
             res.status(422).json({ error: "The provided id is not a valid id" });
