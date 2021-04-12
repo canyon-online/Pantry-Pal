@@ -41,7 +41,7 @@ function safeActions(router) {
             .then(async user => {
                 // If we get here, then the user was successfully registered
                 // No error, so we can generate and send a JWT
-                await jwt.sendJWTBody(user, res);
+                await jwt.sendLoginBody(user, res);
             })
             .catch(function(err) {
                 // Sends the error as output

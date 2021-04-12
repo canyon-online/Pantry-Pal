@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 
 // The duration that generated token should be valid by default in minutes
-const codeDuration = process.env.REFRESH_TOKEN_DURATION || 604800000; // 7 days
+const codeDuration = process.env.REFRESH_TOKEN_DURATION || 10080; // 7 days
 
 const tokenSchema = new mongoose.Schema({ 
     token: {

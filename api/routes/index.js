@@ -65,6 +65,7 @@ const apiEndpoints = {
     ingredients: require('./ingredients'),
     login: require('./login'),
     recipes: require('./recipes'),
+    refresh: require('./refresh'),
     register: require('./register'),
     upload: require('./upload'),
     users: require('./users')
