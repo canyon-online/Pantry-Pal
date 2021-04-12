@@ -8,7 +8,7 @@ const RefreshToken = require('../../models/refreshToken.js');
 // Expiry time is in seconds
 const jwtExpiryTime = process.env.JWT_EXPIRY_TIME * 1000;
 const jwtKey = process.env.JWT_SECRET_KEY;
-const refreshTokenExpiryTime = process.env.REFRESH_TOKEN_DURATION || 10080; // 7 days
+const refreshTokenExpiryTime = process.env.REFRESH_TOKEN_DURATION || 604800000; // 7 days
 
 // Generate a JWT using the key provided and a user's object id
 function generateJWT(oid, name, verified) {
