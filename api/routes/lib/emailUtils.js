@@ -78,6 +78,7 @@ async function sendForgotPasswordEmail(id, name, email) {
 }
 
 module.exports = {
+    generateVerificationCode: generateVerificationCode,
     sendVerificationEmail: sendVerificationEmail,
     sendForgotPasswordEmail: sendForgotPasswordEmail
 }

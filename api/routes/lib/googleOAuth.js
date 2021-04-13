@@ -71,7 +71,7 @@ async function registerGoogle(res, ticket)
     user.save()
     .then(async user => {
         // Successfully created the new user, now use it to log in
-        await jwt.sendJWTBody(user, res);
+        await jwt.sendLoginBody(user, res);
     })
     .catch(async function(err) {
         // If this error occured for Google login, it is most likely a duplicate email
@@ -104,7 +104,7 @@ async function loginGoogle(res, ticket)
     else
     {
         // No error, so we can generate and send a JWT
-        await jwt.sendJWTBody(user, res);
+        await jwt.sendLoginBody(user, res);
     }
 }
 

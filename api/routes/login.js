@@ -55,7 +55,7 @@ async function loginLocal(email, password, res) {
         }
 
         // No error, so we can generate and send a JWT
-        await jwt.sendJWTBody(user, res);
+        await jwt.sendLoginBody(user, res);
     });
 
     return;
@@ -93,5 +93,7 @@ function use(router, authenticatedRouter) {
 
 // Export the use function, enabling the login endpoint
 module.exports = {
+    loginLocal: loginLocal,
+    verifyLocal: verifyLocal,
     use: use
 };

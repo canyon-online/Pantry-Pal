@@ -11,7 +11,6 @@ const Recipe = require('../models/recipe');
 // The root path of this endpoint, which is concatenated to the router path
 // In the current version, this is /api/recipes
 const constructPath = require('./lib/constructpath');
-const ingredient = require('../models/ingredient');
 const endpointPath = '/recipes';
 
 // Given a list of recipes, populate the authors, ingredients, and isLiked field
@@ -113,7 +112,7 @@ function authenticatedActions(router) {
             directions: req.body.directions,
             tags: req.body.tags,
             image: req.body.image,
-            difficulty: req.body.difficulty
+            serves: req.body.serves
         });
 
         recipe.save().then(async function(recipe) {
@@ -125,7 +124,6 @@ function authenticatedActions(router) {
     });
 
     // POST /:id/favorite, add the specified recipe to the current user's favorites
-    // TODO: refactor this greatly - very poorly implemented
     router.post(constructPath(endpointPath, '/:id/favorite'), async function(req, res) { 
         if (!validateObjectId(req.params.id)) {
             res.status(422).json({ error: "The provided id is not a valid id" });
@@ -234,5 +232,6 @@ function use(router, authenticatedRouter) {
 
 // Export the use function, enabling the recipe endpoint
 module.exports = {
+    populateRecipes: populateRecipes,
     use: use
 };

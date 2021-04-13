@@ -102,8 +102,6 @@ function safeActions(router) {
         // We found a user from the JWT, so send that user an email
         if (user) {
 
-            // TODO: rate limit this endpoint
-
             try {
                 emailUtil.sendForgotPasswordEmail(user._id, user.display, user.email);
             } catch(err) {
@@ -164,8 +162,6 @@ function authenticatedActions(router) {
         // We found a user from the JWT, so send that user an email
         if (user) {
 
-            // TODO: rate limit this endpoint
-
             try {
                 emailUtil.sendVerificationEmail(user._id, user.display, user.email);
             } catch(err) {
@@ -189,5 +185,6 @@ function use(router, authenticatedRouter) {
 
 // Export the login object containing the use function
 module.exports = {
+    getCode: getCode,
     use: use
 };
