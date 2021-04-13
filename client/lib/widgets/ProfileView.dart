@@ -1,5 +1,7 @@
+import 'package:client/utils/API.dart';
 import 'package:client/utils/AuthProvider.dart';
 import 'package:client/utils/RouteNames.dart';
+import 'package:client/utils/UserProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,10 +27,38 @@ class ProfileViewState extends State<ProfileView> {
     );
   }
 
+  Widget _emailText(String token) {
+    return FutureBuilder(
+      future: API().getUserInfo(token),
+      builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return Padding(
+                padding: EdgeInsets.all(10),
+                child: CircularProgressIndicator());
+          default:
+            if (snapshot.hasError)
+              return Text('Error: ${snapshot.error}');
+            else {
+              var data = Map.from(snapshot.data!);
+              return Text('${data['email']}');
+            }
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    var user = Provider.of<UserProvider>(context, listen: false).user;
     return SingleChildScrollView(
-      child: Container(child: _buildLogoutButton(context)),
+      child: Container(
+          child: Column(children: [
+        _buildLogoutButton(context),
+        Text(user.name),
+        _emailText(user.token)
+      ])),
     );
   }
 }

@@ -59,7 +59,7 @@ class RecipeModalState extends State<RecipeModal> {
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Icon(Icons.science, color: Colors.grey, size: 30),
+                  Icon(Icons.person, color: Colors.grey, size: 30),
                   Text(widget.recipe.difficulty.toString()),
                 ],
               ),
@@ -115,15 +115,17 @@ class RecipeModalState extends State<RecipeModal> {
 
           // The rest of this stuff stays static as well.
           Divider(),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.of(context, rootNavigator: true).pop('dialog');
-              },
-              child: Text('Close'),
-            ),
-          ),
+
+          Row(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true).pop('dialog');
+                },
+                child: Text('Close'),
+              ),
+            ],
+          )
         ]),
       ),
     );

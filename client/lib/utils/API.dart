@@ -28,6 +28,7 @@ class API {
   static const String clickRecipe = 'api/recipes'; // + '/recipeID (Get)
   static const String requestReset = 'api/account/forgotpassword/requestemail';
   static const String resetPassword = 'api/account/forgotpassword';
+  static const String userInfo = 'api/users/me';
 
   // API call to submit an ingredient based using a user token and the name.
   Future<Map<String, dynamic>> submitIngredient(
@@ -142,6 +143,18 @@ class API {
       },
       body: jsonEncode(<String, dynamic>{'email': email}),
     );
+
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    return responseData;
+  }
+
+  Future<Map<String, dynamic>> getUserInfo(String token) async {
+    final response = await http
+        .get(Uri.https(API.baseURL, API.userInfo), headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      HttpHeaders.authorizationHeader: 'bearer $token'
+    });
 
     Map<String, dynamic> responseData = jsonDecode(response.body);
     responseData['code'] = response.statusCode;
