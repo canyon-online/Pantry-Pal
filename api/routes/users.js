@@ -6,6 +6,7 @@ const validateObjectId = require('./lib/validateObjectId');
 // Import the relevant models
 const User = require('../models/user'); 
 const Recipe = require('../models/recipe'); 
+const Ingredient = require('../models/ingredient');
 
 // The root path of this endpoint, which is concatenated to the router path
 // In the current version, this is /api/recipes
@@ -122,18 +123,12 @@ function authenticatedActions(router) {
         User.findById(userId, 'recipeList', async function(err, user) {
             handleUserQueryErrors(err, user, res, async function() {
                 // If we successfully got our recipes, convert the ids to their associated recipes
-                let recipeList = user.recipeList;
-
-                for (var i = 0; i < recipeList.length; i++) {
-                    recipeList[i] = { _id: recipeList[i] }
-                }
-
-                if (recipeList.length != 0) {
-                    // Do it in one query this way, unsure if this is computationally efficient
-                    recipeList = await Recipe.find({ $or: recipeList }, '-__v');
-                }
                     
-                res.json({ recipes: recipeList });
+                await Recipe.populate(user, { path: 'recipeList', model: 'Recipe' });
+                await User.populate(user.recipeList, { path: 'author', model: 'User', select: 'display' });
+                await Ingredient.populate(user.recipeList, { path: 'ingredients', model: 'Ingredient', select: 'name' });
+
+                res.json({ recipes: user.recipeList });
             });  
         }); 
     });
@@ -147,18 +142,12 @@ function authenticatedActions(router) {
         User.findById(userId, 'favorites', async function(err, user) {
             handleUserQueryErrors(err, user, res, async function() {
                 // If we successfully got our favorites, convert the ids to their associated recipes
-                let recipeList = user.favorites;
 
-                for (var i = 0; i < recipeList.length; i++) {
-                    recipeList[i] = { _id: recipeList[i] }
-                }
+                await Recipe.populate(user, { path: 'favorites', model: 'Recipe' });
+                await User.populate(user.favorites, { path: 'author', model: 'User', select: 'display' });
+                await Ingredient.populate(user.favorites, { path: 'ingredients', model: 'Ingredient', select: 'name' });
 
-                if (recipeList.length != 0) {
-                    // Do it in one query this way, unsure if this is computationally efficient
-                    recipeList = await Recipe.find({ $or: recipeList }, '-__v');
-                }
-
-                res.json({ recipes: recipeList });
+                res.json({ recipes: user.favorites });
             });
         }); 
     });
@@ -189,18 +178,12 @@ function authenticatedActions(router) {
         User.findById(req.params.id, 'recipeList', async function(err, user) {
             handleUserQueryErrors(err, user, res, async function() {
                 // If we successfully got the recipes, convert the ids to their associated recipes
-                let recipeList = user.recipeList;
 
-                for (var i = 0; i < recipeList.length; i++) {
-                    recipeList[i] = { _id: recipeList[i] }
-                }
+                await Recipe.populate(user, { path: 'favorites', model: 'Recipe' });
+                await User.populate(user.recipeList, { path: 'author', model: 'User', select: 'display' });
+                await Ingredient.populate(user.recipeList, { path: 'ingredients', model: 'Ingredient', select: 'name' });
 
-                if (recipeList.length != 0) {
-                    // Do it in one query this way, unsure if this is computationally efficient
-                    recipeList = await Recipe.find({ $or: recipeList }, '-__v');
-                }
-                    
-                res.json({ recipes: recipeList });
+                res.json({ recipes: user.recipeList });
             });  
         }); 
     });
@@ -216,18 +199,12 @@ function authenticatedActions(router) {
         User.findById(req.params.id, 'favorites', async function(err, user) {
             handleUserQueryErrors(err, user, res, async function() {
                 // If we successfully got the favorites, convert the ids to their associated recipes
-                let recipeList = user.favorites;
+                
+                await Recipe.populate(user, { path: 'favorites', model: 'Recipe' });
+                await User.populate(user.favorites, { path: 'author', model: 'User', select: 'display' });
+                await Ingredient.populate(user.favorites, { path: 'ingredients', model: 'Ingredient', select: 'name' });
 
-                for (var i = 0; i < recipeList.length; i++) {
-                    recipeList[i] = { _id: recipeList[i] }
-                }
-
-                if (recipeList.length != 0) {
-                    // Do it in one query this way, unsure if this is computationally efficient
-                    recipeList = await Recipe.find({ $or: recipeList }, '-__v');
-                }
-
-                res.json({ recipes: recipeList });
+                res.json({ recipes: user.favorites });
             });
         }); 
     });
