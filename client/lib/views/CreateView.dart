@@ -5,11 +5,10 @@ import 'package:client/utils/API.dart';
 import 'package:client/utils/UserProvider.dart';
 import 'package:client/widgets/ImageButton.dart';
 import 'package:client/widgets/IngredientField.dart';
+import 'package:client/widgets/RecipeModal.dart';
 import 'package:client/widgets/TagField.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'RecipeModal.dart';
 
 class CreateView extends StatefulWidget {
   @override

@@ -1,9 +1,9 @@
 import 'package:client/screens/landing.dart';
 import 'package:client/utils/AuthProvider.dart';
-import 'package:client/widgets/CreateView.dart';
-import 'package:client/widgets/HomeView.dart';
-import 'package:client/widgets/ProfileView.dart';
-import 'package:client/widgets/SearchView.dart';
+import 'package:client/views/CreateView.dart';
+import 'package:client/views/HomeView.dart';
+import 'package:client/views/ProfileView.dart';
+import 'package:client/views/SearchView.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';

@@ -4,10 +4,9 @@ import 'package:client/utils/API.dart';
 import 'package:client/utils/IngredientModel.dart';
 import 'package:client/utils/UserProvider.dart';
 import 'package:client/widgets/IngredientSelecter.dart';
+import 'package:client/widgets/RecipeCard.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'RecipeCard.dart';
 
 class SearchView extends StatefulWidget {
   @override
