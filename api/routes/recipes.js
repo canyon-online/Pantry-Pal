@@ -11,7 +11,6 @@ const Recipe = require('../models/recipe');
 // The root path of this endpoint, which is concatenated to the router path
 // In the current version, this is /api/recipes
 const constructPath = require('./lib/constructpath');
-const ingredient = require('../models/ingredient');
 const endpointPath = '/recipes';
 
 // Given a list of recipes, populate the authors, ingredients, and isLiked field

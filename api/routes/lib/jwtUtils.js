@@ -42,8 +42,6 @@ function refreshJWT(token, res) {
             algorithm: 'HS256'
         });
 
-        if (res)
-            sendTokenHeader(newToken, res);
 
         return true;
     }
@@ -71,13 +69,6 @@ function generateRefreshToken(uid) {
     return token;
 }
 
-
-// Function to send a JWT with a header to indicate an updated JWT
-async function sendTokenHeader(token, res) {
-    // Send the user a JWT token to store to save their session
-    res.set('Auth-Update', token);
-}
-
 // Function to generate and send a JWT in the body of a response
 async function sendTokenBody(user, res) {
     // Generate a JWT using the user objectid
@@ -103,7 +94,6 @@ async function sendLoginBody(user, res) {
 module.exports = {
     generateJWT: generateJWT,
     generateRefreshToken: generateRefreshToken,
-    sendJWTHeader: sendTokenHeader,
     sendJWTBody: sendTokenBody,
     sendLoginBody: sendLoginBody,
     refreshJWT: refreshJWT,
