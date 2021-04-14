@@ -110,6 +110,7 @@ class CreateViewState extends State<CreateView> {
                         _name.clear();
                         _directions.clear();
                         _ingredients.clear();
+                        _image.clear();
                         _tags.clear();
                         _currentSliderValue = 2;
                       })

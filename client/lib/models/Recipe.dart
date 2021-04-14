@@ -25,7 +25,7 @@ class Recipe {
       this.serves = 1,
       this.hits = 0,
       this.isLiked = false,
-      this.image = '/images/4bade9c7fb6df087d927e753f77ae354da950f3e.png',
+      this.image = '',
       this.tags = const <String>[]});
 
   factory Recipe.fromJson(Map<String, dynamic> data) {
@@ -49,19 +49,6 @@ class Recipe {
           [],
       tags: data['tags'].map<String>((item) => item.toString()).toList() ?? [],
       serves: data['serves'] ?? 0,
-    );
-  }
-
-  factory Recipe.defaultRecipe() {
-    return Recipe(
-      recipeId: 'myrecipeidhere123',
-      name: 'Soy Sauce Garlic Butter Noodles',
-      author: 'super_amazing_cook12',
-      directions: 'cook it',
-      favorites: 1230,
-      serves: 2,
-      tags: ['Vegetarian', '🥡'],
-      hits: 12304,
     );
   }
 

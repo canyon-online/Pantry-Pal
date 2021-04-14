@@ -58,6 +58,7 @@ class RecipeCardState extends State<RecipeCard> {
     Future<bool> _tapCounter(String token, String recipeId) async {
       var response = await API().doClickRecipe(token, recipeId);
 
+      if (!mounted) return false;
       if (response['code'] != 200) {
         setState(() {
           _removed = true;
@@ -122,8 +123,11 @@ class RecipeCardState extends State<RecipeCard> {
                     height: 194,
                     child: FittedBox(
                       clipBehavior: Clip.hardEdge,
-                      child: Image.network(
-                          'https://${API.baseURL}${_recipe.image}'),
+                      child: _recipe.image.compareTo('') != 0
+                          ? Image.network(
+                              'https://${API.baseURL}${_recipe.image}')
+                          : Image(
+                              image: AssetImage('assets/images/default.jpg')),
                       fit: BoxFit.cover,
                     ),
                   ),

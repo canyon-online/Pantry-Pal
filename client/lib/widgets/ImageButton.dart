@@ -7,11 +7,11 @@ import 'package:provider/provider.dart';
 
 class ImageButtonController {
   String fileName = 'No file selected';
-  String url = '/images/4bade9c7fb6df087d927e753f77ae354da950f3e.png';
+  String url = '';
 
   void clear() {
     fileName = 'No file selected';
-    url = '/images/4bade9c7fb6df087d927e753f77ae354da950f3e.png';
+    url = '';
   }
 }
 
