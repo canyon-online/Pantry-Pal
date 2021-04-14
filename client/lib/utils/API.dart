@@ -29,6 +29,8 @@ class API {
   static const String requestReset = 'api/account/forgotpassword/requestemail';
   static const String resetPassword = 'api/account/forgotpassword';
   static const String userInfo = 'api/users/me';
+  static const String favoriteRecipes = 'api/users/me/favorites';
+  static const String myRecipes = 'api/users/me/recipes';
 
   // API call to submit an ingredient based using a user token and the name.
   Future<Map<String, dynamic>> submitIngredient(
@@ -84,6 +86,41 @@ class API {
 
   // API call to fetch recipes based on an offset and limit.
   Future<List<Recipe>> getRecipes(String token, int offset, int limit) async {
+    Map<String, String> params = {
+      'limit': limit.toString(),
+      'offset': offset.toString(),
+      'sortBy': 'numFavorites',
+      'direction': '-1'
+    };
+
+    var response = await http.get(
+        Uri.https(API.baseURL, API.searchRecipe, params),
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
+
+    // Return a list of the recipes fetched as recipe objects.
+    List<dynamic> recipes = jsonDecode(response.body)['recipes'];
+    return recipes.map<Recipe>((item) => Recipe.fromMap(item)).toList();
+  }
+
+  Future<List<Recipe>> getFavoriteRecipes(
+      String token, int offset, int limit) async {
+    Map<String, String> params = {
+      'limit': limit.toString(),
+      'offset': offset.toString(),
+      'sortBy': 'numFavorites',
+      'direction': '-1'
+    };
+
+    var response = await http.get(
+        Uri.https(API.baseURL, API.searchRecipe, params),
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
+
+    // Return a list of the recipes fetched as recipe objects.
+    List<dynamic> recipes = jsonDecode(response.body)['recipes'];
+    return recipes.map<Recipe>((item) => Recipe.fromMap(item)).toList();
+  }
+
+  Future<List<Recipe>> getMyRecipes(String token, int offset, int limit) async {
     Map<String, String> params = {
       'limit': limit.toString(),
       'offset': offset.toString(),
