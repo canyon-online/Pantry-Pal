@@ -9,20 +9,20 @@ class Recipe {
   final String directions;
   final List<String> tags;
   final String image;
-  final int difficulty;
+  final int serves;
   bool isLiked;
   int favorites;
   int hits;
 
   Recipe(
-      {this.recipeId = 'none',
-      this.name = 'New Dish',
-      this.author = 'Pantry Pal',
-      this.authorId = 'none',
-      this.directions = 'There are no directions.',
+      {this.recipeId = '',
+      this.name = '',
+      this.author = '',
+      this.authorId = '',
+      this.directions = '',
       this.ingredients = const <Ingredient>[],
       this.favorites = 0,
-      this.difficulty = 1,
+      this.serves = 1,
       this.hits = 0,
       this.isLiked = false,
       this.image = '/images/4bade9c7fb6df087d927e753f77ae354da950f3e.png',
@@ -34,20 +34,21 @@ class Recipe {
 
   factory Recipe.fromMap(Map<String, dynamic> data) {
     return Recipe(
-      recipeId: data['_id'],
-      name: data['name'],
-      author: data['author']['display'],
-      authorId: data['author']['_id'],
-      directions: data['directions'],
-      favorites: data['numFavorites'],
-      hits: data['numHits'],
-      image: data['image'],
+      recipeId: data['_id'] ?? '',
+      name: data['name'] ?? 'Unknown',
+      author: data['author']['display'] ?? 'Unknown',
+      authorId: data['author']['_id'] ?? '',
+      directions: data['directions'] ?? '',
+      favorites: data['numFavorites'] ?? 0,
+      hits: data['numHits'] ?? 0,
+      image: data['image'] ?? '',
       isLiked: data['isLiked'] ?? false,
       ingredients: data['ingredients']
-          .map<Ingredient>((item) => Ingredient.fromJson(item))
-          .toList(),
-      tags: data['tags'].map<String>((item) => item.toString()).toList(),
-      difficulty: data['difficulty'],
+              .map<Ingredient>((item) => Ingredient.fromJson(item))
+              .toList() ??
+          [],
+      tags: data['tags'].map<String>((item) => item.toString()).toList() ?? [],
+      serves: data['serves'] ?? 0,
     );
   }
 
@@ -58,7 +59,7 @@ class Recipe {
       author: 'super_amazing_cook12',
       directions: 'cook it',
       favorites: 1230,
-      difficulty: 2,
+      serves: 2,
       tags: ['Vegetarian', '🥡'],
       hits: 12304,
     );

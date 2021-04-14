@@ -94,7 +94,7 @@ class CreateViewState extends State<CreateView> {
             'directions': _directions.text.trim(),
             'tags': _tags.list.toList(),
             'image': _image.url,
-            'difficulty': _currentSliderValue.round()
+            'serves': _currentSliderValue.round()
           };
 
           if (_formKey.currentState?.validate() ?? false) {

@@ -17,6 +17,7 @@ class RecipeCard extends StatefulWidget {
 
 class RecipeCardState extends State<RecipeCard> {
   late Recipe _recipe;
+  bool _removed = false;
 
   void initState() {
     super.initState();
@@ -54,59 +55,101 @@ class RecipeCardState extends State<RecipeCard> {
   Widget build(BuildContext context) {
     String token = Provider.of<UserProvider>(context).user.token;
 
-    void _tapCounter(String token, String recipeId) async {
+    Future<bool> _tapCounter(String token, String recipeId) async {
       var response = await API().doClickRecipe(token, recipeId);
-      Recipe newRecipe = Recipe.fromJson(response);
-      setState(() {
-        _recipe = newRecipe;
-      });
+
+      if (response['code'] != 200) {
+        setState(() {
+          _removed = true;
+        });
+        return false;
+      } else {
+        setState(() {
+          _recipe = Recipe.fromJson(response);
+        });
+        return true;
+      }
     }
 
-    return Card(
-        child: InkWell(
-            onTap: () {
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    _tapCounter(token, _recipe.recipeId);
-                    return RecipeModal(recipe: _recipe);
-                  });
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  width: 500,
-                  height: 194,
-                  child: FittedBox(
-                    clipBehavior: Clip.hardEdge,
-                    child:
-                        Image.network('https://' + API.baseURL + _recipe.image),
-                    fit: BoxFit.cover,
+    FutureBuilder _buildDialog(String token, String recipeId) {
+      return FutureBuilder(
+        future: _tapCounter(token, recipeId),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+              return SizedBox();
+            default:
+              if (snapshot.hasError)
+                return Text('Error ${snapshot.error}');
+              else if (snapshot.data == true)
+                return RecipeModal(recipe: _recipe);
+              else
+                return AlertDialog(
+                  title: Text('Error'),
+                  content: Text('This recipe does not exist'),
+                  actions: [
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true)
+                              .pop('dialog');
+                        },
+                        child: Text('Okay'))
+                  ],
+                );
+          }
+        },
+      );
+    }
+
+    Widget _buildCard() {
+      return Card(
+          child: InkWell(
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return _buildDialog(token, _recipe.recipeId);
+                    });
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    width: 500,
+                    height: 194,
+                    child: FittedBox(
+                      clipBehavior: Clip.hardEdge,
+                      child: Image.network(
+                          'https://${API.baseURL}${_recipe.image}'),
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ),
-                Container(
-                  padding: EdgeInsets.all(15.0),
-                  child: Column(
-                    children: [
-                      Divider(height: 20, thickness: 2),
-                      Text(
-                        _recipe.name,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 22),
-                      ),
-                      Text(_recipe.author,
-                          style: TextStyle(fontSize: 14, color: Colors.grey)),
-                      SizedBox(height: 15),
-                      _drawCardBody(),
-                      SizedBox(height: 10),
-                    ],
-                  ),
-                )
-              ],
-            )));
+                  Container(
+                    padding: EdgeInsets.all(15.0),
+                    child: Column(
+                      children: [
+                        Divider(height: 20, thickness: 2),
+                        Text(
+                          _recipe.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 22),
+                        ),
+                        Text(_recipe.author,
+                            style: TextStyle(fontSize: 14, color: Colors.grey)),
+                        SizedBox(height: 15),
+                        _drawCardBody(),
+                        SizedBox(height: 10),
+                      ],
+                    ),
+                  )
+                ],
+              )));
+    }
+
+    return _removed == false ? _buildCard() : SizedBox();
   }
 }
