@@ -3,6 +3,7 @@ import 'Ingredient.dart';
 class Recipe {
   final String recipeId;
   final String author;
+  final String authorId;
   final String name;
   final List<Ingredient> ingredients;
   final String directions;
@@ -17,6 +18,7 @@ class Recipe {
       {this.recipeId = 'none',
       this.name = 'New Dish',
       this.author = 'Pantry Pal',
+      this.authorId = 'none',
       this.directions = 'There are no directions.',
       this.ingredients = const <Ingredient>[],
       this.favorites = 0,
@@ -35,6 +37,7 @@ class Recipe {
       recipeId: data['_id'],
       name: data['name'],
       author: data['author']['display'],
+      authorId: data['author']['_id'],
       directions: data['directions'],
       favorites: data['numFavorites'],
       hits: data['numHits'],

@@ -23,6 +23,7 @@ class API {
   static const String createIngredient = 'api/ingredients';
   static const String searchRecipe = 'api/recipes';
   static const String createRecipe = 'api/recipes';
+  static const String deleteRecipe = 'api/recipes'; // + recipe id
   static const String likeRecipe =
       'api/recipes'; // + '/recipeID + '/favorite' (Post)
   static const String clickRecipe = 'api/recipes'; // + '/recipeID (Get)
@@ -100,6 +101,17 @@ class API {
     // Return a list of the recipes fetched as recipe objects.
     List<dynamic> recipes = jsonDecode(response.body)['recipes'];
     return recipes.map<Recipe>((item) => Recipe.fromMap(item)).toList();
+  }
+
+  Future<Map<String, dynamic>> removeRecipe(String token, String id) async {
+    var response = await http.delete(
+        Uri.https(API.baseURL, '${API.deleteRecipe}/$id'),
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
+
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    print(responseData);
+    return responseData;
   }
 
   Future<List<Recipe>> getFavoriteRecipes(

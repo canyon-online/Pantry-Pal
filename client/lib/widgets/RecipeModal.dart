@@ -1,6 +1,10 @@
 import 'package:client/models/Recipe.dart';
+import 'package:client/models/User.dart';
+import 'package:client/utils/API.dart';
+import 'package:client/utils/UserProvider.dart';
 import 'package:client/widgets/LikeButton.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'TextPill.dart';
 
@@ -13,6 +17,48 @@ class RecipeModal extends StatefulWidget {
 }
 
 class RecipeModalState extends State<RecipeModal> {
+  Widget _deleteButton(context) {
+    User user = Provider.of<UserProvider>(context).user;
+    if (user.userId.compareTo(widget.recipe.authorId) == 0)
+      return ElevatedButton(
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                    title: Text('Delete Recipe'),
+                    content:
+                        Text('Are you sure you want to delete this recipe?'),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true)
+                              .pop('dialog');
+                        },
+                        child: Text('No'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          API()
+                              .removeRecipe(user.token, widget.recipe.recipeId);
+
+                          Navigator.of(context, rootNavigator: true)
+                              .pop('dialog');
+                          Navigator.of(context, rootNavigator: true)
+                              .pop('dialog');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Recipe deleted')));
+                        },
+                        child: Text('Yes'),
+                      )
+                    ],
+                  ));
+        },
+        child: Icon(Icons.delete),
+      );
+    else
+      return SizedBox(width: 10, height: 10);
+  }
+
   @override
   Widget build(BuildContext context) {
     // Dialog acts sort of like a container
@@ -117,13 +163,15 @@ class RecipeModalState extends State<RecipeModal> {
           Divider(),
 
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              _deleteButton(context),
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context, rootNavigator: true).pop('dialog');
                 },
                 child: Text('Close'),
-              ),
+              )
             ],
           )
         ]),
