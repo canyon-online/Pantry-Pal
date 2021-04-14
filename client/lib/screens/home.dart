@@ -25,8 +25,8 @@ class HomeState extends State<Home> {
     CreateView(),
     SearchView(),
     ProfileView(),
-    RecipeView(),
     FavoriteView(),
+    RecipeView(),
   ];
 
   void onTabTapped(int index) {

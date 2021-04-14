@@ -62,8 +62,8 @@ class RecipeViewState extends State<RecipeView> {
   }
 
   void _getRecipes(int offset) async {
-    List<Recipe> parsedRecipes = await API().getRecipes(_token, offset, limit);
-    print(parsedRecipes);
+    List<Recipe> parsedRecipes =
+        await API().getMyRecipes(_token, offset, limit);
     if (!mounted) return;
     setState(() {
       if (parsedRecipes.length <= 0) {

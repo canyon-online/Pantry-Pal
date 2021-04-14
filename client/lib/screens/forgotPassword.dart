@@ -152,7 +152,6 @@ class ForgotPasswordState extends State<ForgotPassword> {
 
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(result['message'])));
-    print('result');
     if (result['status'])
       Navigator.pushNamedAndRemoveUntil(context, RouteName.LOGIN, (_) => false);
   }

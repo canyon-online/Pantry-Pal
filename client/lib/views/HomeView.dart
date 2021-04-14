@@ -63,7 +63,6 @@ class HomeViewState extends State<HomeView> {
 
   void _getRecipes(int offset) async {
     List<Recipe> parsedRecipes = await API().getRecipes(_token, offset, limit);
-    print(parsedRecipes);
     if (!mounted) return;
     setState(() {
       if (parsedRecipes.length <= 0) {
@@ -78,6 +77,7 @@ class HomeViewState extends State<HomeView> {
   void _scrollListener() {
     if (controller.offset >= controller.position.maxScrollExtent &&
         !controller.position.outOfRange) {
+      print('load');
       setState(() {
         _isLoading = true;
 

@@ -104,7 +104,6 @@ class Login extends StatelessWidget {
     auth
         .login(_login.text, _pass.text)
         .then((value) => {
-              print(auth.verificationStatus),
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(value['message']))),
               if (value['status'] == true)

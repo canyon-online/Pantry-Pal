@@ -52,8 +52,6 @@ class API {
   // API call to submit a recipe based using a user token and a map of recipe parts.
   Future<Map<String, dynamic>> submitRecipe(
       String token, Map<String, dynamic> recipe) async {
-    print('Sending new recipe ' + recipe.toString());
-
     final response = await http.post(Uri.https(API.baseURL, API.createRecipe),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -110,7 +108,6 @@ class API {
 
     Map<String, dynamic> responseData = jsonDecode(response.body);
     responseData['code'] = response.statusCode;
-    print(responseData);
     return responseData;
   }
 
@@ -124,7 +121,7 @@ class API {
     };
 
     var response = await http.get(
-        Uri.https(API.baseURL, API.searchRecipe, params),
+        Uri.https(API.baseURL, API.favoriteRecipes, params),
         headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
 
     // Return a list of the recipes fetched as recipe objects.
@@ -140,8 +137,7 @@ class API {
       'direction': '-1'
     };
 
-    var response = await http.get(
-        Uri.https(API.baseURL, API.searchRecipe, params),
+    var response = await http.get(Uri.https(API.baseURL, API.myRecipes, params),
         headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
 
     // Return a list of the recipes fetched as recipe objects.
