@@ -77,7 +77,6 @@ class HomeViewState extends State<HomeView> {
   void _scrollListener() {
     if (controller.offset >= controller.position.maxScrollExtent &&
         !controller.position.outOfRange) {
-      print('load');
       setState(() {
         _isLoading = true;
 

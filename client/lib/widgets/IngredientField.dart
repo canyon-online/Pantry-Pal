@@ -43,13 +43,10 @@ class IngredientFieldState extends State<IngredientField> {
 
     List<Ingredient> fetchedIngredients =
         await API().getIngredients(token, name);
-    print('Searching for $name in the database');
     if (fetchedIngredients.length == 0) {
-      print('Could not find $name in the database. Creating it.');
       var response = await API().submitIngredient(token, name);
       i = Ingredient.fromJson(response);
     } else {
-      print('Found ${fetchedIngredients[0]} in the database.');
       i = fetchedIngredients[0];
     }
 
@@ -79,7 +76,6 @@ class IngredientFieldState extends State<IngredientField> {
                   if (text.length != 0) {
                     addIngredient(token, text.capitalizeFirstofEach);
                     _ingredient.clear();
-                    print(widget.controller.list);
                   }
                 },
               )

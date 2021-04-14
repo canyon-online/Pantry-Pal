@@ -46,12 +46,10 @@ class GoogleSignInState extends State<GoogleSignIn> {
           auth
               .googleLogin()
               .then((value) => {
-                    print(value),
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(value['message']))),
                     if (value['status'] == true)
                       {
-                        print('setting user in login: ' + value['user'].name),
                         Provider.of<UserProvider>(context, listen: false)
                             .setUser(value['user']),
                         Navigator.pushNamedAndRemoveUntil(
@@ -59,7 +57,6 @@ class GoogleSignInState extends State<GoogleSignIn> {
                       }
                     else if (auth.verificationStatus != Status.Verified)
                       {
-                        print('setting user in login: ' + value['user'].name),
                         Provider.of<UserProvider>(context, listen: false)
                             .setUser(value['user']),
                         Navigator.pushNamedAndRemoveUntil(

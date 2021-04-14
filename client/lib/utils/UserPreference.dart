@@ -5,13 +5,11 @@ import 'dart:async';
 class UserPreference {
   Future<bool> verifyUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    print('verified user');
     return prefs.setBool('verified', true);
   }
 
   Future<bool> saveUser(User user) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    print('Saved: ${user.userId} ${user.verified} ${user.name} ${user.token}');
     prefs.setString('userId', user.userId);
     prefs.setString('name', user.name);
     prefs.setBool('verified', user.verified);
@@ -27,14 +25,11 @@ class UserPreference {
     String token = prefs.getString('token') ?? 'null';
     bool verified = prefs.getBool('verified') ?? false;
 
-    print('Fetched: $userId $verified $name $token');
-
     return User(userId: userId, name: name, token: token, verified: verified);
   }
 
   void removeUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    print('Removed user from preferences');
     prefs.remove('userId');
     prefs.remove('name');
     prefs.remove('token');

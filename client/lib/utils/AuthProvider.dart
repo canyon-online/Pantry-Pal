@@ -84,7 +84,6 @@ class AuthProvider with ChangeNotifier {
 
     // If there was no issue with registering or verifying...
     if (responseData['code'] == 200 && responseData['error'] == null) {
-      print(responseData);
       User user = saveLogin(responseData);
 
       if (user.verified) {
@@ -140,8 +139,10 @@ class AuthProvider with ChangeNotifier {
       // Failed to select an account
       _loggedInStatus = Status.NotLoggedIn;
       notifyListeners();
-      print(stacktrace.toString());
-      return {'status': false, 'message': 'Failed to complete google sign in'};
+      return {
+        'status': false,
+        'message': 'Failed to complete Google sign in: ${stacktrace.toString()}'
+      };
     }
 
     // Handle responses
@@ -265,7 +266,6 @@ class AuthProvider with ChangeNotifier {
           };
           break;
         case 422: // Invalid code responseData
-          print(responseData);
           result = {
             'status': false,
             'message': 'Failed to verify: invalid code'

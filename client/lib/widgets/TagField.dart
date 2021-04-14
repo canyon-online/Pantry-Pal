@@ -63,8 +63,6 @@ class TagFieldState extends State<TagField> {
                       }
                     });
                   }
-
-                  print(widget.controller.list);
                 },
               )
             ]),

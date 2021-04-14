@@ -53,7 +53,6 @@ class IngredientSelecterState extends State<IngredientSelecter> {
               setState(() {
                 if (selectedIngredient != null)
                   ingredients.add(selectedIngredient!);
-                print(ingredients.ingredients);
               });
             },
           )

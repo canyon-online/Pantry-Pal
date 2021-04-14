@@ -33,7 +33,6 @@ class Recipe {
   }
 
   factory Recipe.fromMap(Map<String, dynamic> data) {
-    // print(data);
     return Recipe(
       recipeId: data['_id'] ?? '',
       name: data['name'] ?? 'Unknown',

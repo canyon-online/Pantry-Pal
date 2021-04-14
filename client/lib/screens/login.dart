@@ -108,7 +108,6 @@ class Login extends StatelessWidget {
                   .showSnackBar(SnackBar(content: Text(value['message']))),
               if (value['status'] == true)
                 {
-                  print('setting user in login: ' + value['user'].name),
                   Provider.of<UserProvider>(context, listen: false)
                       .setUser(value['user']),
                   Navigator.pushNamedAndRemoveUntil(
@@ -116,7 +115,6 @@ class Login extends StatelessWidget {
                 }
               else if (auth.verificationStatus != Status.Verified)
                 {
-                  print('setting user in login: ' + value['user'].name),
                   Provider.of<UserProvider>(context, listen: false)
                       .setUser(value['user']),
                   Navigator.pushNamedAndRemoveUntil(

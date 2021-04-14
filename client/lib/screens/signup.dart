@@ -129,20 +129,17 @@ class Signup extends StatelessWidget {
                   .showSnackBar(SnackBar(content: Text(value['message']))),
               if (value['status'] == true)
                 {
-                  print('setting user in login: ' + value['user'].name),
                   Provider.of<UserProvider>(context, listen: false)
                       .setUser(value['user']),
                   // Go to verification
-                  print('pushing verification'),
                   Navigator.pushNamedAndRemoveUntil(
                       context, RouteName.VERIFICATION, (_) => false)
                 }
             })
         // ignore: return_of_invalid_type_from_catch_error
         .catchError((error) => {
-              print(error),
               ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text('error')))
+                  .showSnackBar(SnackBar(content: Text(error.toString())))
             });
   }
 

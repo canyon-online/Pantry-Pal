@@ -62,10 +62,10 @@ class VerificationState extends State<Verification> {
           };
       }
     } catch (on, stacktrace) {
-      print(stacktrace.toString());
       result = {
         'status': false,
-        'message': 'Failed to send a new verification email'
+        'message':
+            'Failed to send a new verification email: ${stacktrace.toString()}'
       };
     }
 
@@ -106,7 +106,6 @@ class VerificationState extends State<Verification> {
             })
         // ignore: return_of_invalid_type_from_catch_error
         .catchError((error) => {
-              print(error),
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(error.toString())))
             });
@@ -148,10 +147,6 @@ class VerificationState extends State<Verification> {
   @override
   Widget build(BuildContext context) {
     AuthProvider auth = Provider.of<AuthProvider>(context);
-
-    print(auth.loggedInStatus);
-    print(auth.verificationStatus);
-    print(auth.registeredStatus);
 
     return auth.verificationStatus != Status.Verified
         ? SafeArea(

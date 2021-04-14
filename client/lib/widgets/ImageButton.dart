@@ -45,8 +45,6 @@ class ImageButtonState extends State<ImageButton> {
       setState(() {
         file = PickedFile(image.path);
         widget.controller.fileName = file!.path.split('/').last;
-        print(file.toString() +
-            '${file.toString()} ${widget.controller.fileName}');
       });
     } catch (on) {
       widget.controller.fileName = 'No file selected';
@@ -65,7 +63,6 @@ class ImageButtonState extends State<ImageButton> {
   void _upload(String token, PickedFile file, String name) async {
     Map<String, dynamic> response = await API().uploadFile(token, file, name);
 
-    print("Result: $response");
     widget.controller.url = response['image'];
     widget.controller.fileName = name;
 
