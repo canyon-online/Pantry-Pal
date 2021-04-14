@@ -31,6 +31,9 @@ async function filterAndPopulateRecipes(req, user, path) {
     const sortBy = req.query.sortBy || 'numFavorites';
     const direction = req.query.direction || -1;
 
+    // Create temporary favorites to prevent mutating the favorites list
+    user.tmpFavorites = user.favorites;
+
     // First populate the recipes so we can sort by them
     await Recipe.populate(user, { path: path, model: 'Recipe' });
 
@@ -45,6 +48,11 @@ async function filterAndPopulateRecipes(req, user, path) {
 
     // After sorting, get the group of recipes that we want
     user[path] = user[path].slice(offset * limit, offset * limit + limit);
+
+    // Create the isLiked field for each recipe
+    user[path].forEach(function(recipe) {
+        recipe.set('isLiked', user.tmpFavorites.includes(recipe._id), { strict: false });
+    });  
 
     // Populate the remaining recipes
     await User.populate(user[path], { path: 'author', model: 'User', select: 'display' });
@@ -149,7 +157,7 @@ function authenticatedActions(router) {
         const userId = req.headers.userId;       
 
         // Attempt to retrieve the current user
-        User.findById(userId, 'recipeList', async function(err, user) {
+        User.findById(userId, 'recipeList favorites', async function(err, user) {
             handleUserQueryErrors(err, user, res, async function() {
                 // If we successfully got our recipes, convert the ids to their associated recipes
 
@@ -200,7 +208,7 @@ function authenticatedActions(router) {
         }       
 
         // Attempt to retrieve the specified user
-        User.findById(req.params.id, 'recipeList', async function(err, user) {
+        User.findById(req.params.id, 'recipeList favorites', async function(err, user) {
             handleUserQueryErrors(err, user, res, async function() {
                 // If we successfully got the recipes, convert the ids to their associated recipes
 

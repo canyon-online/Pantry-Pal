@@ -29,7 +29,7 @@ const recipeSchema = new mongoose.Schema({
         required: [true, "Recipes require directions"],
         validate: {
             validator: function(v) {
-                return /^.{1,4096}$/u.test(v);
+                return /^.{1,4096}$/us.test(v);
             },
             message: props => `These directions are too long`
         }
