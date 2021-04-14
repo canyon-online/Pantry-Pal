@@ -2,7 +2,7 @@
     package="com.example.client">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="client"
+        android:label="Pantry Pal"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

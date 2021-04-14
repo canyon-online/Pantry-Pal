@@ -10,10 +10,12 @@ import 'package:client/utils/UserProvider.dart';
 import 'package:client/utils/UserPreference.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'models/User.dart';
 import 'utils/RouteNames.dart';
 
 void main() {
+  SharedPreferences.setMockInitialValues({});
   runApp(MyApp());
 }
 
