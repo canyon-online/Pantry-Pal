@@ -24,6 +24,35 @@ const stripUnsafeQuery = (query) => {
     return query;
 }
 
+// Given a list of recipes, filter and sort them in a "search"-like way
+async function filterAndPopulateRecipes(req, user, path) {
+    const limit = req.query.limit ? (parseInt(req.query.limit) > 20 ? 20 : parseInt(req.query.limit)) : 20;
+    const offset = req.query.offset || 0;
+    const sortBy = req.query.sortBy || 'numFavorites';
+    const direction = req.query.direction || -1;
+
+    // First populate the recipes so we can sort by them
+    await Recipe.populate(user, { path: path, model: 'Recipe' });
+
+    // Sort by the specified field in the specified dirction
+    user[path].sort(function(a,b) {
+        if (a[sortBy] > b[sortBy])
+            return direction;
+        else if (a[sortBy] < b[sortBy])
+            return -direction;
+        return 0;
+    });
+
+    // After sorting, get the group of recipes that we want
+    user[path] = user[path].slice(offset * limit, offset * limit + limit);
+
+    // Populate the remaining recipes
+    await User.populate(user[path], { path: 'author', model: 'User', select: 'display' });
+    await Ingredient.populate(user[path], { path: 'ingredients', model: 'Ingredient', select: 'name' });
+
+    return user[path];
+}
+
 // Error handler for most /users endpoints
 function handleUserQueryErrors(err, user, res, cb) {
     if (err) {
@@ -123,10 +152,8 @@ function authenticatedActions(router) {
         User.findById(userId, 'recipeList', async function(err, user) {
             handleUserQueryErrors(err, user, res, async function() {
                 // If we successfully got our recipes, convert the ids to their associated recipes
-                    
-                await Recipe.populate(user, { path: 'recipeList', model: 'Recipe' });
-                await User.populate(user.recipeList, { path: 'author', model: 'User', select: 'display' });
-                await Ingredient.populate(user.recipeList, { path: 'ingredients', model: 'Ingredient', select: 'name' });
+
+                user.recipeList = await filterAndPopulateRecipes(req, user, "recipeList");
 
                 res.json({ recipes: user.recipeList });
             });  
@@ -143,9 +170,7 @@ function authenticatedActions(router) {
             handleUserQueryErrors(err, user, res, async function() {
                 // If we successfully got our favorites, convert the ids to their associated recipes
 
-                await Recipe.populate(user, { path: 'favorites', model: 'Recipe' });
-                await User.populate(user.favorites, { path: 'author', model: 'User', select: 'display' });
-                await Ingredient.populate(user.favorites, { path: 'ingredients', model: 'Ingredient', select: 'name' });
+                user.favorites = await filterAndPopulateRecipes(req, user, "favorites");
 
                 res.json({ recipes: user.favorites });
             });
@@ -179,9 +204,7 @@ function authenticatedActions(router) {
             handleUserQueryErrors(err, user, res, async function() {
                 // If we successfully got the recipes, convert the ids to their associated recipes
 
-                await Recipe.populate(user, { path: 'favorites', model: 'Recipe' });
-                await User.populate(user.recipeList, { path: 'author', model: 'User', select: 'display' });
-                await Ingredient.populate(user.recipeList, { path: 'ingredients', model: 'Ingredient', select: 'name' });
+                user.recipeList = await filterAndPopulateRecipes(req, user, "recipeList");
 
                 res.json({ recipes: user.recipeList });
             });  
@@ -200,9 +223,7 @@ function authenticatedActions(router) {
             handleUserQueryErrors(err, user, res, async function() {
                 // If we successfully got the favorites, convert the ids to their associated recipes
                 
-                await Recipe.populate(user, { path: 'favorites', model: 'Recipe' });
-                await User.populate(user.favorites, { path: 'author', model: 'User', select: 'display' });
-                await Ingredient.populate(user.favorites, { path: 'ingredients', model: 'Ingredient', select: 'name' });
+                user.favorites = await filterAndPopulateRecipes(req, user, "favorites");
 
                 res.json({ recipes: user.favorites });
             });
