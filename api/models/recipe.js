@@ -56,8 +56,7 @@ const recipeSchema = new mongoose.Schema({
                 return /^\/images\/([A-Za-z0-9])*.png$/.test(v);
             },
             message: props => `${props.value} is not a valid image uri`
-        },
-        required: [true, "Recipes require some image to display the end result"]
+        }
     },
     numFavorites: {
         type: Number,
@@ -78,7 +77,8 @@ const recipeSchema = new mongoose.Schema({
     serves: {
         type: Number,
         min: 0,
-        max: 50
+        max: 50,
+        default: 1
     }
 });
 
