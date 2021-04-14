@@ -23,11 +23,15 @@ class API {
   static const String createIngredient = 'api/ingredients';
   static const String searchRecipe = 'api/recipes';
   static const String createRecipe = 'api/recipes';
+  static const String deleteRecipe = 'api/recipes'; // + recipe id
   static const String likeRecipe =
       'api/recipes'; // + '/recipeID + '/favorite' (Post)
   static const String clickRecipe = 'api/recipes'; // + '/recipeID (Get)
   static const String requestReset = 'api/account/forgotpassword/requestemail';
   static const String resetPassword = 'api/account/forgotpassword';
+  static const String userInfo = 'api/users/me';
+  static const String favoriteRecipes = 'api/users/me/favorites';
+  static const String myRecipes = 'api/users/me/recipes';
 
   // API call to submit an ingredient based using a user token and the name.
   Future<Map<String, dynamic>> submitIngredient(
@@ -99,6 +103,52 @@ class API {
     return recipes.map<Recipe>((item) => Recipe.fromMap(item)).toList();
   }
 
+  Future<Map<String, dynamic>> removeRecipe(String token, String id) async {
+    var response = await http.delete(
+        Uri.https(API.baseURL, '${API.deleteRecipe}/$id'),
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
+
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    print(responseData);
+    return responseData;
+  }
+
+  Future<List<Recipe>> getFavoriteRecipes(
+      String token, int offset, int limit) async {
+    Map<String, String> params = {
+      'limit': limit.toString(),
+      'offset': offset.toString(),
+      'sortBy': 'numFavorites',
+      'direction': '-1'
+    };
+
+    var response = await http.get(
+        Uri.https(API.baseURL, API.searchRecipe, params),
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
+
+    // Return a list of the recipes fetched as recipe objects.
+    List<dynamic> recipes = jsonDecode(response.body)['recipes'];
+    return recipes.map<Recipe>((item) => Recipe.fromMap(item)).toList();
+  }
+
+  Future<List<Recipe>> getMyRecipes(String token, int offset, int limit) async {
+    Map<String, String> params = {
+      'limit': limit.toString(),
+      'offset': offset.toString(),
+      'sortBy': 'numFavorites',
+      'direction': '-1'
+    };
+
+    var response = await http.get(
+        Uri.https(API.baseURL, API.searchRecipe, params),
+        headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
+
+    // Return a list of the recipes fetched as recipe objects.
+    List<dynamic> recipes = jsonDecode(response.body)['recipes'];
+    return recipes.map<Recipe>((item) => Recipe.fromMap(item)).toList();
+  }
+
   // API Call to fetch ingredients based off an (optional?) filter.
   Future<List<Ingredient>> getIngredients(String token, String filter) async {
     var response = await http.get(
@@ -142,6 +192,18 @@ class API {
       },
       body: jsonEncode(<String, dynamic>{'email': email}),
     );
+
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+    responseData['code'] = response.statusCode;
+    return responseData;
+  }
+
+  Future<Map<String, dynamic>> getUserInfo(String token) async {
+    final response = await http
+        .get(Uri.https(API.baseURL, API.userInfo), headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      HttpHeaders.authorizationHeader: 'bearer $token'
+    });
 
     Map<String, dynamic> responseData = jsonDecode(response.body);
     responseData['code'] = response.statusCode;

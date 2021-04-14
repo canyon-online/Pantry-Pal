@@ -30,8 +30,10 @@ class RecipeLikeButtonState extends State<RecipeLikeButton> {
     Map<String, dynamic> response =
         await API().doLikeRecipe(token, widget.recipe.recipeId);
     setState(() {
-      likeCount = response['numFavorites'];
-      isLiked = !value;
+      if (response['code'] == 200) {
+        likeCount = response['numFavorites'];
+        isLiked = !value;
+      }
       liking = false;
     });
 
