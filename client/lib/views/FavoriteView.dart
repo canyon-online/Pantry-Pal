@@ -40,25 +40,32 @@ class FavoriteViewState extends State<FavoriteView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(
-      child: GridView.builder(
-        padding: EdgeInsets.fromLTRB(30, 15, 15, 30),
-        controller: controller,
-        shrinkWrap: true,
-        itemCount: _recipes.length > 0 ? _recipes.length : limit,
-        itemBuilder: (context, index) {
-          return _recipes.length > 0
-              ? RecipeCard(_recipes[index])
-              : Card(child: CircularProgressIndicator());
-        },
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            mainAxisExtent: 391,
-            maxCrossAxisExtent: 500,
-            mainAxisSpacing: 30,
-            crossAxisSpacing: 30,
-            childAspectRatio: 391 / 500),
-      ),
-    );
+    return (_hasMore == false && _recipes.length == 0)
+        ? Column(children: [
+            SizedBox(height: 8),
+            Align(
+                alignment: Alignment.center,
+                child: Text('You have not liked any recipes'))
+          ])
+        : Scrollbar(
+            child: GridView.builder(
+              padding: EdgeInsets.fromLTRB(30, 15, 15, 30),
+              controller: controller,
+              shrinkWrap: true,
+              itemCount: _recipes.length > 0 ? _recipes.length : limit,
+              itemBuilder: (context, index) {
+                return _recipes.length > 0
+                    ? RecipeCard(_recipes[index])
+                    : Card(child: CircularProgressIndicator());
+              },
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  mainAxisExtent: 391,
+                  maxCrossAxisExtent: 500,
+                  mainAxisSpacing: 30,
+                  crossAxisSpacing: 30,
+                  childAspectRatio: 391 / 500),
+            ),
+          );
   }
 
   void _getRecipes(int offset) async {
