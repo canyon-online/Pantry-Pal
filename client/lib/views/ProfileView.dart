@@ -39,10 +39,11 @@ class ProfileViewState extends State<ProfileView> {
                 child: CircularProgressIndicator());
           default:
             if (snapshot.hasError)
-              return Text('Error: ${snapshot.error}');
+              return Text('Error: ${snapshot.error}',
+                  style: TextStyle(fontSize: 32));
             else {
               var data = Map.from(snapshot.data!);
-              return Text('${data['email']}');
+              return Text('${data['email']}', style: TextStyle(fontSize: 20));
             }
         }
       },
@@ -55,9 +56,12 @@ class ProfileViewState extends State<ProfileView> {
     return SingleChildScrollView(
       child: Container(
           child: Column(children: [
+        Text(user.name,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28)),
+        SizedBox(height: 16),
+        _emailText(user.token),
+        SizedBox(height: 16),
         _buildLogoutButton(context),
-        Text(user.name),
-        _emailText(user.token)
       ])),
     );
   }
