@@ -14,26 +14,7 @@ class SearchView extends StatefulWidget {
 }
 
 class SearchViewState extends State<SearchView> {
-  final TextEditingController _search = TextEditingController();
   String _query = '';
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Start listening to changes.
-    _search.addListener(() {
-      setState(() {
-        _query = _search.text.trim();
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _search.dispose();
-    super.dispose();
-  }
 
   Future<Map<String, dynamic>> _getRecipes(
       String token, int offset, int limit, Set<Ingredient> ingredients) {
@@ -43,81 +24,97 @@ class SearchViewState extends State<SearchView> {
     return response;
   }
 
-  Widget _buildScrollview(List<Recipe> recipes) {
-    return GridView.builder(
-      padding: EdgeInsets.fromLTRB(30, 15, 15, 30),
-      // controller: controller,
-      shrinkWrap: true,
-      itemCount: recipes.length,
-      itemBuilder: (context, index) {
-        return RecipeCard(recipes[index]);
-      },
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          mainAxisExtent: 391,
-          maxCrossAxisExtent: 500,
-          mainAxisSpacing: 30,
-          crossAxisSpacing: 30,
-          childAspectRatio: 391 / 500),
-    );
-  }
-
-  Widget _buildFuture(String _token, Set<Ingredient> ingredients) {
-    return FutureBuilder(
-      future: _getRecipes(_token, 0, 10, ingredients),
-      builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-            return Padding(
-                padding: EdgeInsets.all(10),
-                child: CircularProgressIndicator());
-          default:
-            if (snapshot.hasError)
-              return Text('Error: ${snapshot.error}');
-            else {
-              var data = Map.from(snapshot.data!);
-              var recipes = Recipe.fromJsonList(data['recipes']);
-              if (recipes.length <= 0)
-                return Text('No recipes matched the current criteria');
-              else
-                return Expanded(child: _buildScrollview(recipes));
-            }
-        }
-      },
-    );
-  }
-
   Widget _buildSearchField() {
     return TextFormField(
-      controller: _search,
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
-        hintText: 'Search for a recipe',
+        hintText: 'Search for a dish',
         border: OutlineInputBorder(),
         contentPadding: EdgeInsets.only(left: 15.0),
       ),
+      onChanged: (text) {
+        setState(() {
+          _query = text.trim();
+        });
+      },
     );
+  }
+
+  Widget _buildSliver(String token, Set<Ingredient> ingredients) {
+    return FutureBuilder(
+        future: _getRecipes(token, 0, 10, ingredients),
+        builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+          var childCount = 0;
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+              childCount = 1;
+              return SliverList(
+                  delegate:
+                      SliverChildListDelegate([CircularProgressIndicator()]));
+            default:
+              if (snapshot.hasData == false)
+                return SliverList(
+                    delegate:
+                        SliverChildListDelegate([CircularProgressIndicator()]));
+              var data = Map.from(snapshot.data!);
+              var recipes = Recipe.fromJsonList(data['recipes']);
+              childCount = recipes.length;
+              if (recipes.length <= 0)
+                return SliverList(
+                    delegate: SliverChildListDelegate(
+                        [Text('No recipes matched the current criteria')]));
+              else
+                return SliverGrid(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    return RecipeCard(recipes[index]);
+                  }, childCount: childCount),
+                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      mainAxisExtent: 391,
+                      maxCrossAxisExtent: 500,
+                      mainAxisSpacing: 30,
+                      crossAxisSpacing: 30,
+                      childAspectRatio: 391 / 500),
+                );
+          }
+        });
   }
 
   @override
   build(BuildContext context) {
     String _token = Provider.of<UserProvider>(context).user.token;
     return Consumer<IngredientModel>(
-        builder: (context, ingredients, child) => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(height: 8),
-                // Use the child here, without rebuilding everytime.
-                child ?? Text('No child found.'),
-                _buildFuture(_token, ingredients.ingredients)
-              ],
+      builder: (context, ingredients, child) =>
+          CustomScrollView(shrinkWrap: true, slivers: <Widget>[
+        child ??
+            SliverList(
+              delegate: SliverChildListDelegate([CircularProgressIndicator()]),
             ),
-        // Build the expensive widget here.
-        child: Column(
-          children: [
-            _buildSearchField(),
-            IngredientSelecter(),
-          ],
-        ));
+        _buildSliver(_token, ingredients.ingredients)
+      ]),
+      child: SliverList(
+          delegate: SliverChildListDelegate(
+        [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, top: 8),
+            child: Text('Search by name:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _buildSearchField(),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Text('Search by ingredients:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IngredientSelecter(),
+          ),
+        ],
+      )),
+    );
   }
 }

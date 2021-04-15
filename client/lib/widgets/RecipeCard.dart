@@ -58,7 +58,7 @@ class RecipeCardState extends State<RecipeCard> {
     Future<bool> _tapCounter(String token, String recipeId) async {
       var response = await API().doClickRecipe(token, recipeId);
 
-      if (!mounted) return false;
+      if (!mounted) return true;
       if (response['code'] != 200) {
         setState(() {
           _removed = true;
@@ -114,25 +114,26 @@ class RecipeCardState extends State<RecipeCard> {
                     });
               },
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.max,
                 children: [
                   Container(
-                    width: 500,
-                    height: 194,
-                    child: FittedBox(
-                      clipBehavior: Clip.hardEdge,
-                      child: _recipe.image.compareTo('') != 0
-                          ? Image.network(
-                              'https://${API.baseURL}${_recipe.image}')
-                          : Image(
-                              image: AssetImage('assets/images/default.jpg')),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                      width: 500,
+                      height: 200,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                          image: (_recipe.image.compareTo('') != 0)
+                              ? DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                      'https://${API.baseURL}${_recipe.image}'))
+                              : DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: AssetImage(
+                                      'assets/images/default.jpg')))),
                   Container(
-                    padding: EdgeInsets.all(15.0),
+                    padding: EdgeInsets.fromLTRB(15, 0, 15, 15),
                     child: Column(
                       children: [
                         Divider(height: 20, thickness: 2),
@@ -144,7 +145,7 @@ class RecipeCardState extends State<RecipeCard> {
                         ),
                         Text(_recipe.author,
                             style: TextStyle(fontSize: 14, color: Colors.grey)),
-                        SizedBox(height: 15),
+                        SizedBox(height: 24),
                         _drawCardBody(),
                         SizedBox(height: 10),
                       ],

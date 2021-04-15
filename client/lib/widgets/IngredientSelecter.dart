@@ -16,6 +16,7 @@ class IngredientSelecterState extends State<IngredientSelecter> {
   late Ingredient? selectedIngredient;
 
   void handleOnChange(Ingredient? value) {
+    if (value == null) return;
     setState(() {
       selectedIngredient = value;
     });
@@ -26,6 +27,11 @@ class IngredientSelecterState extends State<IngredientSelecter> {
     return DropdownSearch<Ingredient>(
       label: 'Ingredient',
       showSearchBox: true,
+      dropdownSearchDecoration: InputDecoration(
+        border: OutlineInputBorder(),
+        contentPadding: EdgeInsets.only(left: 15),
+        // labelText: 'Search an ingredient',
+      ),
       searchBoxDecoration: InputDecoration(
         border: OutlineInputBorder(),
         contentPadding: EdgeInsets.fromLTRB(12, 12, 8, 0),
