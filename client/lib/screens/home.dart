@@ -99,31 +99,42 @@ class HomeState extends State<Home> {
           _buildDrawerHeader(token),
           ListTile(
             title: Text('Home'),
-            leading: Icon(Icons.home),
+            leading: _currentIndex == 0
+                ? Icon(Icons.home, color: Theme.of(context).colorScheme.primary)
+                : Icon(Icons.home_outlined),
             onTap: () {
               onTabTapped(0);
               Navigator.pop(context);
             },
           ),
           ListTile(
-            title: Text('Search'),
-            leading: Icon(Icons.search),
-            onTap: () {
-              onTabTapped(2);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
             title: Text('Create'),
-            leading: Icon(Icons.create),
+            leading: _currentIndex == 1
+                ? Icon(Icons.create,
+                    color: Theme.of(context).colorScheme.primary)
+                : Icon(Icons.create_outlined),
             onTap: () {
               onTabTapped(1);
               Navigator.pop(context);
             },
           ),
           ListTile(
+            title: Text('Search'),
+            leading: _currentIndex == 2
+                ? Icon(Icons.search,
+                    color: Theme.of(context).colorScheme.primary)
+                : Icon(Icons.search_outlined),
+            onTap: () {
+              onTabTapped(2);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
             title: Text('Profile'),
-            leading: Icon(Icons.person),
+            leading: _currentIndex == 3
+                ? Icon(Icons.person,
+                    color: Theme.of(context).colorScheme.primary)
+                : Icon(Icons.person_outline),
             onTap: () {
               onTabTapped(3);
               Navigator.pop(context);
@@ -131,7 +142,10 @@ class HomeState extends State<Home> {
           ),
           ListTile(
             title: Text('Favorites'),
-            leading: Icon(Icons.favorite),
+            leading: _currentIndex == 4
+                ? Icon(Icons.favorite,
+                    color: Theme.of(context).colorScheme.primary)
+                : Icon(Icons.favorite_outline),
             onTap: () {
               onTabTapped(4);
               Navigator.pop(context);
@@ -139,7 +153,10 @@ class HomeState extends State<Home> {
           ),
           ListTile(
             title: Text('Recipes'),
-            leading: Icon(Icons.food_bank),
+            leading: _currentIndex == 5
+                ? Icon(Icons.food_bank,
+                    color: Theme.of(context).colorScheme.primary)
+                : Icon(Icons.food_bank_outlined),
             onTap: () {
               onTabTapped(5);
               Navigator.pop(context);

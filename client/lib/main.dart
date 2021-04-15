@@ -15,6 +15,7 @@ import 'models/User.dart';
 import 'utils/RouteNames.dart';
 
 void main() {
+  // ignore: invalid_use_of_visible_for_testing_member
   SharedPreferences.setMockInitialValues({});
   runApp(MyApp());
 }
