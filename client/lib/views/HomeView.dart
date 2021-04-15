@@ -38,6 +38,15 @@ class HomeViewState extends State<HomeView> {
     super.dispose();
   }
 
+  Widget _buildCenteredIndicator() {
+    return Center(
+        child: SizedBox(
+      height: 50,
+      width: 50,
+      child: CircularProgressIndicator(),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return (_hasMore == false && _recipes.length == 0)
@@ -56,7 +65,7 @@ class HomeViewState extends State<HomeView> {
               itemBuilder: (context, index) {
                 return _recipes.length > 0
                     ? RecipeCard(_recipes[index])
-                    : Card(child: CircularProgressIndicator());
+                    : Card(child: _buildCenteredIndicator());
               },
               gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                   mainAxisExtent: 391,
