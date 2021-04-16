@@ -16,6 +16,15 @@ class SearchView extends StatefulWidget {
 class SearchViewState extends State<SearchView> {
   String _query = '';
 
+  Widget _buildCenteredIndicator() {
+    return Center(
+        child: SizedBox(
+      height: 50,
+      width: 50,
+      child: CircularProgressIndicator(),
+    ));
+  }
+
   Future<Map<String, dynamic>> _getRecipes(
       String token, int offset, int limit, Set<Ingredient> ingredients) {
     var response =
@@ -51,12 +60,12 @@ class SearchViewState extends State<SearchView> {
               childCount = 1;
               return SliverList(
                   delegate:
-                      SliverChildListDelegate([CircularProgressIndicator()]));
+                      SliverChildListDelegate([_buildCenteredIndicator()]));
             default:
               if (snapshot.hasData == false)
                 return SliverList(
                     delegate:
-                        SliverChildListDelegate([CircularProgressIndicator()]));
+                        SliverChildListDelegate([_buildCenteredIndicator()]));
               var data = Map.from(snapshot.data!);
               var recipes = Recipe.fromJsonList(data['recipes']);
               childCount = recipes.length;
@@ -88,7 +97,7 @@ class SearchViewState extends State<SearchView> {
           CustomScrollView(shrinkWrap: true, slivers: <Widget>[
         child ??
             SliverList(
-              delegate: SliverChildListDelegate([CircularProgressIndicator()]),
+              delegate: SliverChildListDelegate([_buildCenteredIndicator()]),
             ),
         _buildSliver(_token, ingredients.ingredients)
       ]),
