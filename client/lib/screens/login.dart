@@ -104,14 +104,19 @@ class Login extends StatelessWidget {
     auth
         .login(_login.text, _pass.text)
         .then((value) => {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(value['message']))),
               if (value['status'] == true)
                 {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(value['message']))),
                   Provider.of<UserProvider>(context, listen: false)
                       .setUser(value['user']),
                   Navigator.pushNamedAndRemoveUntil(
                       context, RouteName.HOME, (_) => false)
+                }
+              else if (value['code'] == 404)
+                {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(value['message'])))
                 }
               else if (auth.verificationStatus != Status.Verified)
                 {
@@ -119,6 +124,11 @@ class Login extends StatelessWidget {
                       .setUser(value['user']),
                   Navigator.pushNamedAndRemoveUntil(
                       context, RouteName.VERIFICATION, (_) => false)
+                }
+              else
+                {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(value['message'])))
                 }
             })
         .catchError((error) => {
