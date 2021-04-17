@@ -58,6 +58,64 @@ beforeEach(function () {
           }
         }
       }
+    },
+
+    toHaveCode: function() {
+      return {
+        compare: function(actual, expected) {
+          var token = actual;
+          var pass = true;
+
+          // If the verification code for the account is not the same, return false
+          if (token != expected)
+          {
+            pass = false;
+          }
+
+          return {
+            pass: pass
+          }
+        }
+      }
+    },
+
+    toBeVerified: function() {
+      return {
+        compare: function(actual, expected) {
+          var token = actual;
+          var pass = true;
+
+          // If the return value for verifyLocal is contradictory to the
+          // response status, return false
+          if (token == true && expected.status == 422)
+          {
+            pass = false;
+          }
+
+          return {
+            pass: pass
+          }
+        }
+      }
+    },
+
+    ValidCode: function() {
+      return {
+        compare: function(actual, expected) {
+          var token = actual;
+          var pass = true;
+
+          // If the generated verification code is not valid, return false
+          if (expected[0] != token.code.length || expected[1] != token.id || expected[2] != token.purpose)
+          {
+            pass = false;
+          }
+
+          return {
+            pass: pass
+          }
+        }
+      }
     }
   });
 });
