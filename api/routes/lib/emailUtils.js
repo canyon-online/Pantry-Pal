@@ -48,7 +48,7 @@ async function sendVerificationEmail(id, name, email) {
         return;
     
     await transporter.sendMail({
-        from: '"PantryPal" <no-reply@testing.hasty.cc>',
+        from: '"PantryPal" <no-reply@pantrypal.hasty.cc>',
         to: email,
         subject: 'Email Verification Requested',
         text: `Hello ${name}, your verification code is ${verifCode}`,
@@ -67,7 +67,7 @@ async function sendForgotPasswordEmail(id, name, email) {
         return;
     
     await transporter.sendMail({
-        from: '"PantryPal" <no-reply@testing.hasty.cc>',
+        from: '"PantryPal" <no-reply@pantrypal.hasty.cc>',
         to: email,
         subject: 'Forgot Password',
         text: `Hello ${name}, your code is ${verifCode}`,
