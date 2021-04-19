@@ -24,7 +24,14 @@ const transporter = (process.env.DO_EMAIL == 1) ? nodemailer.createTransport({
 
 // Generate a verification code of N digits to be sent to a user
 function generateVerificationCode(digits, id, purpose) {
-    const generatedCode = crypto.randomInt(0, Math.pow(10, digits)).toString(10);
+    let generatedCode = crypto.randomInt(0, Math.pow(10, digits)).toString(10);
+
+    // The int needs to be padded with leading zeros
+    if (generatedCode.length != digits) {
+        while (generatedCode.length != digits) {
+            generatedCode = '0' + generatedCode;
+        }
+    }
 
     const code = new Code({
         code: generatedCode,
