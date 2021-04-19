@@ -95,7 +95,7 @@ function authenticatedActions(router) {
     // POST /, creates a recipe and returns it
     router.post(constructPath(endpointPath, '/'), async function(req, res) { 
         // Ensure that a recipe was properly passed to this endpoint
-        if (!req.body || !req.body.name || !req.body.directions || !req.body.image) {
+        if (!req.body || !req.body.name || !req.body.directions) {
             // Could probably rely on the recipe schema to throw this error on saving
             res.status(422).json({ error: "Missing required recipe properties in request" });
             return;
@@ -111,7 +111,7 @@ function authenticatedActions(router) {
             ingredients: req.body.ingredients,
             directions: req.body.directions,
             tags: req.body.tags,
-            image: req.body.image,
+            image: req.body.image || '',
             serves: req.body.serves
         });
 
