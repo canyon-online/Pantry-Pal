@@ -1,8 +1,8 @@
 # 🌿 Pantry Pal
 A full stack web and mobile app developed with Flutter, Node.js, and MongoDB; this application is a recipe sharing social media site.
 
-[![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](http://testing.hasty.cc/#/)
-[![GitHub contributors](https://img.shields.io/github/contributors/Naereen/StrapDown.js.svg)](https://github.com/SPVTNIK-ONLINE/Pantry-Pal/graphs/contributors)
+[![Website shields.io](https://img.shields.io/website-up-down-green-red/http/pantrypal.hasty.cc.svg)](https://pantrypal.hasty.cc/#/)
+[![GitHub contributors](https://img.shields.io/github/contributors/SPVTNIK-ONLINE/Pantry-Pal.svg)](https://github.com/SPVTNIK-ONLINE/Pantry-Pal/graphs/contributors)
 
 ## 🌟 Goals of this project
 *   To create an effective and secure application.
@@ -24,11 +24,14 @@ A full stack web and mobile app developed with Flutter, Node.js, and MongoDB; th
 | cors                | 2.8.5   | Back      | Node.js CORS middleware                                                                                                                                |
 | dotenv              | 8.2.0   | Back      | Loads environment variables from .env file.                                                                                                            |
 | express             | 4.17.1  | Back      | Fast, unopinionated, minimalist web framework.                                                                                                         |
+| express-winston     | 4.1.0   | Back      | Winston middleware for express.js                                                                                                                      |
 | google-auth-library | 7.0.2   | Back      | Google APIs Authentication Client Library for Node.js                                                                                                  |
+| jasmine             | 3.7.0   | Back      | a package of helper code for developing Jasmine projects for Node.js                                                                                   |
 | jsonwebtoken        | 8.5.1   | Back      | JSON Web Token implementation (symmetric and asymmetric).                                                                                              |
 | mongoose            | 6.11.18 | Back      | Mongoose MongoDB ODM.                                                                                                                                  |
 | multer              | 1.4.2   | Back      | Middleware for handling multipart/form-data.                                                                                                           |
 | nodemailer          | 6.5.0   | Back      | Easy as cake e-mail sending from your Node.js applications.                                                                                            |
+| winston             | 3.0.0   | Back      | A logger for just about anything                                                                                                                       |
 ## 📸 Screenshots
 
 ## 🔌 Plugins
