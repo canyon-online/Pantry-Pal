@@ -118,4 +118,19 @@ beforeEach(function () {
       }
     }
   });
+
+  // Configure mongoose to use the local database
+  const mongoose = require('mongoose');
+  const MONGO_HOST = process.env.DB_HOST || 'localhost';
+  const MONGO_PORT = process.env.DB_PORT || 27017;
+  const MONGO_DB = process.env.DB_NAME || 'my_local_db';
+  const MONGO_URI = `mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}`;
+
+  mongoose.connect(MONGO_URI, { 
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+    useCreateIndex: true
+  });
+
 });
