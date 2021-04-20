@@ -1,9 +1,6 @@
-describe("JWT", function() {
+describe("JWT library", function() {
     // Our "wrapper" library we are testing
     var JWTLib = require('../../routes/lib/jwtUtils');
-
-    // The actual JWT library obtained through npm
-    var actualJWTLib = require('jsonwebtoken');
     
     // Constant testing values we will use for testing JWTS
     const JWTVals = {

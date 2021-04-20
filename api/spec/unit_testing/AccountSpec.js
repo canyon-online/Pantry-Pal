@@ -15,7 +15,7 @@ describe("Account", function() {
 
         // After fulfilling the promise, check
         codePromise.then(function(code) {
-            expect(code).toEqual(undefined);
+            expect(code).toBeDefined();
         });
     });
 
@@ -33,7 +33,7 @@ describe("Account", function() {
 
         codePromise.then(function(code) {
             // Expect a code to have been found
-            expect(code).not.toEqual(undefined);
+            expect(code).toBeDefined();
 
             // Expect it to be the correct code
             expect(code.code).toEqual(CodeVals.code);
