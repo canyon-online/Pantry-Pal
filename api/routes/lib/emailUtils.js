@@ -21,6 +21,9 @@ const transporter = (process.env.DO_EMAIL == 1) ? nodemailer.createTransport({
     }
 }) : null;
 
+// Configuration loaded from environment
+const codeLength = process.env.CODE_LENGTH || 6;
+const doEmail = process.env.DO_EMAIL || 0;
 
 // Generate a verification code of N digits to be sent to a user
 function generateVerificationCode(digits, id, purpose) {
@@ -48,11 +51,12 @@ function generateVerificationCode(digits, id, purpose) {
 
 // Send a verification email to the specified user
 async function sendVerificationEmail(id, name, email) {
-    const verifCode = generateVerificationCode(process.env.CODE_LENGTH, id, "Email Verification");
+    const verifCode = generateVerificationCode(codeLength, id, "Email Verification");
+    var failFlag = false;
 
     // Do not email on development machines
-    if (process.env.DO_EMAIL == 0)
-        return;
+    if (doEmail == 0)
+        return true;
     
     await transporter.sendMail({
         from: `"PantryPal" <no-reply@${process.env.MAIL_SERVER}>`,
@@ -60,18 +64,24 @@ async function sendVerificationEmail(id, name, email) {
         subject: 'Email Verification Requested',
         text: `Hello ${name}, your verification code is ${verifCode}`,
         html: `Hello ${name}, your verification code is ${verifCode}`
+    }, function (err,info) {
+        logger.info(info.envelope);
+
+        if (err)
+            failFlag = true;
     });
 
-    return;
+    return !failFlag;
 }
 
 // Send a verification email to the specified user
 async function sendForgotPasswordEmail(id, name, email) {
-    const verifCode = generateVerificationCode(process.env.CODE_LENGTH, id, "Forgot Password");
+    const verifCode = generateVerificationCode(codeLength, id, "Forgot Password");
+    var failFlag = false;
 
     // Do not email on development machines
-    if (process.env.DO_EMAIL == 0)
-        return;
+    if (doEmail == 0)
+        return true;
     
     await transporter.sendMail({
         from: '"PantryPal" <no-reply@${process.env.MAIL_SERVER}>',
@@ -79,9 +89,14 @@ async function sendForgotPasswordEmail(id, name, email) {
         subject: 'Forgot Password',
         text: `Hello ${name}, your code is ${verifCode}`,
         html: `Hello ${name}, your code is ${verifCode}`
+    }, function (err,info) {
+        logger.info(info.envelope);
+
+        if (err)
+            failFlag = true;
     });
 
-    return;
+    return !failFlag;
 }
 
 module.exports = {
