@@ -8,6 +8,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
 // Allow us to log mail events and failures
+const fs = require('fs');
 const logger = require('./logging').genericLogger;
 
 // Mail transporter object
@@ -24,6 +25,9 @@ const transporter = (process.env.DO_EMAIL == 1) ? nodemailer.createTransport({
 // Configuration loaded from environment
 const codeLength = process.env.CODE_LENGTH || 6;
 const doEmail = process.env.DO_EMAIL || 0;
+
+// Load the HTML file to use as a template for emails (if configured to do so)
+const emailTemplate = process.env.EMAIL_TEMPLATE ? fs.readFileSync(process.env.EMAIL_TEMPLATE) : "Hello ${name}, your code is ${verifCode}";
 
 // Generate a verification code of N digits to be sent to a user
 function generateVerificationCode(digits, id, purpose) {
@@ -63,7 +67,7 @@ async function sendVerificationEmail(id, name, email) {
         to: email,
         subject: 'Email Verification Requested',
         text: `Hello ${name}, your verification code is ${verifCode}`,
-        html: `Hello ${name}, your verification code is ${verifCode}`
+        html: emailTemplate.replace("${name}", name).replace("${verifCode}", verifCode)
     }, function (err,info) {
         logger.info(info.envelope);
 
@@ -88,7 +92,7 @@ async function sendForgotPasswordEmail(id, name, email) {
         to: email,
         subject: 'Forgot Password',
         text: `Hello ${name}, your code is ${verifCode}`,
-        html: `Hello ${name}, your code is ${verifCode}`
+        html: emailTemplate.replace("${name}", name).replace("${verifCode}", verifCode)
     }, function (err,info) {
         logger.info(info.envelope);
 
