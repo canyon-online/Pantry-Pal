@@ -71,8 +71,11 @@ class SearchViewState extends State<SearchView> {
               childCount = recipes.length;
               if (recipes.length <= 0)
                 return SliverList(
-                    delegate: SliverChildListDelegate(
-                        [Text('No recipes matched the current criteria')]));
+                    delegate: SliverChildListDelegate([
+                  Center(
+                      child: Text('No recipes matched the current criteria',
+                          style: TextStyle(color: Colors.grey.shade700)))
+                ]));
               else
                 return SliverGrid(
                   delegate: SliverChildBuilderDelegate((context, index) {

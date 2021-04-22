@@ -2,6 +2,7 @@ import 'package:client/utils/API.dart';
 import 'package:client/utils/AuthProvider.dart';
 import 'package:client/utils/RouteNames.dart';
 import 'package:client/utils/UserProvider.dart';
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,7 +28,16 @@ class ProfileViewState extends State<ProfileView> {
     );
   }
 
-  Widget _emailText(String token) {
+  Widget _buildCenteredIndicator() {
+    return Center(
+        child: SizedBox(
+      height: 50,
+      width: 50,
+      child: CircularProgressIndicator(),
+    ));
+  }
+
+  Widget _accountInfo(String token) {
     return FutureBuilder(
       future: API().getUserInfo(token),
       builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
@@ -35,15 +45,132 @@ class ProfileViewState extends State<ProfileView> {
           case ConnectionState.none:
           case ConnectionState.waiting:
             return Padding(
-                padding: EdgeInsets.all(10),
-                child: CircularProgressIndicator());
+                padding: EdgeInsets.all(10), child: _buildCenteredIndicator());
           default:
             if (snapshot.hasError)
               return Text('Error: ${snapshot.error}',
                   style: TextStyle(fontSize: 32));
             else {
               var data = Map.from(snapshot.data!);
-              return Text('${data['email']}', style: TextStyle(fontSize: 20));
+              print(data);
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      data['avatar'] != null
+                          ? CircleAvatar(
+                              radius: 22,
+                              backgroundImage: NetworkImage(data['avatar']),
+                            )
+                          : CircleAvatar(
+                              radius: 22,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              child: Text(
+                                  data['display'].toString().substring(0, 2)),
+                            ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                                text: '${data['display']} ',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 38)),
+                            WidgetSpan(
+                              child: data['verified'] == true
+                                  ? Icon(
+                                      Icons.verified,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      size: 38,
+                                    )
+                                  : SizedBox(),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  Text(data['email'],
+                      style:
+                          TextStyle(fontSize: 22, color: Colors.grey.shade700)),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildLogoutButton(context),
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              WidgetSpan(
+                                  child: Icon(
+                                Icons.calendar_today,
+                                color: Colors.grey.shade700,
+                                size: 18,
+                              )),
+                              TextSpan(
+                                  text:
+                                      ' Joined ${formatDate(DateTime.parse(data['dateSignedUp']), [
+                                    MM,
+                                    ' ',
+                                    yyyy
+                                  ])}',
+                                  style: TextStyle(
+                                      color: Colors.grey.shade700,
+                                      fontSize: 18)),
+                            ],
+                          ),
+                        ),
+                      ]),
+                  Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                                text: data['recipeList'].length.toString(),
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(
+                                text: ' Recipes Created',
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.grey.shade700)),
+                          ],
+                        ),
+                      ),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                                text: data['favorites'].length.toString(),
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(
+                                text: ' Recipes Favorited',
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.grey.shade700)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              );
             }
         }
       },
@@ -53,16 +180,7 @@ class ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
     var user = Provider.of<UserProvider>(context, listen: false).user;
-    return SingleChildScrollView(
-      child: Container(
-          child: Column(children: [
-        Text(user.name,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28)),
-        SizedBox(height: 16),
-        _emailText(user.token),
-        SizedBox(height: 16),
-        _buildLogoutButton(context),
-      ])),
-    );
+    return Padding(
+        padding: const EdgeInsets.all(15.0), child: _accountInfo(user.token));
   }
 }

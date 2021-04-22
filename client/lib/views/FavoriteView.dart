@@ -45,7 +45,8 @@ class FavoriteViewState extends State<FavoriteView> {
             SizedBox(height: 8),
             Align(
                 alignment: Alignment.center,
-                child: Text('You have not liked any recipes'))
+                child: Text('You have not liked any recipes',
+                    style: TextStyle(color: Colors.grey.shade700)))
           ])
         : Scrollbar(
             child: GridView.builder(

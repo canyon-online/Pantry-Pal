@@ -45,7 +45,8 @@ class HomeViewState extends State<HomeView> {
             SizedBox(height: 8),
             Align(
                 alignment: Alignment.center,
-                child: Text('There does not exist any recipes'))
+                child: Text('There does not exist any recipes',
+                    style: TextStyle(color: Colors.grey.shade700)))
           ])
         : Scrollbar(
             child: GridView.builder(

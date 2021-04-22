@@ -45,7 +45,8 @@ class RecipeViewState extends State<RecipeView> {
             SizedBox(height: 8),
             Align(
                 alignment: Alignment.center,
-                child: Text('You have not created any recipes'))
+                child: Text('You have not created any recipes',
+                    style: TextStyle(color: Colors.grey.shade700)))
           ])
         : Scrollbar(
             child: GridView.builder(
