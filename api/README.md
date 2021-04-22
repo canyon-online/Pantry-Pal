@@ -1,7 +1,7 @@
 # 🌿 Pantry Pal API
 An API developed with Node.js utilizing MongoDB.
 
-[![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](http://testing.hasty.cc/api)
+[![Website shields.io](https://img.shields.io/website-up-down-green-red/http/pantrypal.hasty.cc.svg)](https://testing.hasty.cc/api)
 
 ## 🌟 Goals of this project
 *   To create an effective and secure application.
@@ -17,6 +17,7 @@ An API developed with Node.js utilizing MongoDB.
 | express             | 4.17.1  | Fast, unopinionated, minimalist web framework.                                                                                                         |
 | express-winston     | 4.1.0   | Winston middleware for express.js                                                                                                                      |
 | google-auth-library | 7.0.2   | Google APIs Authentication Client Library for Node.js                                                                                                  |
+| jasmine             | 3.7.0   | a package of helper code for developing Jasmine projects for Node.js                                                                                   |
 | jsonwebtoken        | 8.5.1   | JSON Web Token implementation (symmetric and asymmetric).                                                                                              |
 | mongoose            | 6.11.18 | Mongoose MongoDB ODM.                                                                                                                                  |
 | multer              | 1.4.2   | Middleware for handling multipart/form-data.                                                                                                           |

@@ -53,7 +53,7 @@ const recipeSchema = new mongoose.Schema({
         validate: {
             validator: function(v) {
                 // Check the format of the image provided
-                return /^\/images\/([A-Za-z0-9])*.png$/.test(v);
+                return v.length != 0 ? /^\/images\/([A-Za-z0-9])*.png$/.test(v) : true;
             },
             message: props => `${props.value} is not a valid image uri`
         }
