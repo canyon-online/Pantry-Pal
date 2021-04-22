@@ -116,6 +116,25 @@ beforeEach(function () {
           }
         }
       }
+    },
+
+    PayloadOrNull: function() {
+      return {
+        compare: function(actual, expected) {
+          var token = actual;
+          var pass = true;
+
+          // If the return value is not null but the JWT is null, return false
+          if (token != null && !expected)
+          {
+            pass = false;
+          }
+
+          return {
+            pass: pass
+          }
+        }
+      }
     }
   });
 
