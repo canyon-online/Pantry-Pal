@@ -76,7 +76,10 @@ class SearchViewState extends State<SearchView> {
               else
                 return SliverGrid(
                   delegate: SliverChildBuilderDelegate((context, index) {
-                    return RecipeCard(recipes[index]);
+                    return RecipeCard(
+                      recipes[index],
+                      duration: 100 * (index + 1),
+                    );
                   }, childCount: childCount),
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                       mainAxisExtent: 391,

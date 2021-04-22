@@ -30,8 +30,10 @@ class CreateViewState extends State<CreateView> {
     return TextFormField(
       controller: _name,
       maxLength: 64,
+
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
+        hintText: 'Enter a dish name',
         border: OutlineInputBorder(),
         contentPadding: EdgeInsets.only(left: 15.0),
       ),
@@ -55,8 +57,9 @@ class CreateViewState extends State<CreateView> {
       minLines: 5,
       maxLines: 10,
       decoration: InputDecoration(
+        hintText: 'To make this dish...',
         border: OutlineInputBorder(),
-        contentPadding: EdgeInsets.only(left: 15.0),
+        contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
       ),
       // The validator receives the text that the user has entered.
       validator: (value) {
@@ -74,7 +77,9 @@ class CreateViewState extends State<CreateView> {
       min: 1,
       max: 10,
       divisions: 10,
-      label: _currentSliderValue.round().toString(),
+      label: _currentSliderValue.round() == 10
+          ? '10+'
+          : _currentSliderValue.round().toString(),
       onChanged: (double value) {
         setState(() {
           _currentSliderValue = value;

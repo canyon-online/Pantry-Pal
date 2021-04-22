@@ -106,7 +106,9 @@ class RecipeModalState extends State<RecipeModal> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Icon(Icons.person, color: Colors.grey, size: 30),
-                  Text(widget.recipe.serves.toString()),
+                  Text(widget.recipe.serves == 10
+                      ? '10+'
+                      : widget.recipe.serves.toString()),
                 ],
               ),
             ],

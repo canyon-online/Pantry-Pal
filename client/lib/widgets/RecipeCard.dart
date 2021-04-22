@@ -9,19 +9,38 @@ import 'package:provider/provider.dart';
 
 class RecipeCard extends StatefulWidget {
   final Recipe recipe;
-  const RecipeCard(this.recipe);
+  final int duration;
+  const RecipeCard(this.recipe, {this.duration: 50});
 
   @override
   RecipeCardState createState() => RecipeCardState();
 }
 
-class RecipeCardState extends State<RecipeCard> {
+class RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
   late Recipe _recipe;
   bool _removed = false;
 
+  late final AnimationController _controller;
+
+  late final Animation<double> _animation = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.easeIn,
+  );
+
+  @override
   void initState() {
     super.initState();
     _recipe = widget.recipe;
+    _controller = AnimationController(
+      duration: Duration(milliseconds: widget.duration),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Widget _drawCardBody() {
@@ -104,6 +123,7 @@ class RecipeCardState extends State<RecipeCard> {
     }
 
     Widget _buildCard() {
+      _controller.forward();
       return Card(
           child: InkWell(
               onTap: () {
@@ -155,6 +175,8 @@ class RecipeCardState extends State<RecipeCard> {
               )));
     }
 
-    return _removed == false ? _buildCard() : SizedBox();
+    return _removed == false
+        ? FadeTransition(opacity: _animation, child: _buildCard())
+        : SizedBox();
   }
 }
