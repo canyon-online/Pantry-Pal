@@ -3,10 +3,8 @@ import 'package:client/utils/API.dart';
 import 'package:client/utils/AuthProvider.dart';
 import 'package:client/utils/UserProvider.dart';
 import 'package:client/views/CreateView.dart';
-import 'package:client/views/FavoriteView.dart';
 import 'package:client/views/HomeView.dart';
 import 'package:client/views/ProfileView.dart';
-import 'package:client/views/RecipeView.dart';
 import 'package:client/views/SearchView.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,9 +22,7 @@ class HomeState extends State<Home> {
     HomeView(),
     CreateView(),
     SearchView(),
-    ProfileView(),
-    FavoriteView(),
-    RecipeView(),
+    ProfileView()
   ];
 
   void onTabTapped(int index) {
@@ -137,28 +133,6 @@ class HomeState extends State<Home> {
                 : Icon(Icons.person_outline),
             onTap: () {
               onTabTapped(3);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            title: Text('Favorites'),
-            leading: _currentIndex == 4
-                ? Icon(Icons.favorite,
-                    color: Theme.of(context).colorScheme.primary)
-                : Icon(Icons.favorite_outline),
-            onTap: () {
-              onTabTapped(4);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            title: Text('Recipes'),
-            leading: _currentIndex == 5
-                ? Icon(Icons.food_bank,
-                    color: Theme.of(context).colorScheme.primary)
-                : Icon(Icons.food_bank_outlined),
-            onTap: () {
-              onTabTapped(5);
               Navigator.pop(context);
             },
           ),

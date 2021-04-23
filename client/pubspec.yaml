@@ -36,6 +36,7 @@ dependencies:
   image_picker_for_web: ^2.0.0
   image_picker_platform_interface: ^2.0.1
   http_parser: ^4.0.0
+  flutter_pagewise: ^2.0.1
   date_format: ^2.0.2
   # firebase_auth: ^1.0.1
   # cloud_firestore: ^1.0.3

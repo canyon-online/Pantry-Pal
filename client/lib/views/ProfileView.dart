@@ -1,186 +1,120 @@
+import 'package:client/models/Recipe.dart';
 import 'package:client/utils/API.dart';
-import 'package:client/utils/AuthProvider.dart';
-import 'package:client/utils/RouteNames.dart';
 import 'package:client/utils/UserProvider.dart';
-import 'package:date_format/date_format.dart';
+import 'package:client/widgets/AccountInfo.dart';
+import 'package:client/widgets/RecipeCard.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:provider/provider.dart';
 
 class ProfileView extends StatefulWidget {
+  final Widget _accountInfo = AccountInfo();
   @override
   ProfileViewState createState() => ProfileViewState();
 }
 
 // Creates a state class relating to the addRecipeForm widget
-class ProfileViewState extends State<ProfileView> {
-  Widget _buildLogoutButton(context) {
-    AuthProvider auth = Provider.of<AuthProvider>(context);
+class ProfileViewState extends State<ProfileView>
+    with SingleTickerProviderStateMixin {
+  int _currentIndex = 0;
+  static const int _pageSize = 1;
+  late String _token;
+  late TabController _tabController;
+  late PagewiseLoadController<Recipe> _pageLoadController;
 
-    return ElevatedButton(
-      onPressed: () {
-        auth.logout();
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Logged out')));
-        Navigator.pushNamedAndRemoveUntil(
-            context, RouteName.LANDING, (_) => false);
-      },
-      child: Text('Logout'),
-    );
+  @override
+  void initState() {
+    super.initState();
+
+    _token = Provider.of<UserProvider>(context, listen: false).user.token;
+    _pageLoadController = PagewiseLoadController<Recipe>(
+        pageFuture: _getRecipes, pageSize: _pageSize);
+    _tabController =
+        new TabController(initialIndex: _currentIndex, length: 2, vsync: this)
+          ..addListener(_tabListener);
   }
 
-  Widget _buildCenteredIndicator() {
-    return Center(
-        child: SizedBox(
-      height: 50,
-      width: 50,
-      child: CircularProgressIndicator(),
-    ));
+  Future<List<Recipe>> _getRecipes(int? page) {
+    return _currentIndex == 0
+        ? API().getFavoriteRecipes(_token, page! * _pageSize, _pageSize)
+        : API().getMyRecipes(_token, page! * _pageSize, _pageSize);
   }
 
-  Widget _accountInfo(String token) {
-    return FutureBuilder(
-      future: API().getUserInfo(token),
-      builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-            return Padding(
-                padding: EdgeInsets.all(10), child: _buildCenteredIndicator());
-          default:
-            if (snapshot.hasError)
-              return Text('Error: ${snapshot.error}',
-                  style: TextStyle(fontSize: 32));
-            else {
-              var data = Map.from(snapshot.data!);
-              print(data);
+  void _tabListener() {
+    if (!_tabController.indexIsChanging) {
+      setState(() {
+        _currentIndex = _tabController.index;
+        _pageLoadController.reset();
+      });
+    }
+  }
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      data['avatar'] != null
-                          ? CircleAvatar(
-                              radius: 22,
-                              backgroundImage: NetworkImage(data['avatar']),
-                            )
-                          : CircleAvatar(
-                              radius: 22,
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              child: Text(
-                                  data['display'].toString().substring(0, 2)),
-                            ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                                text: '${data['display']} ',
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 38)),
-                            WidgetSpan(
-                              child: data['verified'] == true
-                                  ? Icon(
-                                      Icons.verified,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                      size: 38,
-                                    )
-                                  : SizedBox(),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                  Text(data['email'],
-                      style:
-                          TextStyle(fontSize: 22, color: Colors.grey.shade700)),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildLogoutButton(context),
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              WidgetSpan(
-                                  child: Icon(
-                                Icons.calendar_today,
-                                color: Colors.grey.shade700,
-                                size: 18,
-                              )),
-                              TextSpan(
-                                  text:
-                                      ' Joined ${formatDate(DateTime.parse(data['dateSignedUp']), [
-                                    MM,
-                                    ' ',
-                                    yyyy
-                                  ])}',
-                                  style: TextStyle(
-                                      color: Colors.grey.shade700,
-                                      fontSize: 18)),
-                            ],
-                          ),
-                        ),
-                      ]),
-                  Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                                text: data['recipeList'].length.toString(),
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold)),
-                            TextSpan(
-                                text: ' Recipes Created',
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.grey.shade700)),
-                          ],
-                        ),
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                                text: data['favorites'].length.toString(),
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold)),
-                            TextSpan(
-                                text: ' Recipes Favorited',
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.grey.shade700)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            }
-        }
-      },
-    );
+  @override
+  void dispose() {
+    _tabController.removeListener(_tabListener);
+    _tabController.dispose();
+    _pageLoadController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    var user = Provider.of<UserProvider>(context, listen: false).user;
-    return Padding(
-        padding: const EdgeInsets.all(15.0), child: _accountInfo(user.token));
+    return CustomScrollView(
+      shrinkWrap: true,
+      slivers: <Widget>[
+        SliverList(
+            delegate: SliverChildListDelegate([
+          widget._accountInfo,
+          TabBar(
+            controller: _tabController,
+            tabs: [
+              Tab(
+                icon: _currentIndex == 0
+                    ? Icon(Icons.favorite,
+                        color: Theme.of(context).colorScheme.primary)
+                    : Icon(
+                        Icons.favorite_outline,
+                        color: Colors.grey,
+                      ),
+              ),
+              Tab(
+                icon: _currentIndex == 1
+                    ? Icon(Icons.food_bank,
+                        color: Theme.of(context).colorScheme.primary)
+                    : Icon(
+                        Icons.food_bank_outlined,
+                        color: Colors.grey,
+                      ),
+              )
+            ],
+          ),
+        ])),
+        PagewiseSliverGrid<Recipe>.extent(
+          maxCrossAxisExtent: 500,
+          childAspectRatio: 410 / 391,
+          mainAxisSpacing: 30,
+          crossAxisSpacing: 30,
+          pageLoadController: _pageLoadController,
+          showRetry: false,
+          noItemsFoundBuilder: (context) {
+            return Text(
+                _currentIndex == 0
+                    ? 'You have not liked any recipes'
+                    : 'You have not created any recipes',
+                style: TextStyle(color: Colors.grey.shade700));
+          },
+          errorBuilder: (context, error) {
+            return Text('Error: $error',
+                style: TextStyle(color: Colors.grey.shade700));
+          },
+          itemBuilder: (context, Recipe entry, index) {
+            return RecipeCard(
+              entry,
+              duration: 300,
+            );
+          },
+        )
+      ],
+    );
   }
 }

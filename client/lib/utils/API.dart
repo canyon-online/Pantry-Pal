@@ -123,7 +123,6 @@ class API {
     var response = await http.get(
         Uri.https(API.baseURL, API.favoriteRecipes, params),
         headers: {HttpHeaders.authorizationHeader: 'bearer $token'});
-
     // Return a list of the recipes fetched as recipe objects.
     List<dynamic> recipes = jsonDecode(response.body)['recipes'];
     return recipes.map<Recipe>((item) => Recipe.fromMap(item)).toList();
