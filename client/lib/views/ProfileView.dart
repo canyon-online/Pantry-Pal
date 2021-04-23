@@ -108,10 +108,7 @@ class ProfileViewState extends State<ProfileView>
                 style: TextStyle(color: Colors.grey.shade700));
           },
           itemBuilder: (context, Recipe entry, index) {
-            return RecipeCard(
-              entry,
-              duration: 300,
-            );
+            return RecipeCard(entry);
           },
         )
       ],

@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 class RecipeCard extends StatefulWidget {
   final Recipe recipe;
   final int duration;
-  const RecipeCard(this.recipe, {this.duration: 50});
+  const RecipeCard(this.recipe, {this.duration: 300});
 
   @override
   RecipeCardState createState() => RecipeCardState();

@@ -56,10 +56,7 @@ class HomeViewState extends State<HomeView> {
               itemCount: _recipes.length > 0 ? _recipes.length : limit,
               itemBuilder: (context, index) {
                 return _recipes.length > 0
-                    ? RecipeCard(
-                        _recipes[index],
-                        duration: 100 * (index + 1),
-                      )
+                    ? RecipeCard(_recipes[index])
                     : SizedBox();
               },
               gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
