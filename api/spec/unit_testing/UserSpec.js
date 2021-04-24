@@ -3,6 +3,7 @@ const { handleUserQueryErrors } = require('../../routes/users');
 describe("User", function() {
     const User = require('../../routes/users');
     const userSchema = require('../../models/user');
+    const Response = require('../test_models/res');
 
     // Test response and user objects
     var res, user;

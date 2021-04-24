@@ -2,6 +2,7 @@ describe("JWT library", function() {
     // Our "wrapper" library we are testing
     var JWTLib = require('../../routes/lib/jwtUtils');
     var userSchema = require('../../models/user');
+    const Response = require('../test_models/res');
 
     // Test response and user objects
     var res, user;
