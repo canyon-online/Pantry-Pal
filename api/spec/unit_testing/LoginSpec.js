@@ -55,10 +55,5 @@ describe("Login", function() {
             expect(res.body).not.toEqual(undefined)
         });
     });
-
-    // Testing the loginLocal function
-    // Slightly less of a "unit test"
-    describe("locally", function() {
-
-    });
+    
 });

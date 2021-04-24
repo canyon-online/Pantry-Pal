@@ -1,6 +1,7 @@
 describe("JWT library", function() {
     // Our "wrapper" library we are testing
     var JWTLib = require('../../routes/lib/jwtUtils');
+    var userSchema = require('../../models/user');
 
     // Test response and user objects
     var res, user;
@@ -22,7 +23,7 @@ describe("JWT library", function() {
     });
 
     // Create a token, so we can use the verification functions after successfully generating one
-    var token, verify;
+    var token, nullToken = null, verify;
 
     it("should generate and sign a JWT", function() {
         // Generate a JWT using the three parameters
@@ -36,37 +37,19 @@ describe("JWT library", function() {
         expect(token).toHavePayload({ userId: JWTVals.userId, name: JWTVals.name, verified: JWTVals.verified });
     });
 
-    it("should verify a JWT and return either null or the token payload", function() {
-        // Generate a JWT using the three parameters
-        token = JWTLib.generateJWT(JWTVals.userId, JWTVals.name, JWTVals.verified);
-
+    it("should verify a JWT and return the token payload", function() {
         // Store the return value of the verifyJWT function
         verify = JWTLib.verifyJWT(token);
 
-        // We expect the payload to be returned if it isn't null
-        expect(verify).PayloadOrNull(token);
+        // We expect the payload to be returned
+        expect(verify).toHavePayload({ userId: JWTVals.userId, name: JWTVals.name, verified: JWTVals.verified });
     });
 
-    it("should refresh a valid JWT", function() {
-        // Generate a JWT using the three parameters
-        token = JWTLib.generateJWT(JWTVals.userId, JWTVals.name, JWTVals.verified);
+    it("should verify a JWT and return null", function() {
+        // Store the return value of the verifyJWT function
+        verify = JWTLib.verifyJWT(nullToken);
 
-        // Refresh the generated JWT
-        JWTLib.refreshJWT(token, res);
-
-        // We expect there to be an algorithm and payload if the JWT is valid
-
+        // We expect the return value to be null
+        expect(verify).toEqual(null);
     });
-
-    //im not sure what we need to expect here
-    it("should generate and send a JWT in the body of a response", function() {
-        //
-        JWTLib.sendTokenBody(user, res);
-    });
-
-    it("should generate and send a JWT and refresh token in a reponse body", function() {
-        //
-        JWTLib.sendLoginBody(user, res);
-    });
-
 });
