@@ -12,9 +12,9 @@ describe("Search", function() {
 
     it("should search various models", function() {
         // Search the recipe model and save the return value
-        token = Search.search(Recipe, req);
+        token = Search(Recipe, req);
 
         // We expect the query to not be null
-        expect(token).toNotEqual(null);
+        expect(token).not.toEqual(null);
     });
 });

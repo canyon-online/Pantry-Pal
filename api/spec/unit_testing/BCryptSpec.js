@@ -3,7 +3,7 @@ describe("BCryptUtil", function() {
 
     // Create password constants to test encrypt and compare functions
     const password = "password";
-    const falsePassword;
+    const falsePassword = "passyword";
 
     // Create hashedPassword var to test encrypt and compare functions
     var hashedPassword;
@@ -11,8 +11,8 @@ describe("BCryptUtil", function() {
     it("should encrypt a given password", function() {
         // Encrypt the given password
         hashedPassword = Bcrypt.encryptPassword(password, function(err, hashedPassword) {
-            expect(err).notToEqual(null);
-            expect(hashedPassword.notToEqual(null));
+            expect(err).toBeNull();
+            expect(hashedPassword).toBeDefined();
         });
     });
 

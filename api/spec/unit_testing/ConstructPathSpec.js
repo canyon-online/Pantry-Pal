@@ -12,6 +12,6 @@ describe("Construct Path", function() {
         construct = ConstructPath(pathRoot, path);
 
         // We expect the return value to equal pathRoot + path
-        expect(construct).toBeEqual(pathRoot + path);
+        expect(construct).toEqual(pathRoot + path);
     });
 });

@@ -119,7 +119,7 @@ recipeSchema.post('delete', async function(recipe) {
 
     // Also update the user's recipe list to indicate removal
     User.findByIdAndUpdate(recipe.author, {
-        $pull: { recipeList: this._id }
+        $pull: { recipeList: recipe._id }
     }, function(err, user) {
         if (err)
             throw new Error(err);

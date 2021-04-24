@@ -22,7 +22,7 @@ describe("User", function() {
         handleUserQueryErrors(yesError, user, res, function(){});
 
         // We expect the res status to be 422
-        expect(res.status).toEqual(422);
+        expect(res.statusCode).toEqual(422);
     });
 
     it("should not catch an error", function() {
@@ -30,7 +30,7 @@ describe("User", function() {
         handleUserQueryErrors(err, user, res, function(){});
 
         // We expect the res status to be 200
-        expect(res.status).toEqual(200);
+        expect(res.statusCode).toEqual(200);
     });
 
     it("should catch no user", function() {
@@ -38,7 +38,7 @@ describe("User", function() {
         handleUserQueryErrors(err, null, res, function(){});
 
         // We expect the res status to be 404
-        expect(res.status).toEqual(404);
+        expect(res.statusCode).toEqual(404);
     });
 
     it("should catch a user", function() {
@@ -46,6 +46,6 @@ describe("User", function() {
         handleUserQueryErrors(err, user, res, function(){});
 
         // We expect the res status to be 200
-        expect(res.status).toEqual(200);
+        expect(res.statusCode).toEqual(200);
     });
 });
