@@ -98,7 +98,7 @@ recipeSchema.pre('validate', function(next) {
 
 // On successful save, mark the indicated image as used so it won't be deleted
 // Also update the user's recipe list with the new recipe
-recipeSchema.post('save', async function(recipe) {
+recipeSchema.post('save', async function(recipe, next) {
     const image = recipe.image;
     await Image.findOneAndUpdate({ uriLocation: image }, { unused: false });
 
@@ -109,11 +109,11 @@ recipeSchema.post('save', async function(recipe) {
             throw new Error(err);
     });
 
-    return;
+    next();
 });
 
 // On intent to delete a recipe, mark the indicated image as unused so it will be deleted
-recipeSchema.post('delete', async function(recipe) {
+recipeSchema.post('remove', { document: true, query: true }, async function(recipe, next) {
     const image = recipe.image;
     await Image.findOneAndUpdate({ uriLocation: image }, { unused: true });
 
