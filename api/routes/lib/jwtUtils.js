@@ -1,6 +1,5 @@
 // Import the JWT library
 const jwt = require('jsonwebtoken');
-const refreshToken = require('../../models/refreshToken.js');
 
 // Import the refreshToken object
 const RefreshToken = require('../../models/refreshToken.js');
@@ -27,9 +26,20 @@ function verifyJWT(token) {
     try {
         return jwt.verify(token, jwtKey);
     } catch(err) {
-        console.log(err);
         return null;
     }
+}
+
+// Refresh a currently valid JWT, returns true if the token is valid and not expired
+function isValidJWT(token) {
+    // Only refresh valid tokens
+    const payload = verifyJWT(token);
+
+    if (payload) {
+        return true;
+    }
+    
+    return false;
 }
 
 // Generate a refresh token, should only be done on login
@@ -79,6 +89,7 @@ module.exports = {
     generateRefreshToken: generateRefreshToken,
     sendJWTBody: sendTokenBody,
     sendLoginBody: sendLoginBody,
+    isValidJWT: isValidJWT,
     verifyJWT: verifyJWT,
 
     maxAge: jwtExpiryTime

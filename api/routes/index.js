@@ -12,10 +12,13 @@ authenticatedRouter.use(async function(req, res, next) {
     if (req.headers.authorization) {
         // Extract the token from the header
         const token = req.headers.authorization.split(' ')[1];
-
-        // Attempt to refresh the current JWT if it is valid
-        const success = jwt.verifyJWT(token);
-
+        if (!token) {
+            res.status(401).json({ error: "The passed authenticaton token is invalid" });
+            return;
+        }
+        console.log(token)
+        // Check whether or not the JWT is valid in form
+        const success = jwt.isValidJWT(token);
         if (!success) {
             res.status(401).json({ error: "The passed authenticaton token is invalid" });
             return;
@@ -46,8 +49,19 @@ router.use(function(req, res, next) {
     if (req.headers.authorization) {
         // Extract the token from the header
         const token = req.headers.authorization.split(' ')[1];
+        if (!token) {
+            next();
+            return;
+        }
 
         // Use the token to obtain the userId
+        const success = jwt.isValidJWT(token);
+        if (!success) {
+            next();
+            return;
+        }
+
+        // If the user is not in the process of verification, ensure that the user is verified
         const { userId } = jwt.verifyJWT(token);
 
         // If the user is logged in, include the userId in the header so future endpoints can get it
