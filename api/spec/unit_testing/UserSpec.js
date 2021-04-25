@@ -1,7 +1,5 @@
-const { handleUserQueryErrors } = require('../../routes/users');
-
 describe("User", function() {
-    const User = require('../../routes/users');
+    const Users = require('../../routes/users');
     const userSchema = require('../../models/user');
     const Response = require('../test_models/res');
 
@@ -19,7 +17,7 @@ describe("User", function() {
 
     it("should catch an error", function() {
         // Call function with an error
-        handleUserQueryErrors(yesError, user, res, function(){});
+        Users.handleUserQueryErrors(yesError, user, res, function(){});
 
         // We expect the res status to be 422
         expect(res.statusCode).toEqual(422);
@@ -27,7 +25,7 @@ describe("User", function() {
 
     it("should not catch an error", function() {
         // Call function without an error
-        handleUserQueryErrors(err, user, res, function(){});
+        Users.handleUserQueryErrors(err, user, res, function(){});
 
         // We expect the res status to be 200
         expect(res.statusCode).toEqual(200);
@@ -35,7 +33,7 @@ describe("User", function() {
 
     it("should catch no user", function() {
         // Call function without a user
-        handleUserQueryErrors(err, null, res, function(){});
+        Users.handleUserQueryErrors(err, null, res, function(){});
 
         // We expect the res status to be 404
         expect(res.statusCode).toEqual(404);
@@ -43,7 +41,7 @@ describe("User", function() {
 
     it("should catch a user", function() {
         // Call function with a user
-        handleUserQueryErrors(err, user, res, function(){});
+        Users.handleUserQueryErrors(err, user, res, function(){});
 
         // We expect the res status to be 200
         expect(res.statusCode).toEqual(200);

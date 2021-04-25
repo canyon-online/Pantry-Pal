@@ -55,23 +55,27 @@ describe("EmailUtils", function() {
     });
 
     // Testing these actual email functions might not be conducive to actual functionality on non-production machines
-    it("should send a verification email to the user", function() {
+    it("should send a verification email to the user", function(done) {
         // Send a verification email to a user, this returns a promise
         promise = EmailLib.sendVerificationEmail(EmailVals.id, EmailVals.name, EmailVals.email);
 
         promise.then(function(success) {
             // We expect this to be successful in all cases, if emailing is set up correctly
             expect(success).toEqual(true);
+
+            done();
         });
     });
 
-    it("should send a 'forgot password' email to the user", function() {
+    it("should send a 'forgot password' email to the user", function(done) {
         // Send a 'forgot password' email to a user, this returns a promise
         promise = EmailLib.sendForgotPasswordEmail(EmailVals.id, EmailVals.name, EmailVals.email);
 
         promise.then(function(success) {
             // We expect this to be successful in all cases, if emailing is set up correctly
             expect(success).toEqual(true);
+
+            done();
         });
     });
 });
