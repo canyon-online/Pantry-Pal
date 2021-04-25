@@ -3,6 +3,10 @@ describe("Recipes", function() {
     const Recipe = require('../../models/recipe');
     const Recipes = require('../../routes/recipes');
 
+    // Import the user and ingredient initialization so we have the ids
+    const IngInit = require('../helpers/db_setup/ingredients.init');
+    const UInit = require('../helpers/db_setup/users.init');
+
     var recipe;
 
     // Recipe template object (should pass validation)
@@ -10,8 +14,8 @@ describe("Recipes", function() {
         name: "Long Name",
         directions: "Directions",
         image: "",
-        author: "6057ea36feb239464ca2f076", // atm these are kind of magic numbers, really need to make a helper for this probably
-        ingredients: ["6063ede90cafeb2ca0abc729"],
+        author: UInit.userId, // "magic" id that is created with init scripts
+        ingredients: [IngInit.ingredientId],
     };
 
     it("should populate the recipe list for an unautheticated user", async function() {

@@ -43,7 +43,7 @@ describe("JWT library", function() {
         verify = JWTLib.verifyJWT(token);
 
         // We expect the payload to be returned
-        expect(verify).toHavePayload({ userId: JWTVals.userId, name: JWTVals.name, verified: JWTVals.verified });
+        expect(verify.userId).toEqual(JWTVals.userId);
     });
 
     it("should verify a JWT and return null", function() {
@@ -51,6 +51,6 @@ describe("JWT library", function() {
         verify = JWTLib.verifyJWT(nullToken);
 
         // We expect the return value to be null
-        expect(verify).toEqual(null);
+        expect(verify).toBeNull();
     });
 });

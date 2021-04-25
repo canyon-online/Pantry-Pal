@@ -2,8 +2,9 @@ describe("Construct Path", function() {
     const ConstructPath = require('../../routes/lib/constructpath');
 
     // Create test pathRoot and path constants
-    const pathRoot = "20";
-    const path = "20";
+    const pathRoot = "/var";
+    const path = "/www";
+    const concatPath = "/var/www";
 
     // Create test construct variable
     var construct;
@@ -12,6 +13,6 @@ describe("Construct Path", function() {
         construct = ConstructPath(pathRoot, path);
 
         // We expect the return value to equal pathRoot + path
-        expect(construct).toEqual(pathRoot + path);
+        expect(construct).toEqual(concatPath);
     });
 });

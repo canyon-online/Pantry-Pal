@@ -5,29 +5,39 @@ describe("BCryptUtil", function() {
     const password = "password";
     const falsePassword = "passyword";
 
-    // Create hashedPassword var to test encrypt and compare functions
-    var hashedPassword;
+    // Create hashword var to test encrypt and compare functions
+    var hashword;
 
+    // Due to the asynchronous nature of these functions, testing is a bit finnicky and hard to write
     it("should encrypt a given password", function() {
         // Encrypt the given password
-        hashedPassword = Bcrypt.encryptPassword(password, function(err, hashedPassword) {
+        Bcrypt.encryptPassword(password, function(err, hashedPassword) {
             expect(err).toBeNull();
             expect(hashedPassword).toBeDefined();
+        
+            hashword = hashedPassword;
         });
     });
 
     // Test a password that matches the hashword
-    it("should positively match password", function() {
-        // Compare the password to the hashedPassword, we expect for the match to be true
-        Bcrypt.comparePassword(password, hashedPassword, function(err, doPasswordsMatch) {
-            expect(doPasswordsMatch).toEqual(true);
-        });
+    // We wrap the contents of this in a timeout to help ensure that the promise above is fulfilled
+    // This is a really poor way of handling this but I'm unfamiliar with how to deal with asynchronicity
+    it("should positively match passwords", function() {
+        setTimeout(function() {
+            // Compare the password to the hashedPassword, we expect for the match to be true
+            Bcrypt.comparePassword(password, hashword, function(err, doPasswordsMatch) {
+                expect(err).toBeNull();
+                expect(doPasswordsMatch).toEqual(true);
+            });
+        }, 1000);
     });
 
     // Test a password that doesn't match the hashword
-    it("should negatively match password", function() {
+    // We don't have to wrap this in a timeout because the synchronous nature of test case execution
+    it("should fail to match incorrect passwords", function() {
         // Compare the false password to the hashedPassword, we expect for the match to be false
-        Bcrypt.comparePassword(falsePassword, hashedPassword, function(err, doPasswordsMatch) {
+        Bcrypt.comparePassword(falsePassword, hashword, function(err, doPasswordsMatch) {
+            expect(err).not.toBeNull();
             expect(doPasswordsMatch).toEqual(false);
         });
     });

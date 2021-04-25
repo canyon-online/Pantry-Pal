@@ -1,7 +1,6 @@
 // Import libraries for handling JWTs and emailing
 const bcryptUtil = require('../routes/lib/bcryptUtil');
 const emailUtil = require('../routes/lib/emailUtils');
-const jwt = require('./lib/jwtUtils');
 const mongoose = require('mongoose');
 
 // Import the relevant models

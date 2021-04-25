@@ -36,7 +36,6 @@ describe("EmailUtils", function() {
         });
             
         expect(token).not.toEqual(undefined);
-
     });
 
     it("should robustly generate verification codes", function() {
