@@ -1,5 +1,4 @@
 // Import libraries for handling database operations
-const mongoose = require('mongoose');
 const search = require('./lib/search');
 const validateObjectId = require('./lib/validateObjectId');
 
@@ -84,7 +83,7 @@ function authenticatedActions(router) {
     // GET /, returns list of users matching given query parameters
     router.get(constructPath(endpointPath, '/'), async function(req, res) {
         // Strip the search fields of any risky search parameters
-        req.query = stripUnsafeQuery(query);
+        req.query = stripUnsafeQuery(req.query);
 
         const { totalRecords, query } = await search(User, req);
 

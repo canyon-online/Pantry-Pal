@@ -32,23 +32,6 @@ function verifyJWT(token) {
     }
 }
 
-// Refresh a currently valid JWT, returns true if the token is valid and not expired
-function refreshJWT(token, res) {
-    // Only refresh valid tokens
-    const payload = verifyJWT(token);
-
-    if (payload) {
-        const newToken = jwt.sign(payload, jwtKey, {
-            algorithm: 'HS256'
-        });
-
-
-        return true;
-    }
-    
-    return false;
-}
-
 // Generate a refresh token, should only be done on login
 function generateRefreshToken(uid) {
     // Generate a token with a simple random string in it
@@ -96,7 +79,6 @@ module.exports = {
     generateRefreshToken: generateRefreshToken,
     sendJWTBody: sendTokenBody,
     sendLoginBody: sendLoginBody,
-    refreshJWT: refreshJWT,
     verifyJWT: verifyJWT,
 
     maxAge: jwtExpiryTime

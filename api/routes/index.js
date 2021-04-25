@@ -14,7 +14,7 @@ authenticatedRouter.use(async function(req, res, next) {
         const token = req.headers.authorization.split(' ')[1];
 
         // Attempt to refresh the current JWT if it is valid
-        const success = jwt.refreshJWT(token, res);
+        const success = jwt.verifyJWT(token);
 
         if (!success) {
             res.status(401).json({ error: "The passed authenticaton token is invalid" });

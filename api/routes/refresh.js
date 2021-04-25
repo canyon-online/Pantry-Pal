@@ -21,7 +21,7 @@ function safeActions(router) {
         }
 
         // Check if the token exists in the database
-        const rToken = RefreshToken.findOneAndUpdate({ token: req.body.refreshToken }, { $inc: { 'uses': 1 } }, { new: true }, async function(err, token) {
+        RefreshToken.findOneAndUpdate({ token: req.body.refreshToken }, { $inc: { 'uses': 1 } }, { new: true }, async function(err, token) {
             // Token does not exist
             if (!token) {
                 res.status(401).json({ error: "Invalid refresh token" });
