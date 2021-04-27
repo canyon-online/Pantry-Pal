@@ -37,6 +37,7 @@ class IngredientSelecterState extends State<IngredientSelecter> {
         contentPadding: EdgeInsets.fromLTRB(12, 12, 8, 0),
         labelText: 'Search an ingredient',
       ),
+      isFilteredOnline: true,
       onFind: (String filter) async {
         return API().getIngredients(token, filter);
       },

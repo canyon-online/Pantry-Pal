@@ -42,7 +42,7 @@ class CreateViewState extends State<CreateView> {
         value = value?.trim().capitalizeFirstofEach ?? '';
         if (value.length <= 0)
           return 'Please enter a dish name';
-        else if (value.length < 4) return 'Please enter a valid dish name';
+        else if (value.length < 4) return 'Please enter a longer dish name';
         return null;
       },
     );
@@ -65,6 +65,8 @@ class CreateViewState extends State<CreateView> {
       validator: (value) {
         if (value?.isEmpty ?? false)
           return 'Please enter the recipe directions';
+        else if (value!.length < 20)
+          return 'Directions must be at least 20 characters';
 
         return null;
       },
