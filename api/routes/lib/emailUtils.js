@@ -88,7 +88,7 @@ async function sendForgotPasswordEmail(id, name, email) {
         return true;
     
     await transporter.sendMail({
-        from: '"PantryPal" <no-reply@${process.env.MAIL_SERVER}>',
+        from: `"PantryPal" <no-reply@${process.env.MAIL_SERVER}>`,
         to: email,
         subject: 'Forgot Password',
         text: `Hello ${name}, your code is ${verifCode}`,
