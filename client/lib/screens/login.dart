@@ -1,10 +1,10 @@
-import 'package:client/utils/UserProvider.dart';
-import 'package:client/widgets/GoogleSignIn.dart';
+import 'package:pantrypal/utils/UserProvider.dart';
+import 'package:pantrypal/widgets/GoogleSignIn.dart';
 import 'package:flutter/material.dart';
-import 'package:client/utils/AuthProvider.dart';
-import 'package:client/utils/RouteNames.dart';
-import 'package:client/widgets/InputBox.dart';
-import 'package:client/utils/StringValidator.dart';
+import 'package:pantrypal/utils/AuthProvider.dart';
+import 'package:pantrypal/utils/RouteNames.dart';
+import 'package:pantrypal/widgets/InputBox.dart';
+import 'package:pantrypal/utils/StringValidator.dart';
 import 'package:provider/provider.dart';
 
 // Login page class that extends stateless widget because it won't change itself.

@@ -1,8 +1,8 @@
-import 'package:client/models/Recipe.dart';
-import 'package:client/utils/API.dart';
-import 'package:client/utils/UserProvider.dart';
-import 'package:client/widgets/AccountInfo.dart';
-import 'package:client/widgets/RecipeCard.dart';
+import 'package:pantrypal/models/Recipe.dart';
+import 'package:pantrypal/utils/API.dart';
+import 'package:pantrypal/utils/UserProvider.dart';
+import 'package:pantrypal/widgets/AccountInfo.dart';
+import 'package:pantrypal/widgets/RecipeCard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:provider/provider.dart';

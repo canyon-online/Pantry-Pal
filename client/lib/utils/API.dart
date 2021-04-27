@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
-import 'package:client/models/Ingredient.dart';
-import 'package:client/models/Recipe.dart';
+import 'package:pantrypal/models/Ingredient.dart';
+import 'package:pantrypal/models/Recipe.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';

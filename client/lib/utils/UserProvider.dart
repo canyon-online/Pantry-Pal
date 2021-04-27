@@ -1,4 +1,4 @@
-import 'package:client/models/User.dart';
+import 'package:pantrypal/models/User.dart';
 import 'package:flutter/material.dart';
 
 class UserProvider with ChangeNotifier {

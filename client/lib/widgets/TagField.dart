@@ -1,5 +1,5 @@
-import 'package:client/widgets/TextPill.dart';
-import 'package:client/utils/StringCap.dart';
+import 'package:pantrypal/widgets/TextPill.dart';
+import 'package:pantrypal/utils/StringCap.dart';
 import 'package:flutter/material.dart';
 
 class TagFieldController {

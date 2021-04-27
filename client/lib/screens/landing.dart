@@ -1,4 +1,4 @@
-import 'package:client/utils/RouteNames.dart';
+import 'package:pantrypal/utils/RouteNames.dart';
 import 'package:flutter/material.dart';
 
 // Landing page class that extends stateless widget because it won't change itself.

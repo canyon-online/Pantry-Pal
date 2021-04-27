@@ -1,8 +1,8 @@
-import 'package:client/utils/API.dart';
-import 'package:client/utils/RouteNames.dart';
-import 'package:client/widgets/InputBox.dart';
+import 'package:pantrypal/utils/API.dart';
+import 'package:pantrypal/utils/RouteNames.dart';
+import 'package:pantrypal/widgets/InputBox.dart';
 import 'package:flutter/material.dart';
-import 'package:client/utils/StringValidator.dart';
+import 'package:pantrypal/utils/StringValidator.dart';
 
 enum Step { email, verification }
 

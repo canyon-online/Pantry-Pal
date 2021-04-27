@@ -1,7 +1,7 @@
-import 'package:client/utils/API.dart';
-import 'package:client/utils/AuthProvider.dart';
-import 'package:client/utils/RouteNames.dart';
-import 'package:client/utils/UserProvider.dart';
+import 'package:pantrypal/utils/API.dart';
+import 'package:pantrypal/utils/AuthProvider.dart';
+import 'package:pantrypal/utils/RouteNames.dart';
+import 'package:pantrypal/utils/UserProvider.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

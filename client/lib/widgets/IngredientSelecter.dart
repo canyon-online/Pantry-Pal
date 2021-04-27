@@ -1,8 +1,8 @@
-import 'package:client/models/Ingredient.dart';
-import 'package:client/utils/API.dart';
-import 'package:client/utils/IngredientModel.dart';
-import 'package:client/utils/UserProvider.dart';
-import 'package:client/widgets/TextPill.dart';
+import 'package:pantrypal/models/Ingredient.dart';
+import 'package:pantrypal/utils/API.dart';
+import 'package:pantrypal/utils/IngredientModel.dart';
+import 'package:pantrypal/utils/UserProvider.dart';
+import 'package:pantrypal/widgets/TextPill.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

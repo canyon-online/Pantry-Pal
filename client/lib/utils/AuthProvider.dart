@@ -5,11 +5,11 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:client/models/User.dart';
-import 'package:client/utils/API.dart';
+import 'package:pantrypal/models/User.dart';
+import 'package:pantrypal/utils/API.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
-import 'package:client/utils/UserPreference.dart';
+import 'package:pantrypal/utils/UserPreference.dart';
 
 enum Status {
   // _verificationStatus

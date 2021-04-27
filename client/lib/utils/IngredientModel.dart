@@ -1,4 +1,4 @@
-import 'package:client/models/Ingredient.dart';
+import 'package:pantrypal/models/Ingredient.dart';
 import 'package:flutter/cupertino.dart';
 
 class IngredientModel extends ChangeNotifier {
