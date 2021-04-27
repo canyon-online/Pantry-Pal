@@ -1,3 +1,4 @@
+
 # 🌿 Pantry Pal
 A full stack web and mobile app developed with Flutter, Node.js, and MongoDB; this application is a recipe sharing social media site.
 
@@ -5,11 +6,34 @@ A full stack web and mobile app developed with Flutter, Node.js, and MongoDB; th
 [![GitHub contributors](https://img.shields.io/github/contributors/SPVTNIK-ONLINE/Pantry-Pal.svg)](https://github.com/SPVTNIK-ONLINE/Pantry-Pal/graphs/contributors)
 
 ## 🌟 Goals of this project
-*   To create an effective and secure application.
-*   Demonstrate mastery of object oreinted design.
-*   Show use of good design principles.
+* Work in a group environment on an application while performing all the steps associated with the object-oriented software development life cycle.
+* Write technical high-level design and detailed design of a software system.
+* Create an effective and secure application.
+* Prepare and successfully give an oral presentation of a software system design and operation of the class project deliverables.
 
 ## 🔨 Development
+Pantry Pal is originally developed for the Spring 2021 semester of UCF's COP 4331 course, Process of Object Oriented Software, taught by Dr. Rick Leinecker.
+
+### Technologies:
+* MongoDB, Express, Flutter, Node
+* Figma, GitHub, Google Sign-In, Android Studio, VS Code
+* Discord, Zoom, Doodle Poll
+
+### What went well:
+*   Project idea was decided early on, giving us a head start on development.
+* Using Flutter allowed us to build the mobile app and web app at the same time, making the two more cohesive and gave a time advantage.
+* Meeting twice a week helped keep everyone on the same page.
+
+### What did not go well
+* Better communication early on would’ve helped us accomplish goals sooner.
+* Using MongoDB instead of Firebase made backend development a bit more difficult.
+
+## 📸 Screenshots
+<img src="https://i.imgur.com/Y2UbuDw.jpg" alt="Log in" width="200"/> <img src="https://i.imgur.com/qSHBUkp.jpg" alt="Sign up" width="200"/> <img src="https://i.imgur.com/aaY156Z.jpg" alt="Recipe" width="200"/>
+
+<img src="https://i.imgur.com/j9BxTWq.jpg" alt="Create" width="200"/> <img src="https://i.imgur.com/Ajpu2jB.jpg" alt="Search" width="200"/> <img src="https://i.imgur.com/toB9TXA.jpg" alt="Profile" width="200"/>
+
+## 🔌 Plugins
 | Technology          | Version | End Point | Description                                                                                                                                            |
 |---------------------|---------|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
 | google_sign_in      | 5.0.1   | Front     | Flutter plugin for Google Sign-In, a secure authentication system for signing in with a Google account on Web, Android, and iOS.                       |
@@ -32,6 +56,5 @@ A full stack web and mobile app developed with Flutter, Node.js, and MongoDB; th
 | multer              | 1.4.2   | Back      | Middleware for handling multipart/form-data.                                                                                                           |
 | nodemailer          | 6.5.0   | Back      | Easy as cake e-mail sending from your Node.js applications.                                                                                            |
 | winston             | 3.0.0   | Back      | A logger for just about anything                                                                                                                       |
-## 📸 Screenshots
 
-## 🔌 Plugins
+Some plugins not listed may be found in `pubspec.yaml`.
