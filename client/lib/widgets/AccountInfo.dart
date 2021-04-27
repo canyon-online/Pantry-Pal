@@ -142,7 +142,9 @@ class AccountInfoState extends State<AccountInfo> {
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold)),
                             TextSpan(
-                                text: ' Recipes Favorited',
+                                text: data['favorites'].length == 1
+                                    ? ' Recipe Favorited'
+                                    : ' Recipes Favorited',
                                 style: TextStyle(
                                     fontSize: 18, color: Colors.grey.shade700)),
                           ],
@@ -158,7 +160,9 @@ class AccountInfoState extends State<AccountInfo> {
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold)),
                             TextSpan(
-                                text: ' Recipes Created',
+                                text: data['recipeList'].length == 1
+                                    ? ' Recipe Created'
+                                    : ' Recipes Created',
                                 style: TextStyle(
                                     fontSize: 18, color: Colors.grey.shade700)),
                           ],
