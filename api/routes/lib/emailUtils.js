@@ -27,7 +27,7 @@ const codeLength = process.env.CODE_LENGTH || 6;
 const doEmail = process.env.DO_EMAIL || 0;
 
 // Load the HTML file to use as a template for emails (if configured to do so)
-const emailTemplate = process.env.EMAIL_TEMPLATE ? fs.readFileSync(process.env.EMAIL_TEMPLATE) : "Hello ${name}, your code is ${verifCode}";
+const emailTemplate = process.env.EMAIL_TEMPLATE ? fs.readFileSync(process.env.EMAIL_TEMPLATE, 'utf8') : "Hello ${name}, your code is ${verifCode}";
 
 // Generate a verification code of N digits to be sent to a user
 function generateVerificationCode(digits, id, purpose) {

@@ -16,7 +16,7 @@ const recipeSchema = new mongoose.Schema({
         required: [true, "Recipe name is required"],
         validate: {
             validator: function(v) {
-                return /^[\p{L}\p{M}0-9-, ]{5,64}$/u.test(v);
+                return /^[\p{L}\p{M}0-9-, ]{2,64}$/u.test(v);
             },
             message: props => `${props.value} is not an accepted name`
         }
@@ -43,7 +43,7 @@ const recipeSchema = new mongoose.Schema({
         type: [String],
         validate: {
             validator: function(v) {
-                return /^[\p{L}\p{M}0-9-,  \p{Emoji_Presentation}]{0,16}$/u.test(v);
+                return /^[\p{L}\p{M}0-9-,  \p{Emoji_Presentation}]{0,32}$/u.test(v);
             },
             message: props => `${props.value} is not an accepted tag name`
         }
