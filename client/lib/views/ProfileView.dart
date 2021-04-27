@@ -96,6 +96,9 @@ class ProfileViewState extends State<ProfileView>
           crossAxisSpacing: 30,
           pageLoadController: _pageLoadController,
           showRetry: false,
+          loadingBuilder: (context) {
+            return SizedBox();
+          },
           noItemsFoundBuilder: (context) {
             return Text(
                 _currentIndex == 0
